@@ -1,5 +1,5 @@
 <script setup>
-defineEmits(['toggleSidebar', 'logout', 'profile'])
+defineEmits(['toggleSidebar', 'logout'])
 </script>
 
 <template>
@@ -17,13 +17,13 @@ defineEmits(['toggleSidebar', 'logout', 'profile'])
         <h1 class="brand-name">Modulex Billund Academy</h1>
       </div>
       <div class="navbar-right">
-        <button class="user-badge" @click="$emit('profile')">
+        <RouterLink to="/dashboard/profile" class="user-badge">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>
           </svg>
           <span>John Doe</span>
-        </button>
+        </RouterLink>
         <button class="logout-btn" @click="$emit('logout')">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -106,6 +106,7 @@ defineEmits(['toggleSidebar', 'logout', 'profile'])
   border-radius: 8px;
   font-size: 14px;
   color: var(--color-text);
+  text-decoration: none;
   cursor: pointer;
   transition: background-color 0.15s, color 0.15s;
 }
@@ -139,6 +140,12 @@ defineEmits(['toggleSidebar', 'logout', 'profile'])
 
 @media (max-width: 767px) {
   .logout-btn span {
+    display: none;
+  }
+}
+
+@media (max-width: 530px) {
+  .brand-name {
     display: none;
   }
 }

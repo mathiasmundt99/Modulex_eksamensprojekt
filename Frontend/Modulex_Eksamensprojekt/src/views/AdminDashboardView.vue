@@ -1,10 +1,8 @@
 <script setup>
 import { ref } from 'vue'
-import AdminNavbar    from '../components/AdminNavbar.vue'
-import AdminSidebar   from '../components/AdminSidebar.vue'
-import AdminDashboard from '../components/AdminDashboard.vue'
+import AdminNavbar  from '../components/AdminNavbar.vue'
+import AdminSidebar from '../components/AdminSidebar.vue'
 
-const activeTab  = ref('overview')
 const sidebarOpen = ref(false)
 
 function toggleSidebar() {
@@ -16,12 +14,10 @@ function toggleSidebar() {
   <div class="admin-dashboard">
     <AdminNavbar @toggleSidebar="toggleSidebar" @logout="() => {}" />
     <div class="admin-dashboard__layout">
-      <AdminSidebar
-        :activeTab="activeTab"
-        :sidebarOpen="sidebarOpen"
-        @update:activeTab="activeTab = $event; sidebarOpen = false"
-      />
-      <AdminDashboard :activeTab="activeTab" />
+      <AdminSidebar :sidebarOpen="sidebarOpen" @navigate="sidebarOpen = false" />
+      <main class="dashboard">
+        <RouterView />
+      </main>
     </div>
   </div>
 </template>
@@ -47,9 +43,13 @@ function toggleSidebar() {
 
 @media (max-width: 1023px) {
   .admin-dashboard__layout {
-    width: 100%;
     flex-direction: column;
-    padding: 24px;
   }
+}
+
+.dashboard {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
 }
 </style>

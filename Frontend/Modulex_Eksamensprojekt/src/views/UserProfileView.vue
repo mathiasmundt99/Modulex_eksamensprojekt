@@ -1,6 +1,8 @@
 <script setup>
+import { useRouter } from 'vue-router'
 import BaseButton from '../components/BaseButton.vue'
-defineEmits(['back'])
+
+const router = useRouter()
 
 const user = {
   firstName: 'John',
@@ -17,7 +19,7 @@ const user = {
 <template>
   <div class="profile">
     <div class="profile__header">
-      <BaseButton @click="$emit('back')">
+      <BaseButton @click="router.push('/dashboard/overview')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="15 18 9 12 15 6"/>
         </svg>

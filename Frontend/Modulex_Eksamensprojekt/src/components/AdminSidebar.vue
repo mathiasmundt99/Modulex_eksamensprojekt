@@ -1,16 +1,19 @@
 <script setup>
+import { useRoute } from 'vue-router'
+
 defineProps({
-  activeTab: { type: String, default: 'overview' },
   sidebarOpen: { type: Boolean, default: false }
 })
 
-defineEmits(['update:activeTab'])
+defineEmits(['navigate'])
+
+const route = useRoute()
 
 const navItems = [
-  { id: 'overview',  label: 'Overview',            icon: 'settings' },
-  { id: 'users',     label: 'Manage Users',         icon: 'users' },
-  { id: 'content',   label: 'Content Library',      icon: 'upload' },
-  { id: 'courses',   label: 'Courses & Packages',   icon: 'book' }
+  { to: '/admin/overview', label: 'Overview',          icon: 'settings' },
+  { to: '/admin/users',    label: 'Manage Users',       icon: 'users' },
+  { to: '/admin/content',  label: 'Content Library',    icon: 'upload' },
+  { to: '/admin/courses',  label: 'Courses & Packages', icon: 'book' }
 ]
 </script>
 
@@ -18,11 +21,12 @@ const navItems = [
   <aside :class="['sidebar', { 'sidebar--open': sidebarOpen }]">
     <div class="sidebar-card">
       <nav class="sidebar-nav">
-        <button
+        <RouterLink
           v-for="item in navItems"
-          :key="item.id"
-          :class="['nav-item', { 'nav-item--active': activeTab === item.id }]"
-          @click="$emit('update:activeTab', item.id)"
+          :key="item.to"
+          :to="item.to"
+          :class="['nav-item', { 'nav-item--active': route.path === item.to }]"
+          @click="$emit('navigate')"
         >
           <svg v-if="item.icon === 'settings'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"/>
@@ -44,7 +48,7 @@ const navItems = [
             <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 0 3-3h7z"/>
           </svg>
           <span>{{ item.label }}</span>
-        </button>
+        </RouterLink>
       </nav>
     </div>
   </aside>
@@ -90,11 +94,10 @@ const navItems = [
   border-radius: 8px;
   font-size: 15px;
   color: var(--color-text);
-  text-align: left;
+  text-decoration: none;
   cursor: pointer;
   transition: background-color 0.15s, color 0.15s;
   background: var(--color-white);
-  border: none;
 }
 
 .nav-item:hover {

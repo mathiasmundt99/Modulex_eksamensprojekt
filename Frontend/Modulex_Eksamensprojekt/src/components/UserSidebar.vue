@@ -1,15 +1,18 @@
 <script setup>
+import { useRoute } from 'vue-router'
+
 defineProps({
-  activeTab: { type: String, default: 'overview' },
   sidebarOpen: { type: Boolean, default: false }
 })
 
-defineEmits(['update:activeTab'])
+defineEmits(['navigate'])
+
+const route = useRoute()
 
 const navItems = [
-  { id: 'overview', label: 'Overview', icon: 'book' },
-  { id: 'courses', label: 'My Courses', icon: 'video' },
-  { id: 'progress', label: 'Progress', icon: 'check-circle' }
+  { to: '/dashboard/overview', label: 'Overview',    icon: 'book' },
+  { to: '/dashboard/courses',  label: 'My Courses',  icon: 'video' },
+  { to: '/dashboard/progress', label: 'Progress',    icon: 'check-circle' }
 ]
 </script>
 
@@ -17,11 +20,12 @@ const navItems = [
   <aside :class="['sidebar', { 'sidebar--open': sidebarOpen }]">
     <div class="sidebar-card">
       <nav class="sidebar-nav">
-        <button
+        <RouterLink
           v-for="item in navItems"
-          :key="item.id"
-          :class="['nav-item', { 'nav-item--active': activeTab === item.id }]"
-          @click="$emit('update:activeTab', item.id)"
+          :key="item.to"
+          :to="item.to"
+          :class="['nav-item', { 'nav-item--active': route.path === item.to }]"
+          @click="$emit('navigate')"
         >
           <svg v-if="item.icon === 'book'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
@@ -36,7 +40,7 @@ const navItems = [
             <polyline points="22 4 12 14.01 9 11.01"/>
           </svg>
           <span>{{ item.label }}</span>
-        </button>
+        </RouterLink>
       </nav>
     </div>
   </aside>
@@ -82,10 +86,9 @@ const navItems = [
   border-radius: 8px;
   font-size: 15px;
   color: var(--color-text);
-  text-align: left;
+  text-decoration: none;
   cursor: pointer;
   transition: background-color 0.15s, color 0.15s;
-  border: none;
   background: var(--color-white);
 }
 

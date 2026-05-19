@@ -1,13 +1,12 @@
 <script setup>
-import { ref } from 'vue'
-import UserNavbar     from '../components/UserNavbar.vue'
-import UserSidebar    from '../components/UserSidebar.vue'
-import UserDashboard  from '../components/UserDashboard.vue'
-import UserProfileView from './UserProfileView.vue'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import UserNavbar  from '../components/UserNavbar.vue'
+import UserSidebar from '../components/UserSidebar.vue'
 
-const activeTab   = ref('overview')
+const route = useRoute()
 const sidebarOpen = ref(false)
-const showProfile = ref(false)
+const isProfile = computed(() => route.path === '/dashboard/profile')
 
 function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value
@@ -16,17 +15,12 @@ function toggleSidebar() {
 
 <template>
   <div class="user-dashboard">
-    <UserNavbar @toggleSidebar="toggleSidebar" @logout="() => {}" @profile="showProfile = true" />
+    <UserNavbar @toggleSidebar="toggleSidebar" @logout="() => {}" />
     <div class="user-dashboard__layout">
-      <template v-if="!showProfile">
-        <UserSidebar
-          :activeTab="activeTab"
-          :sidebarOpen="sidebarOpen"
-          @update:activeTab="activeTab = $event; sidebarOpen = false"
-        />
-        <UserDashboard :activeTab="activeTab" />
-      </template>
-      <UserProfileView v-else @back="showProfile = false" />
+      <UserSidebar v-if="!isProfile" :sidebarOpen="sidebarOpen" @navigate="sidebarOpen = false" />
+      <main class="dashboard">
+        <RouterView />
+      </main>
     </div>
   </div>
 </template>
@@ -52,9 +46,13 @@ function toggleSidebar() {
 
 @media (max-width: 1023px) {
   .user-dashboard__layout {
-    width: 100%;
     flex-direction: column;
-    padding: 24px;
   }
+}
+
+.dashboard {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
 }
 </style>
