@@ -175,16 +175,18 @@ const user = {
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  color: var(--color-text);
+  background-color: var(--color-primary);
+  color: var(--color-white);
   cursor: pointer;
   margin-bottom: 8px;
   width: fit-content;
-  padding: 6px 0;
-  transition: color 0.15s;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: background-color 0.15s;
 }
 
 .back-btn:hover {
-  color: var(--color-primary);
+  background-color: var(--color-primary-hover);
 }
 
 .profile__title {
