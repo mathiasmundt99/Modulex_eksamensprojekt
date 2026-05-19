@@ -40,7 +40,7 @@ function toggleSidebar() {
   margin: 0 auto;
   display: flex;
   gap: 24px;
-  padding: 24px 0px;
+  padding: 24px;
   flex: 1;
   align-items: flex-start;
 }

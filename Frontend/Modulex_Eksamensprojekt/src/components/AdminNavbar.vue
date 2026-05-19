@@ -44,7 +44,6 @@ defineEmits(['toggleSidebar', 'logout'])
 .navbar {
   background-color: var(--color-white);
   border-bottom: 1px solid var(--color-border);
-  padding: 0 24px;
   position: sticky;
   top: 0;
   z-index: 40;
@@ -53,6 +52,7 @@ defineEmits(['toggleSidebar', 'logout'])
 .navbar-inner {
   max-width: var(--site-width);
   margin: 0 auto;
+  padding: 0 24px;
   height: 64px;
   display: flex;
   align-items: center;

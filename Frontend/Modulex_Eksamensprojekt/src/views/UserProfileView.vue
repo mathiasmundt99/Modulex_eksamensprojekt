@@ -60,7 +60,7 @@ const user = {
       <!-- Contact Information -->
       <section class="section">
         <h2 class="section__title">Contact Information</h2>
-        <div class="field-stack">
+        <div class="field-grid">
           <div class="field">
             <label class="field__label">Email</label>
             <div class="field__value field__value--muted">
@@ -89,7 +89,7 @@ const user = {
       <!-- Company Information -->
       <section class="section">
         <h2 class="section__title">Company Information</h2>
-        <div class="field-stack">
+        <div class="field-grid">
           <div class="field">
             <label class="field__label">Company Name</label>
             <div class="field__value">
@@ -158,7 +158,7 @@ const user = {
 <style scoped>
 .profile {
   flex: 1;
-  width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -230,16 +230,10 @@ const user = {
   gap: 16px;
 }
 
-@media (max-width: 599px) {
+@media (max-width: 767px) {
   .field-grid {
     grid-template-columns: 1fr;
   }
-}
-
-.field-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
 }
 
 .field__label {
@@ -263,7 +257,6 @@ const user = {
 
 .field__value--muted {
   background-color: var(--color-bg);
-  color: var(--color-text);
 }
 
 .field__hint {
