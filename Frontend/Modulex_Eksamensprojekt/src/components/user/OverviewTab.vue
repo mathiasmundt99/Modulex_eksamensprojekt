@@ -3,6 +3,7 @@ import WelcomeBanner from './WelcomeBanner.vue'
 import StatsGrid from './StatsGrid.vue'
 import ContinueLearning from './ContinueLearning.vue'
 import RecentActivity from './RecentActivity.vue'
+import HelpBanner from '../HelpBanner.vue'
 </script>
 
 <template>
@@ -11,6 +12,7 @@ import RecentActivity from './RecentActivity.vue'
     <StatsGrid />
     <ContinueLearning />
     <RecentActivity />
+    <HelpBanner />
   </div>
 </template>
 

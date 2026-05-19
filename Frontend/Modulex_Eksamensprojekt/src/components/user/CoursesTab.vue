@@ -1,4 +1,6 @@
 <script setup>
+import HelpBanner from '../HelpBanner.vue'
+
 const courses = [
   {
     id: 1,
@@ -75,6 +77,7 @@ const courses = [
         </div>
       </div>
     </div>
+    <HelpBanner />
   </div>
 </template>
 

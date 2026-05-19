@@ -20,7 +20,10 @@ const onboardingProgress = 45
 
 <style scoped>
 .welcome-banner {
-  background: linear-gradient(to right, var(--color-primary), var(--color-primary-hover));
+  background-image: url('@/assets/images/welcomebanner.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
   border-radius: 8px;
   padding: 32px;
   color: var(--color-white);

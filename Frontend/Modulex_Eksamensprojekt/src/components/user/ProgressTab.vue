@@ -1,4 +1,6 @@
 <script setup>
+import HelpBanner from '../HelpBanner.vue'
+
 const onboardingProgress = 45
 
 const checklistItems = [
@@ -47,6 +49,7 @@ const checklistItems = [
         </div>
       </div>
     </div>
+    <HelpBanner />
   </div>
 </template>
 
