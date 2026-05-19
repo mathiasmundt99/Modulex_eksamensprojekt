@@ -13,8 +13,10 @@ defineEmits(['toggleSidebar', 'logout'])
             <line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
-        <img class="brand-logo" src="../assets/images/modulex-logo.png" alt="">
-        <h1 class="brand-name">Modulex Billund Academy</h1>
+        <RouterLink to="/dashboard/overview" class="brand-link">
+          <img class="brand-logo" src="../assets/images/modulex-logo.png" alt="">
+          <h1 class="brand-name">Modulex Billund Academy</h1>
+        </RouterLink>
       </div>
       <div class="navbar-right">
         <RouterLink to="/dashboard/profile" class="user-badge">
@@ -79,6 +81,13 @@ defineEmits(['toggleSidebar', 'logout'])
   .menu-btn {
     display: flex;
   }
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
 }
 
 .brand-logo {
