@@ -22,10 +22,12 @@
   font-size: 28px;
   font-weight: 400;
   margin-bottom: 8px;
+  max-width: 70%;
 }
 
 .welcome-banner__subtitle {
   font-size: 18px;
   opacity: 0.9;
+  max-width: 70%;
 }
 </style>

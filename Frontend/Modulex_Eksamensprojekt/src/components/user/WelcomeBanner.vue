@@ -33,12 +33,14 @@ const onboardingProgress = 45
   font-size: 28px;
   font-weight: 400;
   margin-bottom: 8px;
+  max-width: 70%;
 }
 
 .welcome-banner__subtitle {
   font-size: 18px;
   opacity: 0.9;
   margin-bottom: 24px;
+  max-width: 70%;
 }
 
 .welcome-banner__progress {

@@ -93,6 +93,18 @@ defineEmits(['toggleSidebar', 'logout'])
   flex-direction: column;
 }
 
+@media (max-width: 530px) {
+  .brand-text {
+    display: none;
+  }
+}
+
+@media (max-width: 300px) {
+  .brand-logo {
+    height: 30px;
+  }
+}
+
 .brand-name {
   font-size: 18px;
   font-weight: 400;
