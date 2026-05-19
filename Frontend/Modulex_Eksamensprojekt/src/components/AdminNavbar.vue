@@ -51,7 +51,7 @@ defineEmits(['toggleSidebar', 'logout'])
 }
 
 .navbar-inner {
-  max-width: 1500px;
+  max-width: var(--site-width);
   margin: 0 auto;
   height: 64px;
   display: flex;

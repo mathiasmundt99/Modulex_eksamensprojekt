@@ -21,5 +21,6 @@ import HelpBanner from '../HelpBanner.vue'
   display: flex;
   flex-direction: column;
   gap: 24px;
+  width: 100%;
 }
 </style>

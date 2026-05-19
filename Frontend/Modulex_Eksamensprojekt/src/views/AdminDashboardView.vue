@@ -36,7 +36,7 @@ function toggleSidebar() {
 
 .admin-dashboard__layout {
   width: 100%;
-  max-width: 1500px;
+  max-width: var(--site-width);
   margin: 0 auto;
   display: flex;
   gap: 24px;

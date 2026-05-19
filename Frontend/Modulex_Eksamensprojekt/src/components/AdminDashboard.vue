@@ -21,6 +21,6 @@ defineProps({
 <style scoped>
 .dashboard {
   flex: 1;
-  width: 100%;
+  min-width: 0;
 }
 </style>

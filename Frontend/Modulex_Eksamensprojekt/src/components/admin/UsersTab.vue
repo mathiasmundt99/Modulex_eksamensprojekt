@@ -112,6 +112,7 @@ const filteredUsers = computed(() => {
 .tab-content {
   display: flex;
   flex-direction: column;
+  width: 100%;
   gap: 24px;
 }
 
