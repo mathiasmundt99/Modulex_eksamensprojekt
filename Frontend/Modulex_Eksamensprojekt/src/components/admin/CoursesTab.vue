@@ -6,9 +6,9 @@ import BaseButton from '../BaseButton.vue'
 const showCreateCourseModal = ref(false)
 
 const courses = [
-  { id: 1, title: 'Introduction to Modulex Sign Systems',  modules: 4, enrolledUsers: 24, avgCompletion: 75, status: 'published' },
-  { id: 2, title: 'Product Configuration & Ordering',       modules: 5, enrolledUsers: 18, avgCompletion: 42, status: 'published' },
-  { id: 3, title: 'Advanced Installation Techniques',       modules: 6, enrolledUsers: 0,  avgCompletion: 0,  status: 'draft' }
+  { id: 1, title: 'Introduction to Modulex Sign Systems',  modules: 4, enrolledUsers: 24, avgCompletion: 75, status: 'Published' },
+  { id: 2, title: 'Product Configuration & Ordering',       modules: 5, enrolledUsers: 18, avgCompletion: 42, status: 'Published' },
+  { id: 3, title: 'Advanced Installation Techniques',       modules: 6, enrolledUsers: 0,  avgCompletion: 0,  status: 'Draft' }
 ]
 </script>
 
@@ -33,7 +33,7 @@ const courses = [
         <div class="course-card__info">
           <div class="course-card__title-row">
             <h3 class="course-card__title">{{ course.title }}</h3>
-            <span :class="['badge', course.status === 'published' ? 'badge--published' : 'badge--draft']">
+            <span :class="['badge', course.status === 'Published' ? 'badge--published' : 'badge--draft']">
               {{ course.status }}
             </span>
           </div>
@@ -81,7 +81,6 @@ const courses = [
 
 .page-title {
   font-size: 24px;
-  font-weight: 400;
   color: var(--color-text);
 }
 
@@ -125,7 +124,6 @@ const courses = [
 
 .course-card__title {
   font-size: 20px;
-  font-weight: 400;
   color: var(--color-text);
 }
 
@@ -165,6 +163,7 @@ const courses = [
 
 .course-stat__label {
   font-size: 13px;
+  font-weight: 500;
   color: var(--color-text);
   margin-bottom: 4px;
 }

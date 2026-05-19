@@ -47,7 +47,6 @@ const activities = [
 
 .card__title {
   font-size: 20px;
-  font-weight: 400;
   color: var(--color-text);
   margin-bottom: 16px;
 }
@@ -69,6 +68,7 @@ const activities = [
 
 .activity-item__text {
   font-size: 14px;
+  font-weight: 500;
   color: var(--color-text);
 }
 

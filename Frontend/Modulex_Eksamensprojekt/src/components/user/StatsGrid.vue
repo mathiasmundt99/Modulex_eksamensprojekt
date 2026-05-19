@@ -72,6 +72,7 @@ const totalModules = 7
 
 .stat-card__label {
   font-size: 14px;
+    font-weight: 600;
   color: var(--color-text);
 }
 

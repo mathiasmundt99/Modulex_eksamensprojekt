@@ -179,7 +179,7 @@ const user = {
 
 .profile__title {
   font-size: 24px;
-  font-weight: 400;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -201,7 +201,7 @@ const user = {
 
 .section__title {
   font-size: 18px;
-  font-weight: 400;
+  font-weight: 600;
   color: var(--color-text);
   padding-bottom: 12px;
   margin-bottom: 20px;
@@ -229,6 +229,7 @@ const user = {
 .field__label {
   display: block;
   font-size: 13px;
+  font-weight: 500;
   color: var(--color-text);
   margin-bottom: 6px;
 }

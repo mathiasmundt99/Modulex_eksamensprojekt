@@ -83,7 +83,6 @@ const content = [
 
 .page-title {
   font-size: 24px;
-  font-weight: 400;
   color: var(--color-text);
 }
 

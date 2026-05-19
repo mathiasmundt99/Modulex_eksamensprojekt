@@ -36,7 +36,6 @@ const users = [
 
 .card__title {
   font-size: 20px;
-  font-weight: 400;
   color: var(--color-text);
   margin-bottom: 16px;
 }

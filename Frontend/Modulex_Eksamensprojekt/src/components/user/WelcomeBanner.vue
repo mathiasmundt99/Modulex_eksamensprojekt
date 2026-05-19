@@ -31,7 +31,6 @@ const onboardingProgress = 45
 
 .welcome-banner__title {
   font-size: 28px;
-  font-weight: 400;
   margin-bottom: 8px;
   max-width: 70%;
 }

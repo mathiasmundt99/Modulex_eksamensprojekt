@@ -98,6 +98,7 @@ const activePercent = Math.round((stats.activeUsers / stats.totalUsers) * 100)
 
 .stat-card__label {
   font-size: 14px;
+  font-weight: 600;
   color: var(--color-text);
 }
 

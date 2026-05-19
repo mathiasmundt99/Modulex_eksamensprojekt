@@ -72,7 +72,7 @@ const checklistItems = [
 
 .page-title {
   font-size: 24px;
-  font-weight: 400;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -90,7 +90,7 @@ const checklistItems = [
 
 .card__title {
   font-size: 20px;
-  font-weight: 400;
+  font-weight: 600;
   color: var(--color-text);
   margin-bottom: 16px;
 }

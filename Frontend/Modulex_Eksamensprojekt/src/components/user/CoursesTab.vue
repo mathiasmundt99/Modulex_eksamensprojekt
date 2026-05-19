@@ -94,7 +94,7 @@ const courses = [
 
 .page-title {
   font-size: 24px;
-  font-weight: 400;
+  font-weight: 600;
   color: var(--color-text);
 }
 
@@ -131,7 +131,7 @@ const courses = [
 
 .course-card__title {
   font-size: 20px;
-  font-weight: 400;
+  font-weight: 600;
   color: var(--color-text);
 }
 
