@@ -1,11 +1,13 @@
 <script setup>
 import { ref } from 'vue'
-import Navbar from '../components/Navbar.vue'
-import Sidebar from '../components/Sidebar.vue'
-import Dashboard from '../components/Dashboard.vue'
+import UserNavbar     from '../components/UserNavbar.vue'
+import UserSidebar    from '../components/UserSidebar.vue'
+import UserDashboard  from '../components/UserDashboard.vue'
+import UserProfileView from './UserProfileView.vue'
 
-const activeTab = ref('overview')
+const activeTab   = ref('overview')
 const sidebarOpen = ref(false)
+const showProfile = ref(false)
 
 function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value
@@ -14,14 +16,17 @@ function toggleSidebar() {
 
 <template>
   <div class="user-dashboard">
-    <Navbar @toggleSidebar="toggleSidebar" @logout="() => {}" />
+    <UserNavbar @toggleSidebar="toggleSidebar" @logout="() => {}" @profile="showProfile = true" />
     <div class="user-dashboard__layout">
-      <Sidebar
-        :activeTab="activeTab"
-        :sidebarOpen="sidebarOpen"
-        @update:activeTab="activeTab = $event; sidebarOpen = false"
-      />
-      <Dashboard :activeTab="activeTab" />
+      <template v-if="!showProfile">
+        <UserSidebar
+          :activeTab="activeTab"
+          :sidebarOpen="sidebarOpen"
+          @update:activeTab="activeTab = $event; sidebarOpen = false"
+        />
+        <UserDashboard :activeTab="activeTab" />
+      </template>
+      <UserProfileView v-else @back="showProfile = false" />
     </div>
   </div>
 </template>
@@ -35,12 +40,12 @@ function toggleSidebar() {
 }
 
 .user-dashboard__layout {
-  width: 80%;
+  width: 100%;
   max-width: 1500px;
   margin: 0 auto;
   display: flex;
   gap: 24px;
-  padding: 24px;
+  padding: 24px 0px;
   flex: 1;
   align-items: flex-start;
 }
@@ -49,6 +54,7 @@ function toggleSidebar() {
   .user-dashboard__layout {
     width: 100%;
     flex-direction: column;
+    padding: 24px;
   }
 }
 </style>
