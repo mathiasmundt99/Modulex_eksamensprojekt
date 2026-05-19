@@ -1,5 +1,5 @@
 <script setup>
-defineEmits(['toggleSidebar', 'logout'])
+defineEmits(['toggleSidebar', 'logout', 'profile'])
 </script>
 
 <template>
@@ -13,22 +13,17 @@ defineEmits(['toggleSidebar', 'logout'])
             <line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
-        <svg class="brand-icon" width="32" height="32" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="2" width="14" height="14" rx="2" fill="currentColor"/>
-          <rect x="20" y="2" width="14" height="14" rx="2" fill="currentColor"/>
-          <rect x="2" y="20" width="14" height="14" rx="2" fill="currentColor"/>
-          <rect x="20" y="20" width="7" height="7" rx="1.5" fill="currentColor"/>
-        </svg>
+        <img class="brand-logo" src="../assets/images/modulex-logo.png" alt="">
         <h1 class="brand-name">Modulex Billund Academy</h1>
       </div>
       <div class="navbar-right">
-        <div class="user-badge">
+        <button class="user-badge" @click="$emit('profile')">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>
           </svg>
           <span>John Doe</span>
-        </div>
+        </button>
         <button class="logout-btn" @click="$emit('logout')">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -86,9 +81,8 @@ defineEmits(['toggleSidebar', 'logout'])
   }
 }
 
-.brand-icon {
-  color: var(--color-primary);
-  flex-shrink: 0;
+.brand-logo {
+  height: 40px;
 }
 
 .brand-name {
@@ -112,6 +106,13 @@ defineEmits(['toggleSidebar', 'logout'])
   border-radius: 8px;
   font-size: 14px;
   color: var(--color-text);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.user-badge:hover {
+  background-color: var(--color-border);
+  color: var(--color-primary);
 }
 
 @media (max-width: 767px) {

@@ -1,7 +1,7 @@
 <script setup>
-import OverviewTab from './dashboard/OverviewTab.vue'
-import CoursesTab from './dashboard/CoursesTab.vue'
-import ProgressTab from './dashboard/ProgressTab.vue'
+import OverviewTab from './user/OverviewTab.vue'
+import CoursesTab  from './user/CoursesTab.vue'
+import ProgressTab from './user/ProgressTab.vue'
 
 defineProps({
   activeTab: { type: String, default: 'overview' }
