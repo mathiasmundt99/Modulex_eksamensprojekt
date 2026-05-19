@@ -1,7 +1,9 @@
 <script setup>
-import UserDashboardView from './views/UserDashboardView.vue'
+import AdminDashboardView from './views/AdminDashboardView.vue'
+import UserDashboardView from './views/UserDashboardView.vue';
 </script>
 
 <template>
   <UserDashboardView />
+  <!-- <AdminDashboardView /> -->
 </template>
