@@ -1,4 +1,5 @@
 <script setup>
+import BaseButton from '../components/BaseButton.vue'
 defineEmits(['back'])
 
 const user = {
@@ -16,12 +17,12 @@ const user = {
 <template>
   <div class="profile">
     <div class="profile__header">
-      <button class="back-btn" @click="$emit('back')">
+      <BaseButton @click="$emit('back')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="15 18 9 12 15 6"/>
         </svg>
         Back to Dashboard
-      </button>
+      </BaseButton>
       <h1 class="profile__title">My Profile</h1>
       <p class="profile__subtitle">Your account information</p>
     </div>
@@ -142,13 +143,13 @@ const user = {
       <!-- Password -->
       <section class="section">
         <h2 class="section__title">Password</h2>
-        <button class="change-pw-btn">
+        <BaseButton variant="outline">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
           Change Password
-        </button>
+        </BaseButton>
       </section>
 
     </div>
@@ -170,23 +171,8 @@ const user = {
   gap: 4px;
 }
 
-.back-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  cursor: pointer;
+.profile__header :deep(button) {
   margin-bottom: 8px;
-  width: fit-content;
-  padding: 10px 20px;
-  border-radius: 8px;
-  transition: background-color 0.15s;
-}
-
-.back-btn:hover {
-  background-color: var(--color-primary-hover);
 }
 
 .profile__title {
@@ -267,21 +253,4 @@ const user = {
   margin-top: 4px;
 }
 
-.change-pw-btn {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 24px;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  font-size: 14px;
-  color: var(--color-text);
-  cursor: pointer;
-  transition: background-color 0.15s, color 0.15s;
-}
-
-.change-pw-btn:hover {
-  background-color: var(--color-bg);
-  color: var(--color-primary);
-}
 </style>

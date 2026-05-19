@@ -1,4 +1,6 @@
 <script setup>
+import BaseButton from '../BaseButton.vue'
+
 const users = [
   { id: 1, name: 'John Doe',    company: 'Acme Signs Ltd.', progress: 45 },
   { id: 3, name: 'Mike Johnson', company: 'Visual Sign Co.', progress: 20 }
@@ -18,7 +20,7 @@ const users = [
           </div>
           <p class="progress-label">{{ user.progress }}% complete</p>
         </div>
-        <button class="btn">Send Reminder</button>
+        <BaseButton variant="muted">Send Reminder</BaseButton>
       </div>
     </div>
   </div>
@@ -92,18 +94,4 @@ const users = [
   color: var(--color-text);
 }
 
-.btn {
-  background-color: var(--color-accent);
-  color: var(--color-white);
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.15s;
-}
-
-.btn:hover {
-  background-color: var(--color-accent-hover);
-}
 </style>

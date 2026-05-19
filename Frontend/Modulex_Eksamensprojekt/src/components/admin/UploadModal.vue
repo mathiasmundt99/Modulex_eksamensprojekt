@@ -1,4 +1,5 @@
 <script setup>
+import BaseButton from '../BaseButton.vue'
 defineEmits(['close'])
 </script>
 
@@ -30,8 +31,8 @@ defineEmits(['close'])
           </div>
         </div>
         <div class="form-actions">
-          <button class="btn btn--cancel" @click="$emit('close')">Cancel</button>
-          <button class="btn btn--submit">Upload</button>
+          <BaseButton variant="outline" @click="$emit('close')">Cancel</BaseButton>
+          <BaseButton>Upload</BaseButton>
         </div>
       </div>
     </div>
@@ -118,32 +119,7 @@ defineEmits(['close'])
   padding-top: 8px;
 }
 
-.btn {
+.form-actions :deep(button) {
   flex: 1;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.btn--cancel {
-  border: 1px solid var(--color-border);
-  background-color: var(--color-white);
-  color: var(--color-text);
-}
-
-.btn--cancel:hover {
-  background-color: var(--color-bg);
-}
-
-.btn--submit {
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  border: none;
-}
-
-.btn--submit:hover {
-  background-color: var(--color-primary-hover);
 }
 </style>

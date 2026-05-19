@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import BaseButton from '../BaseButton.vue'
 
 const searchQuery = ref('')
 
@@ -27,13 +28,13 @@ const filteredUsers = computed(() => {
         <h2 class="page-title">Manage Users</h2>
         <p class="page-subtitle">Track and manage partner onboarding</p>
       </div>
-      <button class="btn btn--primary">
+      <BaseButton>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"/>
           <line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
         Invite User
-      </button>
+      </BaseButton>
     </div>
 
     <div class="card">
@@ -134,24 +135,6 @@ const filteredUsers = computed(() => {
   font-size: 15px;
   color: var(--color-text);
   margin-top: 4px;
-}
-
-.btn--primary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.15s;
-}
-
-.btn--primary:hover {
-  background-color: var(--color-primary-hover);
 }
 
 .card {

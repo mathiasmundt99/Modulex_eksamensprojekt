@@ -1,4 +1,6 @@
 <script setup>
+import BaseButton from '../BaseButton.vue'
+
 const course = {
   title: 'Product Configuration & Ordering',
   subtitle: 'Module 3 of 5',
@@ -18,7 +20,7 @@ const course = {
         </div>
         <span class="progress-label">{{ course.progress }}% complete</span>
       </div>
-      <button class="btn">Resume Course</button>
+      <BaseButton>Resume Course</BaseButton>
     </div>
   </div>
 </template>
@@ -88,18 +90,4 @@ const course = {
   display: block;
 }
 
-.btn {
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.15s;
-}
-
-.btn:hover {
-  background-color: var(--color-primary-hover);
-}
 </style>

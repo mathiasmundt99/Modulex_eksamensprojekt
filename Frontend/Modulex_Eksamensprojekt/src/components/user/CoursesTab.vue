@@ -1,5 +1,6 @@
 <script setup>
 import HelpBanner from '../HelpBanner.vue'
+import BaseButton from '../BaseButton.vue'
 
 const courses = [
   {
@@ -71,9 +72,9 @@ const courses = [
           </div>
         </div>
         <div class="course-card__actions">
-          <button v-if="course.status === 'completed'" class="btn btn--muted">Review</button>
-          <button v-if="course.status === 'in-progress'" class="btn btn--primary">Continue</button>
-          <button v-if="course.status === 'locked'" class="btn btn--disabled" disabled>Locked</button>
+          <BaseButton v-if="course.status === 'completed'" variant="muted">Review</BaseButton>
+          <BaseButton v-if="course.status === 'in-progress'">Continue</BaseButton>
+          <BaseButton v-if="course.status === 'locked'" variant="disabled" disabled>Locked</BaseButton>
         </div>
       </div>
     </div>
@@ -183,37 +184,4 @@ const courses = [
   display: block;
 }
 
-.btn {
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.15s;
-}
-
-.btn--primary {
-  background-color: var(--color-primary);
-  color: var(--color-white);
-}
-
-.btn--primary:hover {
-  background-color: var(--color-primary-hover);
-}
-
-.btn--muted {
-  background-color: var(--color-accent);
-  color: var(--color-white);
-}
-
-.btn--muted:hover {
-  background-color: var(--color-accent-hover);
-}
-
-.btn--disabled {
-  background-color: var(--color-border);
-  color: var(--color-text);
-  cursor: not-allowed;
-  opacity: 0.5;
-}
 </style>

@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import UploadModal from './UploadModal.vue'
+import BaseButton from '../BaseButton.vue'
 
 const showUploadModal = ref(false)
 
@@ -18,14 +19,14 @@ const content = [
         <h2 class="page-title">Content Library</h2>
         <p class="page-subtitle">Manage videos, PDFs, and learning materials</p>
       </div>
-      <button class="btn btn--primary" @click="showUploadModal = true">
+      <BaseButton @click="showUploadModal = true">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="16 16 12 12 8 16"/>
           <line x1="12" y1="12" x2="12" y2="21"/>
           <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
         </svg>
         Upload Content
-      </button>
+      </BaseButton>
     </div>
 
     <div class="content-grid">
@@ -90,24 +91,6 @@ const content = [
   font-size: 15px;
   color: var(--color-text);
   margin-top: 4px;
-}
-
-.btn--primary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.15s;
-}
-
-.btn--primary:hover {
-  background-color: var(--color-primary-hover);
 }
 
 .content-grid {

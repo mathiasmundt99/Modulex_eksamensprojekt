@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import CreateCourseModal from './CreateCourseModal.vue'
+import BaseButton from '../BaseButton.vue'
 
 const showCreateCourseModal = ref(false)
 
@@ -18,13 +19,13 @@ const courses = [
         <h2 class="page-title">Courses &amp; Packages</h2>
         <p class="page-subtitle">Create and manage learning paths</p>
       </div>
-      <button class="btn btn--primary" @click="showCreateCourseModal = true">
+      <BaseButton @click="showCreateCourseModal = true">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"/>
           <line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
         Create Course
-      </button>
+      </BaseButton>
     </div>
 
     <div v-for="course in courses" :key="course.id" class="course-card">
@@ -52,8 +53,8 @@ const courses = [
           </div>
         </div>
         <div class="course-card__actions">
-          <button class="btn btn--edit">Edit Course</button>
-          <button class="btn btn--analytics">View Analytics</button>
+          <BaseButton variant="muted">Edit Course</BaseButton>
+          <BaseButton variant="ghost">View Analytics</BaseButton>
         </div>
       </div>
     </div>
@@ -90,23 +91,6 @@ const courses = [
   margin-top: 4px;
 }
 
-.btn--primary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: var(--color-primary);
-  color: var(--color-white);
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.15s;
-}
-
-.btn--primary:hover {
-  background-color: var(--color-primary-hover);
-}
 
 .course-card {
   background-color: var(--color-white);
@@ -197,32 +181,4 @@ const courses = [
   flex-shrink: 0;
 }
 
-.btn {
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.15s;
-}
-
-.btn--edit {
-  background-color: var(--color-accent);
-  color: var(--color-white);
-  border: none;
-}
-
-.btn--edit:hover {
-  background-color: var(--color-accent-hover);
-}
-
-.btn--analytics {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  border: none;
-}
-
-.btn--analytics:hover {
-  background-color: var(--color-border);
-}
 </style>
