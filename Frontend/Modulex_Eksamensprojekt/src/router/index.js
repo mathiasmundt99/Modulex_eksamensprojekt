@@ -11,6 +11,7 @@ import AdminContentTab from "../components/admin/ContentTab.vue";
 import AdminCoursesTab from "../components/admin/CoursesTab.vue";
 import InvitationView from "../views/InvitationView.vue";
 import LoginView from "../views/LoginView.vue";
+import SignupView from "../views/SignupView.vue";
 
 export default createRouter({
   history: createWebHistory(),
@@ -18,6 +19,7 @@ export default createRouter({
     { path: "/", redirect: "/dashboard" },
     { path: "/invitation", component: InvitationView },
     { path: "/login", component: LoginView },
+    { path: "/signup", component: SignupView },
     { path: "/overview", redirect: "/dashboard/overview" },
     { path: "/courses", redirect: "/dashboard/courses" },
     { path: "/progress", redirect: "/dashboard/progress" },
