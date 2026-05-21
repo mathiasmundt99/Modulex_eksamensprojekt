@@ -20,9 +20,7 @@ const user = {
   <div class="profile">
     <div class="profile__header">
       <BaseButton @click="router.push('/dashboard/overview')">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
+        <span class="material-symbols-rounded">chevron_left</span>
         Back to Dashboard
       </BaseButton>
       <h1 class="profile__title">My Profile</h1>
