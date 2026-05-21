@@ -51,7 +51,7 @@ const showModal = ref(false)
             </div>
             <p class="progress-label">{{ course.progress }}% complete</p>
           </div>
-          <BaseButton variant="ghost" class="remove-btn" @click="emit('remove-course', course.id)">Remove</BaseButton>
+          <BaseButton @click="emit('remove-course', course.id)">Remove</BaseButton>
         </div>
       </div>
     </div>
@@ -162,18 +162,5 @@ const showModal = ref(false)
 .progress-label { 
   font-size: 12px; 
   color: var(--color-text); 
-}
-
-.remove-btn {
-  font-size: 13px;
-  color: var(--color-primary);
-  background: none;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: color 0.15s;
-}
-
-.remove-btn:hover { 
-  color: var(--color-primary-hover); 
 }
 </style>
