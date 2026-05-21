@@ -10,6 +10,7 @@ import AdminUsersTab from "../components/admin/UsersTab.vue";
 import AdminContentTab from "../components/admin/ContentTab.vue";
 import AdminCoursesTab from "../components/admin/CoursesTab.vue";
 import AdminUserDetailView from "../views/AdminUserDetailView.vue";
+import AdminCourseEditorView from "../views/AdminCourseEditorView.vue";
 import InvitationView from "../views/InvitationView.vue";
 import LoginView from "../views/LoginView.vue";
 import SignupView from "../views/SignupView.vue";
@@ -45,8 +46,10 @@ export default createRouter({
         { path: "overview",  component: AdminOverviewTab,     meta: { label: "Overview" } },
         { path: "users",     component: AdminUsersTab,        meta: { label: "Users" } },
         { path: "users/:id", component: AdminUserDetailView,  meta: { label: "User Detail" } },
-        { path: "content",   component: AdminContentTab,      meta: { label: "Content" } },
-        { path: "courses",   component: AdminCoursesTab,      meta: { label: "Courses" } },
+        { path: "content",         component: AdminContentTab,       meta: { label: "Content" } },
+        { path: "courses",         component: AdminCoursesTab,       meta: { label: "Courses" } },
+        { path: "courses/new",     component: AdminCourseEditorView, meta: { label: "New Course" } },
+        { path: "courses/:courseId", component: AdminCourseEditorView, meta: { label: "Edit Course" } },
       ],
     },
   ],

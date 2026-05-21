@@ -1,10 +1,9 @@
 <script setup>
-import { ref } from 'vue'
-import CreateCourseModal from './CreateCourseModal.vue'
+import { useRouter } from 'vue-router'
 import BaseButton from '../BaseButton.vue'
 import BreadCrumb from '../BreadCrumb.vue'
 
-const showCreateCourseModal = ref(false)
+const router = useRouter()
 
 const courses = [
   { id: 1, title: 'Introduction to Modulex Sign Systems',  modules: 4, enrolledUsers: 24, avgCompletion: 75, status: 'Published' },
@@ -21,7 +20,7 @@ const courses = [
         <h2 class="page-title">Courses &amp; Packages</h2>
         <p class="page-subtitle">Create and manage learning paths</p>
       </div>
-      <BaseButton @click="showCreateCourseModal = true">
+      <BaseButton @click="router.push('/admin/courses/new')">
         <span class="material-symbols-rounded">add</span>
         Create Course
       </BaseButton>
@@ -52,13 +51,12 @@ const courses = [
           </div>
         </div>
         <div class="course-card__actions">
-          <BaseButton variant="muted">Edit Course</BaseButton>
+          <BaseButton variant="muted" @click="router.push('/admin/courses/' + course.id)">Edit Course</BaseButton>
           <BaseButton variant="ghost">View Analytics</BaseButton>
         </div>
       </div>
     </div>
 
-    <CreateCourseModal v-if="showCreateCourseModal" @close="showCreateCourseModal = false" />
   </div>
 </template>
 

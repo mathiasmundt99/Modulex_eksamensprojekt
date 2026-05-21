@@ -85,9 +85,6 @@ const filteredUsers = computed(() => {
               </td>
               <td>
                 <div class="action-btns">
-                  <BaseButton variant="ghost" class="action-btn">
-                    <span class="material-symbols-rounded">visibility</span>
-                  </BaseButton>
                   <BaseButton variant="ghost" class="action-btn" @click="router.push('/admin/users/' + user.id)">
                     <span class="material-symbols-rounded">edit_square</span>
                   </BaseButton>
