@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import BaseButton    from '../BaseButton.vue'
+import BaseButton     from '../BaseButton.vue'
 import AddModuleModal from './AddModuleModal.vue'
 
 const props = defineProps({
@@ -8,13 +8,36 @@ const props = defineProps({
   isEditing:        { type: Boolean, default: false },
   availableContent: { type: Array,   required: true },
 })
-const emit = defineEmits(['remove-module', 'add-module'])
+const emit = defineEmits(['remove-module', 'add-module', 'reorder'])
 
-const showModal = ref(false)
+const showModal   = ref(false)
+const draggedIdx  = ref(null)
+const dragOverIdx = ref(null)
 
 function handleAdd(content) {
   emit('add-module', content)
   showModal.value = false
+}
+
+function onDragStart(index) {
+  draggedIdx.value = index
+}
+
+function onDragOver(event, index) {
+  event.preventDefault()
+  dragOverIdx.value = index
+}
+
+function onDrop(index) {
+  if (draggedIdx.value === null || draggedIdx.value === index) return
+  emit('reorder', { from: draggedIdx.value, to: index })
+  draggedIdx.value  = null
+  dragOverIdx.value = null
+}
+
+function onDragEnd() {
+  draggedIdx.value  = null
+  dragOverIdx.value = null
 }
 </script>
 
@@ -29,7 +52,26 @@ function handleAdd(content) {
     </div>
 
     <div class="modules">
-      <div v-for="(module, index) in modules" :key="module.id" class="module-item">
+      <div
+        v-for="(module, index) in modules"
+        :key="module.id"
+        :class="[
+          'module-item',
+          { 'module-item--dragging':  draggedIdx === index },
+          { 'module-item--drag-over': dragOverIdx === index && draggedIdx !== index },
+        ]"
+        :draggable="isEditing"
+        @dragstart="onDragStart(index)"
+        @dragover="onDragOver($event, index)"
+        @drop="onDrop(index)"
+        @dragend="onDragEnd"
+      >
+        <span
+          v-if="isEditing"
+          class="material-symbols-rounded module-item__grip"
+        >
+          drag_indicator
+        </span>
         <div class="module-item__number">{{ index + 1 }}</div>
         <div class="module-item__body">
           <div class="module-item__type">
@@ -107,11 +149,32 @@ function handleAdd(content) {
   padding: 16px;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  transition: box-shadow 0.15s;
+  transition: box-shadow 0.15s, opacity 0.15s, border-color 0.15s;
 }
 
 .module-item:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.module-item--dragging {
+  opacity: 0.4;
+}
+
+.module-item--drag-over {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(239, 96, 35, 0.15);
+}
+
+.module-item__grip {
+  color: var(--color-border);
+  cursor: grab;
+  font-size: 20px;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.module-item__grip:hover {
+  color: var(--color-primary);
 }
 
 .module-item__number {

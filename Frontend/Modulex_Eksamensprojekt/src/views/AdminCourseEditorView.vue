@@ -114,6 +114,13 @@ function addModule(content) {
     contentId: content.id,
   })
 }
+
+function reorderModules({ from, to }) {
+  const list = [...modules.value]
+  const [moved] = list.splice(from, 1)
+  list.splice(to, 0, moved)
+  modules.value = list
+}
 </script>
 
 <template>
@@ -171,6 +178,7 @@ function addModule(content) {
           :availableContent="availableContent"
           @remove-module="removeModule"
           @add-module="addModule"
+          @reorder="reorderModules"
         />
       </div>
     </div>
