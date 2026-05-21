@@ -9,6 +9,7 @@ import AdminOverviewTab from "../components/admin/OverviewTab.vue";
 import AdminUsersTab from "../components/admin/UsersTab.vue";
 import AdminContentTab from "../components/admin/ContentTab.vue";
 import AdminCoursesTab from "../components/admin/CoursesTab.vue";
+import AdminUserDetailView from "../views/AdminUserDetailView.vue";
 import InvitationView from "../views/InvitationView.vue";
 import LoginView from "../views/LoginView.vue";
 import SignupView from "../views/SignupView.vue";
@@ -27,22 +28,25 @@ export default createRouter({
       path: "/dashboard",
       redirect: "/dashboard/overview",
       component: UserDashboardView,
+      meta: { label: "Dashboard" },
       children: [
-        { path: "overview", component: UserOverviewTab },
-        { path: "courses", component: UserCoursesTab },
-        { path: "progress", component: UserProgressTab },
-        { path: "profile", component: UserProfileView },
+        { path: "overview", component: UserOverviewTab,  meta: { label: "Overview" } },
+        { path: "courses",  component: UserCoursesTab,   meta: { label: "Courses" } },
+        { path: "progress", component: UserProgressTab,  meta: { label: "Progress" } },
+        { path: "profile",  component: UserProfileView,  meta: { label: "Profile" } },
       ],
     },
     {
       path: "/admin",
       redirect: "/admin/overview",
       component: AdminDashboardView,
+      meta: { label: "Admin" },
       children: [
-        { path: "overview", component: AdminOverviewTab },
-        { path: "users", component: AdminUsersTab },
-        { path: "content", component: AdminContentTab },
-        { path: "courses", component: AdminCoursesTab },
+        { path: "overview",  component: AdminOverviewTab,     meta: { label: "Overview" } },
+        { path: "users",     component: AdminUsersTab,        meta: { label: "Users" } },
+        { path: "users/:id", component: AdminUserDetailView,  meta: { label: "User Detail" } },
+        { path: "content",   component: AdminContentTab,      meta: { label: "Content" } },
+        { path: "courses",   component: AdminCoursesTab,      meta: { label: "Courses" } },
       ],
     },
   ],
