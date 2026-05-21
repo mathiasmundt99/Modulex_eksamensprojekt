@@ -83,14 +83,12 @@ const crumbs = computed(() => {
 
 .breadcrumb__link {
   font-size: 13px;
-  color: var(--color-text);
-  opacity: 0.6;
-  transition: opacity 0.15s, color 0.15s;
+  color: var(--color-primary);
+  transition: opacity 0.15s;
 }
 
 .breadcrumb__link:hover {
-  opacity: 1;
-  color: var(--color-primary);
+  opacity: 0.75;
 }
 
 .breadcrumb__current {
