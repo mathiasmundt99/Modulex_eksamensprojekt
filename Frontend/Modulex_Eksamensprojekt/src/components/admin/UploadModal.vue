@@ -1,42 +1,76 @@
 <script setup>
+import { ref, computed } from 'vue'
 import BaseButton from '../BaseButton.vue'
+
+const props = defineProps({
+  item: { type: Object, default: null },
+})
 defineEmits(['close'])
+
+const isEditMode = computed(() => !!props.item)
+
+const form = ref({
+  title:       props.item?.title       ?? '',
+  type:        props.item?.type        ?? 'video',
+  description: props.item?.description ?? '',
+})
+
+const hasExistingFile = ref(isEditMode.value)
 </script>
 
 <template>
   <div class="modal-backdrop" @click.self="$emit('close')">
     <div class="modal">
-      <h3 class="modal__title">Upload New Content</h3>
+      <h3 class="modal__title">{{ isEditMode ? 'Edit Content' : 'Upload New Content' }}</h3>
       <div class="form">
         <div class="form-group">
           <label class="form-label">Content Title</label>
-          <input type="text" class="form-input" placeholder="Enter title" />
+          <input
+            v-model="form.title"
+            type="text"
+            class="form-input"
+            placeholder="Enter title"
+          />
         </div>
         <div class="form-group">
           <label class="form-label">Content Type</label>
-          <select class="form-input">
-            <option>Video</option>
-            <option>PDF</option>
+          <select v-model="form.type" class="form-input">
+            <option value="video">Video</option>
+            <option value="pdf">PDF</option>
           </select>
         </div>
         <div class="form-group">
           <label class="form-label">Description</label>
           <textarea
+            v-model="form.description"
             class="form-input form-textarea"
             rows="3"
             placeholder="Write a short description of this content"
           ></textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">Upload File</label>
-          <div class="dropzone">
+          <label class="form-label">File</label>
+          <div v-if="hasExistingFile" class="existing-file">
+            <span class="material-symbols-rounded existing-file__icon">
+              {{ form.type === 'video' ? 'play_circle' : 'picture_as_pdf' }}
+            </span>
+            <div class="existing-file__info">
+              <p class="existing-file__name">{{ form.title }}</p>
+              <p class="existing-file__meta">Current file</p>
+            </div>
+            <BaseButton variant="ghost" @click="hasExistingFile = false">
+              <span class="material-symbols-rounded">delete</span>
+              Remove
+            </BaseButton>
+          </div>
+          <div v-else class="dropzone">
             <span class="material-symbols-rounded cloud-icon">cloud_upload</span>
             <p class="dropzone__text">Drag and drop or click to upload</p>
           </div>
         </div>
         <div class="form-actions">
           <BaseButton variant="outline" @click="$emit('close')">Cancel</BaseButton>
-          <BaseButton>Upload</BaseButton>
+          <BaseButton>{{ isEditMode ? 'Save Changes' : 'Upload' }}</BaseButton>
         </div>
       </div>
     </div>
@@ -102,6 +136,7 @@ defineEmits(['close'])
   background-color: var(--color-white);
   outline: none;
   font-family: inherit;
+  box-sizing: border-box;
 }
 
 .form-input:focus {
@@ -111,6 +146,42 @@ defineEmits(['close'])
 
 .form-textarea {
   resize: vertical;
+}
+
+.existing-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-bg);
+}
+
+.existing-file__icon {
+  font-size: 24px;
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.existing-file__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.existing-file__name {
+  font-size: 14px;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.existing-file__meta {
+  font-size: 12px;
+  color: var(--color-text);
+  opacity: 0.6;
+  margin-top: 2px;
 }
 
 .dropzone {

@@ -5,12 +5,27 @@ import BaseButton from '../BaseButton.vue'
 import BreadCrumb from '../BreadCrumb.vue'
 
 const showUploadModal = ref(false)
+const editingItem     = ref(null)
 
-const content = [
+function openEdit(item) {
+  editingItem.value     = item
+  showUploadModal.value = true
+}
+
+function closeModal() {
+  showUploadModal.value = false
+  editingItem.value     = null
+}
+
+const content = ref([
   { id: 1, title: 'Introduction to Modulex Products', description: 'An introductory video covering the core Modulex product range and key features.',         type: 'video', duration: '15 min', uploadDate: '2024-02-01', usedInCourses: 3 },
   { id: 2, title: 'Product Catalog 2024',             description: 'Full product catalog with specifications, dimensions, and ordering information.',           type: 'pdf',   pages: 45,         uploadDate: '2024-01-15', usedInCourses: 5 },
   { id: 3, title: 'Installation Guidelines',          description: 'Step-by-step installation instructions and best practices for Modulex sign systems.',       type: 'pdf',   pages: 28,         uploadDate: '2024-02-10', usedInCourses: 2 }
-]
+])
+
+function deleteContent(id) {
+  content.value = content.value.filter(item => item.id !== id)
+}
 </script>
 
 <template>
@@ -32,10 +47,10 @@ const content = [
         <div class="content-card__header">
           <h3 class="content-card__title">{{ item.title }}</h3>
           <div class="content-card__actions">
-            <BaseButton variant="ghost" class="action-btn">
+            <BaseButton variant="ghost" class="action-btn" @click="openEdit(item)">
               <span class="material-symbols-rounded">edit_square</span>
             </BaseButton>
-            <BaseButton variant="ghost" class="action-btn">
+            <BaseButton variant="ghost" class="action-btn" @click="deleteContent(item.id)">
               <span class="material-symbols-rounded">delete</span>
             </BaseButton>
           </div>
@@ -55,7 +70,7 @@ const content = [
       </div>
     </div>
 
-    <UploadModal v-if="showUploadModal" @close="showUploadModal = false" />
+    <UploadModal v-if="showUploadModal" :item="editingItem" @close="closeModal" />
   </div>
 </template>
 
