@@ -20,10 +20,7 @@ const courses = [
         <p class="page-subtitle">Create and manage learning paths</p>
       </div>
       <BaseButton @click="showCreateCourseModal = true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
+        <span class="material-symbols-rounded">add</span>
         Create Course
       </BaseButton>
     </div>

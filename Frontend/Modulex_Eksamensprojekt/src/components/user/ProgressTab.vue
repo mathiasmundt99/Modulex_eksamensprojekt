@@ -38,13 +38,9 @@ const checklistItems = [
           :key="item.id"
           :class="['checklist-item', { 'checklist-item--done': item.completed }]"
         >
-          <svg v-if="item.completed" class="icon--primary" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
-          <svg v-else class="icon--border" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-          </svg>
+          <span class="material-symbols-rounded" :class="item.completed ? 'icon--primary' : ''">
+            {{ item.completed ? 'task_alt' : 'radio_button_unchecked' }}
+          </span>
           <span :class="{ 'text-strikethrough': item.completed }">{{ item.title }}</span>
         </div>
       </div>

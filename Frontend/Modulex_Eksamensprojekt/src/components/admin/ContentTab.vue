@@ -20,11 +20,7 @@ const content = [
         <p class="page-subtitle">Manage videos, PDFs, and learning materials</p>
       </div>
       <BaseButton @click="showUploadModal = true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="16 16 12 12 8 16"/>
-          <line x1="12" y1="12" x2="12" y2="21"/>
-          <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
-        </svg>
+        <span class="material-symbols-rounded">cloud_upload</span>
         Upload Content
       </BaseButton>
     </div>
@@ -35,23 +31,18 @@ const content = [
           <h3 class="content-card__title">{{ item.title }}</h3>
           <div class="content-card__actions">
             <button class="action-btn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
+              <span class="material-symbols-rounded">edit_square</span>
             </button>
             <button class="action-btn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6"/>
-                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                <path d="M10 11v6"/><path d="M14 11v6"/>
-                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-              </svg>
+              <span class="material-symbols-rounded">delete</span>
             </button>
           </div>
         </div>
         <div class="content-card__tags">
-          <span class="tag">{{ item.type === 'video' ? '📹 Video' : '📄 PDF' }}</span>
+          <span class="tag">
+            <span class="material-symbols-rounded tag__icon">{{ item.type === 'video' ? 'videocam' : 'description' }}</span>
+            {{ item.type === 'video' ? 'Video' : 'PDF' }}
+          </span>
           <span class="tag">{{ item.type === 'video' ? item.duration : item.pages + ' pages' }}</span>
         </div>
         <div class="content-card__footer">
@@ -157,11 +148,18 @@ const content = [
 }
 
 .tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   padding: 4px 12px;
   background-color: var(--color-bg);
   border-radius: 9999px;
   font-size: 13px;
   color: var(--color-text);
+}
+
+.tag__icon {
+  font-size: 16px;
 }
 
 .content-card__footer {

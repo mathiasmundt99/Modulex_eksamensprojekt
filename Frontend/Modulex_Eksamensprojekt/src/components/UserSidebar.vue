@@ -10,9 +10,9 @@ defineEmits(['navigate'])
 const route = useRoute()
 
 const navItems = [
-  { to: '/dashboard/overview', label: 'Overview',    icon: 'book' },
-  { to: '/dashboard/courses',  label: 'My Courses',  icon: 'video' },
-  { to: '/dashboard/progress', label: 'Progress',    icon: 'check-circle' }
+  { to: '/dashboard/overview', label: 'Overview',    icon: 'dashboard' },
+  { to: '/dashboard/courses',  label: 'My Courses',  icon: 'videocam' },
+  { to: '/dashboard/progress', label: 'Progress',    icon: 'task_alt' }
 ]
 </script>
 
@@ -27,18 +27,7 @@ const navItems = [
           :class="['nav-item', { 'nav-item--active': route.path === item.to }]"
           @click="$emit('navigate')"
         >
-          <svg v-if="item.icon === 'book'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 0 3-3h7z"/>
-          </svg>
-          <svg v-if="item.icon === 'video'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="2" y="7" width="15" height="10" rx="1"/>
-            <polygon points="17 8 22 4 22 20 17 16"/>
-          </svg>
-          <svg v-if="item.icon === 'check-circle'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
+          <span class="material-symbols-rounded">{{ item.icon }}</span>
           <span>{{ item.label }}</span>
         </RouterLink>
       </nav>

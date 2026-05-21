@@ -4,9 +4,7 @@
   <div class="help-banner">
     <div class="banner-content">
       <div class="help-banner__icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
+        <span class="material-symbols-rounded">live_help</span>
       </div>
       <div class="help-banner__text">
         <p class="help-banner__title">Need help?</p>

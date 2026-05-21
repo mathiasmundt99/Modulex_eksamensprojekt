@@ -136,8 +136,4 @@ const contentItems = [
   gap: 12px;
   padding-top: 8px;
 }
-
-.form-actions :deep(button) {
-  flex: 1;
-}
 </style>

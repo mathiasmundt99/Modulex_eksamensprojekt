@@ -42,25 +42,16 @@ const courses = [
         <div class="course-card__info">
           <div class="course-card__title-row">
             <h3 class="course-card__title">{{ course.title }}</h3>
-            <svg v-if="course.status === 'completed'" class="icon--primary" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
+            <span class="material-symbols-rounded icon--primary">task_alt</span>
           </div>
           <p class="course-card__description">{{ course.description }}</p>
           <div class="course-card__meta">
             <span class="meta-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 0 3-3h7z"/>
-              </svg>
+              <span class="material-symbols-rounded">import_contacts</span>
               {{ course.modules }} modules
             </span>
             <span class="meta-item">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
+              <span class="material-symbols-rounded">schedule</span>
               {{ course.duration }}
             </span>
           </div>
