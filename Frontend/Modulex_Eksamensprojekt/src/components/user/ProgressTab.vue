@@ -1,4 +1,5 @@
 <script setup>
+import BreadCrumb from '../BreadCrumb.vue'
 import HelpBanner from '../HelpBanner.vue'
 
 const onboardingProgress = 45
@@ -15,6 +16,7 @@ const checklistItems = [
 
 <template>
   <div class="tab-content">
+    <BreadCrumb />
     <div class="page-header">
       <h2 class="page-title">Onboarding Progress</h2>
       <p class="page-subtitle">Track your journey to becoming a certified partner</p>

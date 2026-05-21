@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import CreateCourseModal from './CreateCourseModal.vue'
 import BaseButton from '../BaseButton.vue'
+import BreadCrumb from '../BreadCrumb.vue'
 
 const showCreateCourseModal = ref(false)
 
@@ -14,6 +15,7 @@ const courses = [
 
 <template>
   <div class="tab-content">
+    <BreadCrumb />
     <div class="tab-header">
       <div>
         <h2 class="page-title">Courses &amp; Packages</h2>

@@ -1,4 +1,5 @@
 <script setup>
+import BreadCrumb from '../BreadCrumb.vue'
 import HelpBanner from '../HelpBanner.vue'
 import BaseButton from '../BaseButton.vue'
 
@@ -35,6 +36,7 @@ const courses = [
 
 <template>
   <div class="tab-content">
+    <BreadCrumb />
     <h2 class="page-title">My Courses</h2>
 
     <div v-for="course in courses" :key="course.id" class="course-card">

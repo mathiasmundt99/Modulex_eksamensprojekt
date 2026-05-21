@@ -1,4 +1,5 @@
 <script setup>
+import BreadCrumb from '../BreadCrumb.vue'
 import WelcomeBanner from './WelcomeBanner.vue'
 import StatsGrid from './StatsGrid.vue'
 import ContinueLearning from './ContinueLearning.vue'
@@ -8,6 +9,7 @@ import HelpBanner from '../HelpBanner.vue'
 
 <template>
   <div class="tab-content">
+    <BreadCrumb />
     <WelcomeBanner />
     <StatsGrid />
     <ContinueLearning />

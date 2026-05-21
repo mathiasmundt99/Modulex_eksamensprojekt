@@ -1,4 +1,5 @@
 <script setup>
+import BreadCrumb from '../BreadCrumb.vue'
 import WelcomeBanner from './WelcomeBanner.vue'
 import AdminStatsGrid from './AdminStatsGrid.vue'
 import RecentUserActivity from './RecentUserActivity.vue'
@@ -7,6 +8,7 @@ import UsersNeedingAttention from './UsersNeedingAttention.vue'
 
 <template>
   <div class="tab-content">
+    <BreadCrumb />
     <WelcomeBanner />
     <AdminStatsGrid />
     <RecentUserActivity />

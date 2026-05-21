@@ -1,8 +1,6 @@
 <script setup>
-import { useRouter } from 'vue-router'
 import BaseButton from '../components/BaseButton.vue'
-
-const router = useRouter()
+import BreadCrumb from '../components/BreadCrumb.vue'
 
 const user = {
   firstName: 'John',
@@ -19,10 +17,7 @@ const user = {
 <template>
   <div class="profile">
     <div class="profile__header">
-      <BaseButton @click="router.push('/dashboard/overview')">
-        <span class="material-symbols-rounded">chevron_left</span>
-        Back to Dashboard
-      </BaseButton>
+      <BreadCrumb />
       <h1 class="profile__title">My Profile</h1>
       <p class="profile__subtitle">Your account information</p>
     </div>
@@ -139,10 +134,6 @@ const user = {
   display: flex;
   flex-direction: column;
   gap: 4px;
-}
-
-.profile__header :deep(button) {
-  margin-bottom: 8px;
 }
 
 .profile__title {

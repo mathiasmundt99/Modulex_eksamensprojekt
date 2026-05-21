@@ -1,7 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import BaseButton from '../BaseButton.vue'
+import BreadCrumb from '../BreadCrumb.vue'
 
+const router = useRouter()
 const searchQuery = ref('')
 
 const users = [
@@ -23,6 +26,7 @@ const filteredUsers = computed(() => {
 
 <template>
   <div class="tab-content">
+    <BreadCrumb />
     <div class="tab-header">
       <div>
         <h2 class="page-title">Manage Users</h2>
@@ -81,12 +85,12 @@ const filteredUsers = computed(() => {
               </td>
               <td>
                 <div class="action-btns">
-                  <button class="action-btn">
+                  <BaseButton variant="ghost" class="action-btn">
                     <span class="material-symbols-rounded">visibility</span>
-                  </button>
-                  <button class="action-btn">
+                  </BaseButton>
+                  <BaseButton variant="ghost" class="action-btn" @click="router.push('/admin/users/' + user.id)">
                     <span class="material-symbols-rounded">edit_square</span>
-                  </button>
+                  </BaseButton>
                 </div>
               </td>
             </tr>
@@ -96,6 +100,7 @@ const filteredUsers = computed(() => {
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .tab-content {

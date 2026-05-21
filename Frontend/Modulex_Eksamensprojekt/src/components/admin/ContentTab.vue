@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import UploadModal from './UploadModal.vue'
 import BaseButton from '../BaseButton.vue'
+import BreadCrumb from '../BreadCrumb.vue'
 
 const showUploadModal = ref(false)
 
@@ -14,6 +15,7 @@ const content = [
 
 <template>
   <div class="tab-content">
+    <BreadCrumb />
     <div class="tab-header">
       <div>
         <h2 class="page-title">Content Library</h2>
@@ -30,12 +32,12 @@ const content = [
         <div class="content-card__header">
           <h3 class="content-card__title">{{ item.title }}</h3>
           <div class="content-card__actions">
-            <button class="action-btn">
+            <BaseButton variant="ghost" class="action-btn">
               <span class="material-symbols-rounded">edit_square</span>
-            </button>
-            <button class="action-btn">
+            </BaseButton>
+            <BaseButton variant="ghost" class="action-btn">
               <span class="material-symbols-rounded">delete</span>
-            </button>
+            </BaseButton>
           </div>
         </div>
         <div class="content-card__tags">
