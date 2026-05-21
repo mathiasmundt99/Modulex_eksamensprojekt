@@ -20,6 +20,14 @@ defineEmits(['close'])
           </select>
         </div>
         <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea
+            class="form-input form-textarea"
+            rows="3"
+            placeholder="Write a short description of this content"
+          ></textarea>
+        </div>
+        <div class="form-group">
           <label class="form-label">Upload File</label>
           <div class="dropzone">
             <span class="material-symbols-rounded cloud-icon">cloud_upload</span>
@@ -99,6 +107,10 @@ defineEmits(['close'])
 .form-input:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px rgba(239, 96, 35, 0.15);
+}
+
+.form-textarea {
+  resize: vertical;
 }
 
 .dropzone {
