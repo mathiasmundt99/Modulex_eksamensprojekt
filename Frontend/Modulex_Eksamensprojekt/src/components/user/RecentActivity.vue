@@ -1,8 +1,8 @@
 <script setup>
 const recentActivities = [
-  { id: 1, title: 'Completed: Product Materials Overview', time: '2 hours ago', type: 'video' },
-  { id: 2, title: 'Started: Pricing & Quotes Module', time: '1 day ago', type: 'pdf' },
-  { id: 3, title: 'Completed: Welcome Survey', time: '3 days ago', type: 'survey' }
+  { id: 1, title: 'Completed: Product Materials Overview', time: '2 hours ago', status: 'completed' },
+  { id: 2, title: 'Started: Pricing & Quotes Module',      time: '1 day ago',   status: 'started' },
+  { id: 3, title: 'Completed: Welcome Survey',             time: '3 days ago',  status: 'completed' }
 ]
 </script>
 
@@ -13,9 +13,9 @@ const recentActivities = [
       <div v-for="activity in recentActivities" :key="activity.id" class="activity-item">
         <span
           class="material-symbols-rounded"
-          :class="activity.type === 'survey' ? 'icon--primary' : 'icon--accent'"
+          :class="activity.status === 'completed' ? 'icon--primary' : 'icon--accent'"
         >
-          {{ activity.type === 'video' ? 'videocam' : activity.type === 'pdf' ? 'description' : 'task_alt' }}
+          {{ activity.status === 'completed' ? 'sports_score' : 'start' }}
         </span>
         <div class="activity-item__text">
           <p class="activity-item__title">{{ activity.title }}</p>

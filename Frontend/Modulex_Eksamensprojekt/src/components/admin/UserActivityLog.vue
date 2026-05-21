@@ -13,7 +13,12 @@ defineProps({
         :key="entry.id"
         class="activity-row"
       >
-        <span class="material-symbols-rounded activity-icon">schedule</span>
+        <span
+          class="material-symbols-rounded activity-icon"
+          :class="entry.status === 'completed' ? 'activity-icon--primary' : 'activity-icon--accent'"
+        >
+          {{ entry.status === 'completed' ? 'sports_score' : 'start' }}
+        </span>
         <div>
           <p class="activity-action">{{ entry.action }}</p>
           <p class="activity-meta">{{ entry.course }} &bull; {{ entry.timestamp }}</p>
@@ -52,11 +57,18 @@ defineProps({
   border-radius: 8px;
 }
 
-.activity-icon { 
-  font-size: 20px; 
-  color: var(--color-accent); 
-  flex-shrink: 0; 
-  margin-top: 2px; 
+.activity-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.activity-icon--primary {
+  color: var(--color-primary);
+}
+
+.activity-icon--accent {
+  color: var(--color-accent);
 }
 .activity-action { 
   font-size: 14px; 

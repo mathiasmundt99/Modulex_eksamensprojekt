@@ -7,9 +7,9 @@ import BreadCrumb from '../BreadCrumb.vue'
 const showUploadModal = ref(false)
 
 const content = [
-  { id: 1, title: 'Introduction to Modulex Products', type: 'video', duration: '15 min',  uploadDate: '2024-02-01', usedInCourses: 3 },
-  { id: 2, title: 'Product Catalog 2024',             type: 'pdf',   pages: 45,            uploadDate: '2024-01-15', usedInCourses: 5 },
-  { id: 3, title: 'Installation Guidelines',          type: 'pdf',   pages: 28,            uploadDate: '2024-02-10', usedInCourses: 2 }
+  { id: 1, title: 'Introduction to Modulex Products', description: 'An introductory video covering the core Modulex product range and key features.',         type: 'video', duration: '15 min', uploadDate: '2024-02-01', usedInCourses: 3 },
+  { id: 2, title: 'Product Catalog 2024',             description: 'Full product catalog with specifications, dimensions, and ordering information.',           type: 'pdf',   pages: 45,         uploadDate: '2024-01-15', usedInCourses: 5 },
+  { id: 3, title: 'Installation Guidelines',          description: 'Step-by-step installation instructions and best practices for Modulex sign systems.',       type: 'pdf',   pages: 28,         uploadDate: '2024-02-10', usedInCourses: 2 }
 ]
 </script>
 
@@ -40,9 +40,10 @@ const content = [
             </BaseButton>
           </div>
         </div>
+        <p v-if="item.description" class="content-card__description">{{ item.description }}</p>
         <div class="content-card__tags">
           <span class="tag">
-            <span class="material-symbols-rounded tag__icon">{{ item.type === 'video' ? 'videocam' : 'description' }}</span>
+            <span class="material-symbols-rounded tag__icon">{{ item.type === 'video' ? 'play_circle' : 'picture_as_pdf' }}</span>
             {{ item.type === 'video' ? 'Video' : 'PDF' }}
           </span>
           <span class="tag">{{ item.type === 'video' ? item.duration : item.pages + ' pages' }}</span>
@@ -140,6 +141,14 @@ const content = [
 
 .action-btn:hover {
   color: var(--color-primary);
+}
+
+.content-card__description {
+  font-size: 14px;
+  color: var(--color-text);
+  opacity: 0.7;
+  margin-bottom: 12px;
+  line-height: 1.5;
 }
 
 .content-card__tags {

@@ -1,8 +1,8 @@
 <script setup>
 const activities = [
-  { id: 1, text: 'John Doe completed "Product Configuration"',   time: '2 hours ago', type: 'check' },
-  { id: 2, text: 'New user registered: Mike Johnson',            time: '5 hours ago', type: 'users' },
-  { id: 3, text: 'Jane Smith started "Installation Best Practices"', time: '1 day ago', type: 'clock' }
+  { id: 1, text: 'John Doe completed "Product Configuration"',       time: '2 hours ago', status: 'completed' },
+  { id: 2, text: 'New user registered: Mike Johnson',                time: '5 hours ago', status: 'registered' },
+  { id: 3, text: 'Jane Smith started "Installation Best Practices"', time: '1 day ago',   status: 'started' }
 ]
 </script>
 
@@ -13,9 +13,9 @@ const activities = [
       <div v-for="activity in activities" :key="activity.id" class="activity-item">
         <span
           class="material-symbols-rounded"
-          :class="activity.type === 'check' ? 'icon--primary' : 'icon--accent'"
+          :class="activity.status === 'completed' ? 'icon--primary' : 'icon--accent'"
         >
-          {{ activity.type === 'check' ? 'task_alt' : activity.type === 'users' ? 'person' : 'schedule' }}
+          {{ activity.status === 'completed' ? 'sports_score' : activity.status === 'registered' ? 'person' : 'start' }}
         </span>
         <div>
           <p class="activity-item__text">{{ activity.text }}</p>

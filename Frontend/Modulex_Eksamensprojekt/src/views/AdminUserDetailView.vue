@@ -33,9 +33,9 @@ const availableCourses = [
 ]
 
 const activityLog = [
-  { id: 1, action: 'Completed module: Product Materials Overview', timestamp: '2024-03-25 14:30', course: 'Product Configuration & Ordering' },
-  { id: 2, action: 'Started course: Product Configuration & Ordering',            timestamp: '2024-03-20 10:15', course: 'Product Configuration & Ordering' },
-  { id: 3, action: 'Completed course: Introduction to Modulex Sign Systems',      timestamp: '2024-03-20 09:45', course: 'Introduction to Modulex Sign Systems' },
+  { id: 1, action: 'Completed module: Product Materials Overview',           timestamp: '2024-03-25 14:30', course: 'Product Configuration & Ordering',     status: 'completed' },
+  { id: 2, action: 'Started course: Product Configuration & Ordering',       timestamp: '2024-03-20 10:15', course: 'Product Configuration & Ordering',     status: 'started' },
+  { id: 3, action: 'Completed course: Introduction to Modulex Sign Systems', timestamp: '2024-03-20 09:45', course: 'Introduction to Modulex Sign Systems', status: 'completed' },
 ]
 
 function removeCourse(id) {
