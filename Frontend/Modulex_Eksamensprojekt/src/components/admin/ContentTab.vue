@@ -3,7 +3,7 @@ import { ref, onMounted } from "vue";
 import UploadModal from "./UploadModal.vue";
 import BaseButton from "../BaseButton.vue";
 import BreadCrumb from "../BreadCrumb.vue";
-import { getPdfs } from "@/services/contentService";
+import { getPdfs, getLibraryContent } from "@/services/contentService";
 
 const showUploadModal = ref(false);
 const editingItem = ref(null);
@@ -26,21 +26,18 @@ const content = ref([]);
 
 onMounted(async () => {
   try {
-    const pdfs = await getPdfs();
-    content.value = pdfs.map((pdf, index) => ({
-      id: index + 1,
-      title: pdf.originalName,
-      description: "",
-      type: "pdf",
-      pages: 0,
-      uploadDate: new Date().toISOString().split("T")[0],
-      usedInCourses: 0,
-      url: pdf.url,
-    }));
+    const libraryContent = await getLibraryContent();
+    content.value = libraryContent;
   } catch (error) {
-    console.error("Error loading PDFs:", error);
+    console.error("Error loading library content:", error);
   }
 });
+
+function handleContentAdded(newContent) {
+  content.value.unshift(newContent); // Tilføj øverst i listen
+  showUploadModal.value = false;
+  editingItem.value = null;
+}
 </script>
 
 <template>
@@ -100,7 +97,8 @@ onMounted(async () => {
     <UploadModal
       v-if="showUploadModal"
       :item="editingItem"
-      @close="closeModal" />
+      @close="closeModal"
+      @content-added="handleContentAdded" />
   </div>
 </template>
 

@@ -1,12 +1,16 @@
 <script setup>
 import { ref, computed } from "vue";
 import BaseButton from "../BaseButton.vue";
-import { uploadPdf } from "@/services/contentService";
+import {
+  uploadPdf,
+  createLibraryContent,
+  updateLibraryContent,
+} from "@/services/contentService";
 
 const props = defineProps({
   item: { type: Object, default: null },
 });
-defineEmits(["close"]);
+const emit = defineEmits(["close", "content-added"]);
 
 const isEditMode = computed(() => !!props.item);
 
@@ -33,15 +37,43 @@ function handleFileChange(event) {
 
 async function handleUpload() {
   try {
+    let uploadedContent;
+
+    if (isEditMode.value) {
+      console.log("Editing item with ID:", props.item.id); // DEBUG
+      console.log("Item data:", props.item); // DEBUG
+
+      uploadedContent = await updateLibraryContent(props.item.id, {
+        title: form.value.title,
+        description: form.value.description,
+      });
+
+      console.log("Content updated:", uploadedContent);
+      emit("content-added", uploadedContent);
+      emit("close");
+      return;
+    }
+
     if (form.value.type === "pdf") {
       if (!selectedFile.value) {
         alert("Please select a PDF");
         return;
       }
 
-      const result = await uploadPdf(selectedFile.value);
+      const pdfResult = await uploadPdf(selectedFile.value);
+      console.log("PDF upload result:", pdfResult);
 
-      console.log("PDF upload success:", result);
+      const contentPayload = {
+        title: form.value.title,
+        description: form.value.description,
+        type: "pdf",
+        url: pdfResult.data.fileName, // ÆNDRING: Brug fileName i stedet for url
+        durationOrPages: pdfResult.data.size.toString() || "0",
+      };
+      console.log("Sending to library:", contentPayload);
+
+      uploadedContent = await createLibraryContent(contentPayload);
+      console.log("PDF uploaded and saved to library:", uploadedContent);
     }
 
     if (form.value.type === "video") {
@@ -50,12 +82,24 @@ async function handleUpload() {
         return;
       }
 
-      console.log("Save video link:", form.value.videoUrl);
+      const contentPayload = {
+        title: form.value.title,
+        description: form.value.description,
+        type: "video",
+        url: form.value.videoUrl,
+        durationOrPages: "0:00",
+      };
+      console.log("Sending to library:", contentPayload);
 
-      // backend kald for video
+      uploadedContent = await createLibraryContent(contentPayload);
+      console.log("Video saved to library:", uploadedContent);
     }
+
+    emit("content-added", uploadedContent);
+    emit("close");
   } catch (error) {
-    console.error(error);
+    console.error("Full error:", error);
+    alert("Error uploading content");
   }
 }
 </script>
@@ -105,8 +149,8 @@ async function handleUpload() {
             </BaseButton>
           </div>
           <div
+            v-if="!isEditMode && form.type === 'pdf'"
             class="dropzone"
-            v-if="form.type === 'pdf'"
             @click="$refs.fileInput.click()">
             <input
               ref="fileInput"
