@@ -14,6 +14,7 @@ import AdminCourseEditorView from "../views/AdminCourseEditorView.vue";
 import InvitationView from "../views/InvitationView.vue";
 import LoginView from "../views/LoginView.vue";
 import SignupView from "../views/SignupView.vue";
+import CourseView from "../views/CourseView.vue";
 
 export default createRouter({
   history: createWebHistory(),
@@ -22,6 +23,7 @@ export default createRouter({
     { path: "/invitation", component: InvitationView },
     { path: "/login", component: LoginView },
     { path: "/signup", component: SignupView },
+    { path: "/course", component: CourseView },
     { path: "/overview", redirect: "/dashboard/overview" },
     { path: "/courses", redirect: "/dashboard/courses" },
     { path: "/progress", redirect: "/dashboard/progress" },
