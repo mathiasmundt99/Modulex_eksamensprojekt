@@ -1,27 +1,71 @@
 <script setup>
-import { ref, computed } from 'vue'
-import BaseButton from '../BaseButton.vue'
+import { ref, computed } from "vue";
+import BaseButton from "../BaseButton.vue";
+import { uploadPdf } from "@/services/contentService";
 
 const props = defineProps({
   item: { type: Object, default: null },
-})
-defineEmits(['close'])
+});
+defineEmits(["close"]);
 
-const isEditMode = computed(() => !!props.item)
+const isEditMode = computed(() => !!props.item);
 
 const form = ref({
-  title:       props.item?.title       ?? '',
-  type:        props.item?.type        ?? 'video',
-  description: props.item?.description ?? '',
-})
+  title: props.item?.title ?? "",
+  type: props.item?.type ?? "video",
+  description: props.item?.description ?? "",
+  videoUrl: props.item?.videoUrl ?? "",
+});
 
-const hasExistingFile = ref(isEditMode.value)
+const hasExistingFile = ref(isEditMode.value);
+const selectedFile = ref(null);
+const videoUrl = ref("");
+
+function handleFileChange(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.type !== "application/pdf") {
+    alert("Only PDF files are allowed");
+    return;
+  }
+  selectedFile.value = file;
+}
+
+async function handleUpload() {
+  try {
+    if (form.value.type === "pdf") {
+      if (!selectedFile.value) {
+        alert("Please select a PDF");
+        return;
+      }
+
+      const result = await uploadPdf(selectedFile.value);
+
+      console.log("PDF upload success:", result);
+    }
+
+    if (form.value.type === "video") {
+      if (!form.value.videoUrl) {
+        alert("Please enter a YouTube URL");
+        return;
+      }
+
+      console.log("Save video link:", form.value.videoUrl);
+
+      // backend kald for video
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
 </script>
 
 <template>
   <div class="modal-backdrop" @click.self="$emit('close')">
     <div class="modal">
-      <h3 class="modal__title">{{ isEditMode ? 'Edit Content' : 'Upload New Content' }}</h3>
+      <h3 class="modal__title">
+        {{ isEditMode ? "Edit Content" : "Upload New Content" }}
+      </h3>
       <div class="form">
         <div class="form-group">
           <label class="form-label">Content Title</label>
@@ -29,8 +73,7 @@ const hasExistingFile = ref(isEditMode.value)
             v-model="form.title"
             type="text"
             class="form-input"
-            placeholder="Enter title"
-          />
+            placeholder="Enter title" />
         </div>
         <div class="form-group">
           <label class="form-label">Content Type</label>
@@ -45,14 +88,12 @@ const hasExistingFile = ref(isEditMode.value)
             v-model="form.description"
             class="form-input form-textarea"
             rows="3"
-            placeholder="Write a short description of this content"
-          ></textarea>
+            placeholder="Write a short description of this content"></textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">File</label>
           <div v-if="hasExistingFile" class="existing-file">
             <span class="material-symbols-rounded existing-file__icon">
-              {{ form.type === 'video' ? 'play_circle' : 'picture_as_pdf' }}
+              {{ form.type === "video" ? "play_circle" : "picture_as_pdf" }}
             </span>
             <div class="existing-file__info">
               <p class="existing-file__name">{{ form.title }}</p>
@@ -63,14 +104,43 @@ const hasExistingFile = ref(isEditMode.value)
               Remove
             </BaseButton>
           </div>
-          <div v-else class="dropzone">
-            <span class="material-symbols-rounded cloud-icon">cloud_upload</span>
+          <div
+            class="dropzone"
+            v-if="form.type === 'pdf'"
+            @click="$refs.fileInput.click()">
+            <input
+              ref="fileInput"
+              type="file"
+              accept=".pdf"
+              style="display: none"
+              @change="handleFileChange" />
+
+            <span class="material-symbols-rounded cloud-icon">
+              cloud_upload
+            </span>
+
             <p class="dropzone__text">Drag and drop or click to upload</p>
+
+            <p v-if="selectedFile">
+              {{ selectedFile.name }}
+            </p>
+          </div>
+          <div v-else-if="form.type === 'video'" class="form-group">
+            <label class="form-label">YouTube URL</label>
+            <input
+              v-model="form.videoUrl"
+              type="text"
+              class="form-input"
+              placeholder="https://youtube.com/watch?v=..." />
           </div>
         </div>
         <div class="form-actions">
-          <BaseButton variant="outline" @click="$emit('close')">Cancel</BaseButton>
-          <BaseButton>{{ isEditMode ? 'Save Changes' : 'Upload' }}</BaseButton>
+          <BaseButton variant="outline" @click="$emit('close')"
+            >Cancel</BaseButton
+          >
+          <BaseButton @click="handleUpload">{{
+            isEditMode ? "Save Changes" : "Upload"
+          }}</BaseButton>
         </div>
       </div>
     </div>
@@ -185,6 +255,8 @@ const hasExistingFile = ref(isEditMode.value)
 }
 
 .dropzone {
+  display: flex;
+  flex-direction: column;
   border: 2px dashed var(--color-border);
   border-radius: 8px;
   padding: 32px;
