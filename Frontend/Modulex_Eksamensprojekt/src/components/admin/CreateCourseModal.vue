@@ -1,12 +1,46 @@
 <script setup>
-import BaseButton from '../BaseButton.vue'
-defineEmits(['close'])
+import { ref } from "vue";
+import BaseButton from "../BaseButton.vue";
+import { createCourse } from "@/services/courseService";
 
-const contentItems = [
-  { id: 1, title: 'Introduction to Modulex Products' },
-  { id: 2, title: 'Product Catalog 2024' },
-  { id: 3, title: 'Installation Guidelines' }
-]
+defineEmits(["close", "course-created"]);
+
+const title = ref("");
+const description = ref("");
+const isLoading = ref(false);
+const error = ref(null);
+
+async function handleCreateCourse() {
+  if (!title.value.trim() || !description.value.trim()) {
+    error.value = "Please fill in all fields";
+    return;
+  }
+
+  isLoading.value = true;
+  error.value = null;
+
+  try {
+    const newCourse = await createCourse({
+      title: title.value,
+      description: description.value,
+      modulesId: [],
+      createdBy: "YOUR_USER_ID_HERE",
+    });
+
+    this.$emit("course-created", newCourse);
+
+    // Reset form
+    title.value = "";
+    description.value = "";
+
+    this.$emit("close");
+  } catch (err) {
+    console.error("Failed to create course:", err);
+    error.value = "Failed to create course";
+  } finally {
+    isLoading.value = false;
+  }
+}
 </script>
 
 <template>
@@ -16,24 +50,37 @@ const contentItems = [
       <div class="form">
         <div class="form-group">
           <label class="form-label">Course Title</label>
-          <input type="text" class="form-input" placeholder="Enter course title" />
+          <input
+            type="text"
+            class="form-input"
+            placeholder="Enter course title" />
         </div>
         <div class="form-group">
           <label class="form-label">Description</label>
-          <textarea class="form-input form-textarea" rows="3" placeholder="Enter course description"></textarea>
+          <textarea
+            class="form-input form-textarea"
+            rows="3"
+            placeholder="Enter course description"></textarea>
         </div>
         <div class="form-group">
           <label class="form-label">Select Content</label>
           <div class="content-list">
-            <label v-for="item in contentItems" :key="item.id" class="content-list__item">
+            <label
+              v-for="item in contentItems"
+              :key="item.id"
+              class="content-list__item">
               <input type="checkbox" class="checkbox" />
               <span>{{ item.title }}</span>
             </label>
           </div>
         </div>
         <div class="form-actions">
-          <BaseButton variant="outline" @click="$emit('close')">Cancel</BaseButton>
-          <BaseButton>Create Course</BaseButton>
+          <BaseButton variant="outline" @click="$emit('close')"
+            >Cancel</BaseButton
+          >
+          <BaseButton @click="handleCreateCourse" :disabled="isLoading">
+            {{ isLoading ? "Creating..." : "Create Course" }}
+          </BaseButton>
         </div>
       </div>
     </div>

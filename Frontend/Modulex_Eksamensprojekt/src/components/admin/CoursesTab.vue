@@ -1,15 +1,62 @@
 <script setup>
-import { useRouter } from 'vue-router'
-import BaseButton from '../BaseButton.vue'
-import BreadCrumb from '../BreadCrumb.vue'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import BaseButton from "../BaseButton.vue";
+import BreadCrumb from "../BreadCrumb.vue";
+import {
+  getAllCourses,
+  deleteCourse,
+  updateCourse,
+} from "@/services/courseService";
+import CreateCourseModal from "./CreateCourseModal.vue";
 
-const router = useRouter()
+const router = useRouter();
+const courses = ref([]);
+const isLoading = ref(false);
+const error = ref(null);
 
-const courses = [
-  { id: 1, title: 'Introduction to Modulex Sign Systems',  modules: 4, enrolledUsers: 24, avgCompletion: 75, status: 'Published' },
-  { id: 2, title: 'Product Configuration & Ordering',       modules: 5, enrolledUsers: 18, avgCompletion: 42, status: 'Published' },
-  { id: 3, title: 'Advanced Installation Techniques',       modules: 6, enrolledUsers: 0,  avgCompletion: 0,  status: 'Draft' }
-]
+onMounted(async () => {
+  await loadCourses();
+});
+
+async function loadCourses() {
+  isLoading.value = true;
+  error.value = null;
+  try {
+    courses.value = await getAllCourses();
+  } catch (err) {
+    console.error("Failed to load courses:", err);
+    error.value = "Failed to load courses";
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+async function handleDeleteCourse(courseId) {
+  if (!confirm("Are you sure you want to delete this course?")) return;
+
+  try {
+    await deleteCourse(courseId);
+    courses.value = courses.value.filter((c) => c.id !== courseId);
+  } catch (err) {
+    console.error("Failed to delete course:", err);
+    error.value = "Failed to delete course";
+  }
+}
+
+function handleEditCourse(courseId) {
+  router.push("/admin/courses/" + courseId);
+}
+
+const showCreateModal = ref(false);
+
+function handleCreateCourse() {
+  showCreateModal.value = true;
+}
+
+async function handleCourseCreated(newCourse) {
+  courses.value.push(newCourse);
+}
 </script>
 
 <template>
@@ -20,10 +67,14 @@ const courses = [
         <h2 class="page-title">Courses &amp; Packages</h2>
         <p class="page-subtitle">Create and manage learning paths</p>
       </div>
-      <BaseButton @click="router.push('/admin/courses/new')">
+      <BaseButton @click="handleCreateCourse">
         <span class="material-symbols-rounded">add</span>
         Create Course
       </BaseButton>
+    </div>
+
+    <div v-if="courses.length === 0" class="empty-state">
+      <p>No courses yet. Create your first course!</p>
     </div>
 
     <div v-for="course in courses" :key="course.id" class="course-card">
@@ -31,7 +82,13 @@ const courses = [
         <div class="course-card__info">
           <div class="course-card__title-row">
             <h3 class="course-card__title">{{ course.title }}</h3>
-            <span :class="['badge', course.status === 'Published' ? 'badge--published' : 'badge--draft']">
+            <span
+              :class="[
+                'badge',
+                course.status === 'Published'
+                  ? 'badge--published'
+                  : 'badge--draft',
+              ]">
               {{ course.status }}
             </span>
           </div>
@@ -51,16 +108,53 @@ const courses = [
           </div>
         </div>
         <div class="course-card__actions">
-          <BaseButton variant="muted" @click="router.push('/admin/courses/' + course.id)">Edit Course</BaseButton>
+          <BaseButton
+            variant="muted"
+            @click="router.push('/admin/courses/' + course.id)"
+            >Edit Course</BaseButton
+          >
           <BaseButton variant="ghost">View Analytics</BaseButton>
         </div>
       </div>
     </div>
-
   </div>
+  <CreateCourseModal
+    v-if="showCreateModal"
+    @close="showCreateModal = false"
+    @course-created="handleCourseCreated" />
 </template>
 
 <style scoped>
+.error-message {
+  padding: 12px 16px;
+  background-color: #fee;
+  color: #c33;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.loading-message {
+  padding: 12px 16px;
+  background-color: #eef;
+  color: #33c;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-text);
+  opacity: 0.6;
+}
+
+.course-card__description {
+  font-size: 14px;
+  color: var(--color-text);
+  opacity: 0.8;
+  margin-bottom: 12px;
+}
+
 .tab-content {
   display: flex;
   flex-direction: column;
@@ -87,7 +181,6 @@ const courses = [
   margin-top: 4px;
 }
 
-
 .course-card {
   background-color: var(--color-white);
   border: 1px solid var(--color-border);
@@ -97,7 +190,9 @@ const courses = [
 }
 
 .course-card:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .course-card__body {
@@ -176,5 +271,4 @@ const courses = [
   gap: 8px;
   flex-shrink: 0;
 }
-
 </style>
