@@ -1,31 +1,46 @@
 <script setup>
-import { ref } from 'vue'
-import UploadModal from './UploadModal.vue'
-import BaseButton from '../BaseButton.vue'
-import BreadCrumb from '../BreadCrumb.vue'
+import { ref, onMounted } from "vue";
+import UploadModal from "./UploadModal.vue";
+import BaseButton from "../BaseButton.vue";
+import BreadCrumb from "../BreadCrumb.vue";
+import { getPdfs } from "@/services/contentService";
 
-const showUploadModal = ref(false)
-const editingItem     = ref(null)
+const showUploadModal = ref(false);
+const editingItem = ref(null);
 
 function openEdit(item) {
-  editingItem.value     = item
-  showUploadModal.value = true
+  editingItem.value = item;
+  showUploadModal.value = true;
 }
 
 function closeModal() {
-  showUploadModal.value = false
-  editingItem.value     = null
+  showUploadModal.value = false;
+  editingItem.value = null;
 }
-
-const content = ref([
-  { id: 1, title: 'Introduction to Modulex Products', description: 'An introductory video covering the core Modulex product range and key features.',         type: 'video', duration: '15 min', uploadDate: '2024-02-01', usedInCourses: 3 },
-  { id: 2, title: 'Product Catalog 2024',             description: 'Full product catalog with specifications, dimensions, and ordering information.',           type: 'pdf',   pages: 45,         uploadDate: '2024-01-15', usedInCourses: 5 },
-  { id: 3, title: 'Installation Guidelines',          description: 'Step-by-step installation instructions and best practices for Modulex sign systems.',       type: 'pdf',   pages: 28,         uploadDate: '2024-02-10', usedInCourses: 2 }
-])
 
 function deleteContent(id) {
-  content.value = content.value.filter(item => item.id !== id)
+  content.value = content.value.filter((item) => item.id !== id);
 }
+
+const content = ref([]);
+
+onMounted(async () => {
+  try {
+    const pdfs = await getPdfs();
+    content.value = pdfs.map((pdf, index) => ({
+      id: index + 1,
+      title: pdf.originalName,
+      description: "",
+      type: "pdf",
+      pages: 0,
+      uploadDate: new Date().toISOString().split("T")[0],
+      usedInCourses: 0,
+      url: pdf.url,
+    }));
+  } catch (error) {
+    console.error("Error loading PDFs:", error);
+  }
+});
 </script>
 
 <template>
@@ -47,21 +62,33 @@ function deleteContent(id) {
         <div class="content-card__header">
           <h3 class="content-card__title">{{ item.title }}</h3>
           <div class="content-card__actions">
-            <BaseButton variant="ghost" class="action-btn" @click="openEdit(item)">
+            <BaseButton
+              variant="ghost"
+              class="action-btn"
+              @click="openEdit(item)">
               <span class="material-symbols-rounded">edit_square</span>
             </BaseButton>
-            <BaseButton variant="ghost" class="action-btn" @click="deleteContent(item.id)">
+            <BaseButton
+              variant="ghost"
+              class="action-btn"
+              @click="deleteContent(item.id)">
               <span class="material-symbols-rounded">delete</span>
             </BaseButton>
           </div>
         </div>
-        <p v-if="item.description" class="content-card__description">{{ item.description }}</p>
+        <p v-if="item.description" class="content-card__description">
+          {{ item.description }}
+        </p>
         <div class="content-card__tags">
           <span class="tag">
-            <span class="material-symbols-rounded tag__icon">{{ item.type === 'video' ? 'play_circle' : 'picture_as_pdf' }}</span>
-            {{ item.type === 'video' ? 'Video' : 'PDF' }}
+            <span class="material-symbols-rounded tag__icon">{{
+              item.type === "video" ? "play_circle" : "picture_as_pdf"
+            }}</span>
+            {{ item.type === "video" ? "Video" : "PDF" }}
           </span>
-          <span class="tag">{{ item.type === 'video' ? item.duration : item.pages + ' pages' }}</span>
+          <span class="tag">{{
+            item.type === "video" ? item.duration : item.pages + " pages"
+          }}</span>
         </div>
         <div class="content-card__footer">
           <span>Used in {{ item.usedInCourses }} courses</span>
@@ -70,7 +97,10 @@ function deleteContent(id) {
       </div>
     </div>
 
-    <UploadModal v-if="showUploadModal" :item="editingItem" @close="closeModal" />
+    <UploadModal
+      v-if="showUploadModal"
+      :item="editingItem"
+      @close="closeModal" />
   </div>
 </template>
 
@@ -122,7 +152,9 @@ function deleteContent(id) {
 }
 
 .content-card:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .content-card__header {
