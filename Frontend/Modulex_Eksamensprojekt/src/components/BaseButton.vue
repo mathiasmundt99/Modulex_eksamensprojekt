@@ -1,11 +1,12 @@
 <script setup>
 defineProps({
-  variant: { type: String, default: 'primary' }
+  variant: { type: String, default: 'primary' },
+  block:   { type: Boolean, default: false },
 })
 </script>
 
 <template>
-  <button :class="['btn', `btn--${variant}`]">
+  <button :class="['btn', `btn--${variant}`, { 'btn--block': block }]">
     <slot />
   </button>
 </template>
@@ -19,6 +20,7 @@ defineProps({
   padding: 10px 24px;
   border-radius: 8px;
   font-size: 14px;
+  font-family: inherit;
   cursor: pointer;
   white-space: nowrap;
   border: none;
@@ -67,5 +69,10 @@ defineProps({
   color: var(--color-text);
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+.btn--block {
+  width: 100%;
+  justify-content: center;
 }
 </style>

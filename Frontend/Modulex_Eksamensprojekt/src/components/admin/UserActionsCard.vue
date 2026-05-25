@@ -6,13 +6,13 @@ import BaseButton from '../BaseButton.vue'
   <div class="card">
     <h3 class="card-title">Actions</h3>
     <div class="actions-list">
-      <BaseButton variant="muted" class="btn--block">
+      <BaseButton variant="muted" block>
         Send Message
       </BaseButton>
-      <BaseButton variant="outline" class="btn--block">
+      <BaseButton variant="outline" block>
         Reset Password
       </BaseButton>
-      <BaseButton variant="outline" class="btn--block">
+      <BaseButton variant="outline" block>
         Deactivate User
       </BaseButton>
     </div>
@@ -35,8 +35,4 @@ import BaseButton from '../BaseButton.vue'
   display: flex; flex-direction: column; gap: 8px; margin-top: 16px; 
 }
 
-.btn--block {
-  width: 100%;
-  justify-content: center;
-}
 </style>

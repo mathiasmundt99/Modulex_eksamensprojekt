@@ -37,7 +37,7 @@ defineEmits(['close', 'add'])
         </div>
 
         <div class="modal__footer">
-          <BaseButton variant="outline" class="btn--block" @click="$emit('close')">
+          <BaseButton variant="outline" block @click="$emit('close')">
             Close
           </BaseButton>
         </div>
@@ -128,8 +128,4 @@ defineEmits(['close', 'add'])
   border-top: 1px solid var(--color-border);
 }
 
-.btn--block {
-  width: 100%;
-  justify-content: center;
-}
 </style>
