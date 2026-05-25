@@ -70,6 +70,10 @@ function handleContentAdded(newContent) {
       </BaseButton>
     </div>
 
+    <div v-if="content.length === 0" class="empty-state">
+      <p>No content yet. Upload your first video or PDF!</p>
+    </div>
+
     <div class="content-grid">
       <ContentCard
         v-for="item in content"
@@ -112,6 +116,13 @@ function handleContentAdded(newContent) {
   font-size: 15px;
   color: var(--color-text);
   margin-top: 4px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-text);
+  opacity: 0.6;
 }
 
 .content-grid {
