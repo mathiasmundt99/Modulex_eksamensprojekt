@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import UserNavbar  from '../components/UserNavbar.vue'
-import UserSidebar from '../components/UserSidebar.vue'
+import UserNavbar  from '../components/user/UserNavbar.vue'
+import UserSidebar from '../components/user/UserSidebar.vue'
 
 const route = useRoute()
 const sidebarOpen = ref(false)

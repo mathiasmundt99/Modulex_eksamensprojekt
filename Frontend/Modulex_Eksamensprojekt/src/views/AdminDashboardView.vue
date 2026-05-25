@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-import AdminNavbar  from '../components/AdminNavbar.vue'
-import AdminSidebar from '../components/AdminSidebar.vue'
+import AdminNavbar  from '../components/admin/AdminNavbar.vue'
+import AdminSidebar from '../components/admin/AdminSidebar.vue'
 
 const sidebarOpen = ref(false)
 
