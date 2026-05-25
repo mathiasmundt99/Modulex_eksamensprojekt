@@ -95,24 +95,39 @@ export async function deleteCourse(courseId) {
   }
 }
 
-// link modul til kursus
-export async function linkModuleToCourse(courseId, moduleId) {
+// link content til kursus
+export async function linkContentToCourse(courseId, contentId) {
   try {
     const response = await fetch(
-      `${BASE_URL}/courses/${courseId}/modules/link`,
+      `${BASE_URL}/courses/${courseId}/content/link`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ moduleId }),
+        body: JSON.stringify({ contentId }),
       },
     );
 
-    if (!response.ok) throw new Error("Failed to link module");
+    if (!response.ok) throw new Error("Failed to link content");
     return await response.json();
   } catch (error) {
-    console.error("Error linking module:", error);
+    console.error("Error linking content:", error);
+    throw error;
+  }
+}
+
+// fjern content fra kursus
+export async function unlinkContentFromCourse(courseId, contentId) {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/courses/${courseId}/content/${contentId}`,
+      { method: "DELETE" },
+    );
+    if (!response.ok) throw new Error("Failed to unlink content");
+    return await response.json();
+  } catch (error) {
+    console.error("Error unlinking content:", error);
     throw error;
   }
 }
