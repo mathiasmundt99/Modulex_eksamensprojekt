@@ -82,11 +82,12 @@ async function handleCourseCreated(newCourse) {
       v-for="course in courses"
       :key="course.id"
       :course="course" />
+
+    <CreateCourseModal
+      v-if="showCreateModal"
+      @close="showCreateModal = false"
+      @course-created="handleCourseCreated" />
   </div>
-  <CreateCourseModal
-    v-if="showCreateModal"
-    @close="showCreateModal = false"
-    @course-created="handleCourseCreated" />
 </template>
 
 <style scoped>
