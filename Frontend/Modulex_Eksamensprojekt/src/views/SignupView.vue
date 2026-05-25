@@ -1,128 +1,85 @@
 <script setup>
-import { ref } from "vue";
+import SignupSection from '../components/auth/SignupSection.vue'
+import FormInputBox from '../components/auth/FormInputBox.vue'
+import BaseButton from '../components/BaseButton.vue'
+import { ref } from 'vue'
+
+const firstName       = ref('')
+const lastName        = ref('')
+const email           = ref('')
+const phone           = ref('')
+const companyName     = ref('')
+const cvr             = ref('')
+const companyAddress  = ref('')
+const country         = ref('')
+const password        = ref('')
+const confirmPassword = ref('')
 </script>
 
 <template>
   <div class="signup-page">
-    <img
-      class="logo"
-      src="../assets/images/modulex-logo.png"
-      alt="Modulex logo" />
+    <img class="logo" src="../assets/images/modulex-logo.png" alt="Modulex logo" />
 
     <header class="header">
       <h1>Modulex Billund Academy</h1>
       <p>Create your account to get started</p>
     </header>
 
-    <form class="signup-card">
-      <section>
-        <h2>Personal Information</h2>
+    <form class="signup-card" @submit.prevent>
+      <SignupSection title="Personal Information">
+        <label>
+          First Name *
+          <FormInputBox v-model="firstName" icon="person" placeholder="Karin" />
+        </label>
+        <label>
+          Last Name *
+          <FormInputBox v-model="lastName" icon="person" placeholder="Andersen" />
+        </label>
+      </SignupSection>
 
-        <div class="grid">
-          <label>
-            First Name *
-            <div class="input-box">
-              <span class="material-symbols-rounded"> person </span>
-              <input type="text" placeholder="Karin" />
-            </div>
-          </label>
+      <SignupSection title="Contact Information">
+        <label>
+          Email *
+          <FormInputBox v-model="email" icon="mail" type="email" placeholder="partner@example.com" />
+          <small>This is the email from your invitation</small>
+        </label>
+        <label>
+          Phone Number *
+          <FormInputBox v-model="phone" icon="call" type="tel" placeholder="+45 12 23 45 67" />
+        </label>
+      </SignupSection>
 
-          <label>
-            Last Name *
-            <div class="input-box">
-              <span class="material-symbols-rounded"> person </span>
-              <input type="text" placeholder="Andersen" />
-            </div>
-          </label>
-        </div>
-      </section>
+      <SignupSection title="Company Information">
+        <label>
+          Company Name *
+          <FormInputBox v-model="companyName" icon="apartment" placeholder="Firma ApS" />
+        </label>
+        <label>
+          CVR *
+          <FormInputBox v-model="cvr" icon="security" placeholder="12345678" />
+        </label>
+        <label>
+          Company Address *
+          <FormInputBox v-model="companyAddress" icon="location_on" placeholder="Eksempelgade 1" />
+        </label>
+        <label>
+          Country *
+          <FormInputBox v-model="country" icon="globe_location_pin" placeholder="Denmark" />
+        </label>
+      </SignupSection>
 
-      <section>
-        <h2>Contact Information</h2>
+      <SignupSection title="Create Password">
+        <label>
+          Password *
+          <FormInputBox v-model="password" icon="lock" type="password" placeholder="Min. 8 characters" suffix-icon="visibility_off" />
+        </label>
+        <label>
+          Confirm Password *
+          <FormInputBox v-model="confirmPassword" icon="lock" type="password" placeholder="Min. 8 characters" suffix-icon="visibility_off" />
+        </label>
+      </SignupSection>
 
-        <div class="grid">
-          <label>
-            Email*
-            <div class="input-box">
-              <span class="material-symbols-rounded"> mail </span>
-              <input type="email" placeholder="partner@example.com" />
-            </div>
-            <small>This is the email from your invitation</small>
-          </label>
-
-          <label>
-            Phone Number *
-            <div class="input-box">
-              <span class="material-symbols-rounded"> call </span>
-              <input type="tel" placeholder="+45 12 23 45 67" />
-            </div>
-          </label>
-        </div>
-      </section>
-
-      <section>
-        <h2>Company Information</h2>
-
-        <div class="grid">
-          <label>
-            Company Name *
-            <div class="input-box">
-              <span class="material-symbols-rounded"> apartment </span>
-              <input type="text" placeholder="partner@example.com" />
-            </div>
-          </label>
-
-          <label>
-            Cvr*
-            <div class="input-box">
-              <span class="material-symbols-rounded"> security </span>
-              <input type="text" placeholder="partner@example.com" />
-            </div>
-          </label>
-
-          <label>
-            Company Adress*
-            <div class="input-box">
-              <span class="material-symbols-rounded"> location_on </span>
-              <input type="text" placeholder="partner@example.com" />
-            </div>
-          </label>
-
-          <label>
-            Country*
-            <div class="input-box">
-              <span class="material-symbols-rounded"> globe_location_pin </span>
-              <input type="text" placeholder="partner@example.com" />
-            </div>
-          </label>
-        </div>
-      </section>
-
-      <section>
-        <h2>Create Password</h2>
-
-        <div class="grid">
-          <label>
-            Password *
-            <div class="input-box">
-              <span class="material-symbols-rounded"> lock </span>
-              <input type="password" placeholder="Min. 8 characters" />
-              <span class="material-symbols-rounded"> visibility_off </span>
-            </div>
-          </label>
-
-          <label>
-            Confirm Password *
-            <div class="input-box">
-              <span class="material-symbols-rounded"> lock </span>
-              <input type="password" placeholder="Min. 8 characters" />
-              <span class="material-symbols-rounded"> visibility_off </span>
-            </div>
-          </label>
-        </div>
-      </section>
-
-      <button type="submit">Create Account</button>
+      <BaseButton block style="margin-top: 10px">Create Account</BaseButton>
     </form>
   </div>
 </template>
@@ -169,74 +126,19 @@ import { ref } from "vue";
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
-section {
-  margin-bottom: 28px;
-}
-
-section h2 {
-  font-size: 1.2rem;
-  font-weight: 700;
-  padding-bottom: 8px;
-  margin-bottom: 18px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 26px 70px;
-}
-
 label {
   font-size: 0.95rem;
   font-weight: 500;
-}
-
-.input-box {
-  height: 42px;
-  margin-top: 8px;
-  background: #f6f6f6;
-  border-radius: 5px;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 12px;
-}
-
-.input-box input {
-  width: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 0.95rem;
-}
-
-.input-box input::placeholder {
-  color: #aaa;
-}
-
-.input-box span {
-  font-size: 1.1rem;
-  color: #222;
+  flex-direction: column;
+  gap: 8px;
 }
 
 small {
-  display: block;
-  margin-top: 8px;
   font-size: 0.8rem;
+  font-weight: 400;
 }
 
-button {
-  width: 100%;
-  height: 38px;
-  border: none;
-  border-radius: 5px;
-  background: var(--color-primary);
-  color: white;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 10px;
-}
 
 @media (max-width: 900px) {
   .signup-card {
@@ -244,13 +146,6 @@ button {
     max-width: 820px;
   }
 
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .header h1 {
-    font-size: 2.2rem;
-  }
+  .header h1 { font-size: 2.2rem; }
 }
 </style>
