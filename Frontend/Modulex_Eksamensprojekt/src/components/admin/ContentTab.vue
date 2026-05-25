@@ -3,7 +3,8 @@ import { ref, onMounted } from "vue";
 import UploadModal from "./UploadModal.vue";
 import BaseButton from "../BaseButton.vue";
 import BreadCrumb from "../BreadCrumb.vue";
-import { getPdfs, getLibraryContent } from "@/services/contentService";
+import { getLibraryContent, deleteLibraryContent } from "@/services/contentService";
+import { getAllCourses } from "@/services/courseService";
 import ContentCard from "./ContentCard.vue";
 
 const showUploadModal = ref(false);
@@ -19,16 +20,30 @@ function closeModal() {
   editingItem.value = null;
 }
 
-function deleteContent(id) {
-  content.value = content.value.filter((item) => item.id !== id);
+async function deleteContent(id) {
+  try {
+    await deleteLibraryContent(id);
+    content.value = content.value.filter((item) => item.id !== id);
+  } catch (error) {
+    console.error("Failed to delete content:", error);
+  }
 }
 
 const content = ref([]);
 
 onMounted(async () => {
   try {
-    const libraryContent = await getLibraryContent();
-    content.value = libraryContent;
+    const [libraryContent, courses] = await Promise.all([
+      getLibraryContent(),
+      getAllCourses(),
+    ]);
+
+    content.value = libraryContent.map((item) => ({
+      ...item,
+      usedInCourses: courses.filter((c) =>
+        c.contentIds?.includes(item.id),
+      ).length,
+    }));
   } catch (error) {
     console.error("Error loading library content:", error);
   }

@@ -9,11 +9,12 @@ import CourseDangerZone from "../components/admin/CourseDangerZone.vue";
 import CourseModulesList from "../components/admin/CourseModulesList.vue";
 import {
   getCourseById,
-  createCourse,
   updateCourse,
   deleteCourse,
-  linkModuleToCourse,
+  linkContentToCourse,
+  unlinkContentFromCourse,
 } from "@/services/courseService";
+import { getLibraryContent } from "@/services/contentService";
 
 const route = useRoute();
 const router = useRouter();
@@ -27,6 +28,7 @@ const courseData = ref({
 });
 
 const modules = ref([]);
+const availableContent = ref([]);
 const isEditing = ref(isNew.value);
 const isLoading = ref(false);
 const error = ref(null);
@@ -37,17 +39,36 @@ const breadcrumbItems = computed(() => [
   { label: isNew.value ? "New Course" : courseData.value.title },
 ]);
 
-onMounted(async () => {
-  if (isNew.value) return;
+function contentToModule(item) {
+  return {
+    id: item.id,
+    title: item.title,
+    type: item.type,
+    duration: item.type === "video" ? item.durationOrPages : undefined,
+    pages: item.type === "pdf" ? item.durationOrPages : undefined,
+  };
+}
 
+onMounted(async () => {
   isLoading.value = true;
   error.value = null;
 
   try {
-    const course = await getCourseById(route.params.courseId);
-    courseData.value = { ...course };
-    // modulesId kommer fra API'en, men vi viser dem som tom liste til vi har modules endpoint
-    modules.value = [];
+    const [allContent, course] = await Promise.all([
+      getLibraryContent(),
+      isNew.value ? null : getCourseById(route.params.courseId),
+    ]);
+
+    availableContent.value = allContent;
+
+    if (course) {
+      courseData.value = { ...course };
+      const linkedIds = new Set(course.contentIds ?? []);
+      modules.value = allContent
+        .filter((item) => linkedIds.has(item.id))
+        .sort((a, b) => course.contentIds.indexOf(a.id) - course.contentIds.indexOf(b.id))
+        .map(contentToModule);
+    }
   } catch (err) {
     console.error("Failed to load course:", err);
     error.value = "Failed to load course data";
@@ -56,8 +77,17 @@ onMounted(async () => {
   }
 });
 
-function handleSave() {
-  isEditing.value = false;
+async function handleSave() {
+  try {
+    await updateCourse(route.params.courseId, {
+      title: courseData.value.title,
+      description: courseData.value.description,
+    });
+    isEditing.value = false;
+  } catch (err) {
+    console.error("Failed to save course:", err);
+    error.value = "Failed to save course";
+  }
 }
 
 function handleCancel() {
@@ -68,24 +98,33 @@ function handleCancel() {
   }
 }
 
-function handleDelete() {
-  router.push("/admin/courses");
+async function handleDelete() {
+  try {
+    await deleteCourse(route.params.courseId);
+    router.push("/admin/courses");
+  } catch (err) {
+    console.error("Failed to delete course:", err);
+    error.value = "Failed to delete course";
+  }
 }
 
-function removeModule(id) {
-  const idx = modules.value.findIndex((m) => m.id === id);
-  if (idx !== -1) modules.value.splice(idx, 1);
+async function removeModule(id) {
+  try {
+    await unlinkContentFromCourse(route.params.courseId, id);
+    modules.value = modules.value.filter((m) => m.id !== id);
+  } catch (err) {
+    console.error("Failed to remove module:", err);
+  }
 }
 
-function addModule(content) {
-  modules.value.push({
-    id: Date.now(),
-    title: content.title,
-    type: content.type,
-    duration: content.type === "video" ? content.duration : undefined,
-    pages: content.type === "pdf" ? content.pages : undefined,
-    contentId: content.id,
-  });
+async function addModule(content) {
+  if (modules.value.some((m) => m.id === content.id)) return;
+  try {
+    await linkContentToCourse(route.params.courseId, content.id);
+    modules.value.push(contentToModule(content));
+  } catch (err) {
+    console.error("Failed to add module:", err);
+  }
 }
 
 function reorderModules({ from, to }) {

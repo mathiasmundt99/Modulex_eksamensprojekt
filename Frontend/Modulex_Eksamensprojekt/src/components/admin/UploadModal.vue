@@ -1,8 +1,8 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import BaseButton from "../BaseButton.vue";
 import {
-  uploadPdf,
+  uploadPdfToLibrary,
   createLibraryContent,
   updateLibraryContent,
 } from "@/services/contentService";
@@ -18,12 +18,70 @@ const form = ref({
   title: props.item?.title ?? "",
   type: props.item?.type ?? "video",
   description: props.item?.description ?? "",
-  videoUrl: props.item?.videoUrl ?? "",
+  videoUrl: props.item?.url ?? "",
+  pages: props.item?.type === "pdf" ? (props.item?.durationOrPages ?? "") : "",
+  duration: props.item?.type === "video" ? (props.item?.durationOrPages ?? "") : "",
 });
 
 const hasExistingFile = ref(isEditMode.value);
 const selectedFile = ref(null);
-const videoUrl = ref("");
+const isDragging = ref(false);
+const isFetchingDuration = ref(false);
+
+function extractYoutubeId(url) {
+  const match = url.match(
+    /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+  );
+  return match ? match[1] : null;
+}
+
+function parseIsoDuration(iso) {
+  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!m) return "0:00";
+  const h = parseInt(m[1] ?? 0);
+  const min = parseInt(m[2] ?? 0);
+  const sec = parseInt(m[3] ?? 0);
+  const mm = String(min).padStart(h > 0 ? 2 : 1, "0");
+  const ss = String(sec).padStart(2, "0");
+  return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+}
+
+watch(
+  () => form.value.videoUrl,
+  async (url) => {
+    const videoId = extractYoutubeId(url);
+    if (!videoId) return;
+    isFetchingDuration.value = true;
+    try {
+      const key = import.meta.env.VITE_YOUTUBE_API_KEY;
+      const res = await fetch(
+        `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=${videoId}&key=${key}`,
+      );
+      const data = await res.json();
+      const item = data.items?.[0];
+      if (!item) return;
+      const iso = item.contentDetails?.duration;
+      if (iso) form.value.duration = parseIsoDuration(iso);
+      if (!form.value.title) form.value.title = item.snippet?.title ?? "";
+      if (!form.value.description) form.value.description = item.snippet?.description ?? "";
+    } catch {
+      // ignorer fejl — brugeren kan udfylde manuelt
+    } finally {
+      isFetchingDuration.value = false;
+    }
+  },
+);
+
+function handleDrop(event) {
+  isDragging.value = false;
+  const file = event.dataTransfer.files[0];
+  if (!file) return;
+  if (file.type !== "application/pdf") {
+    alert("Only PDF files are allowed");
+    return;
+  }
+  selectedFile.value = file;
+}
 
 function handleFileChange(event) {
   const file = event.target.files[0];
@@ -40,15 +98,12 @@ async function handleUpload() {
     let uploadedContent;
 
     if (isEditMode.value) {
-      console.log("Editing item with ID:", props.item.id); // DEBUG
-      console.log("Item data:", props.item); // DEBUG
-
       uploadedContent = await updateLibraryContent(props.item.id, {
         title: form.value.title,
         description: form.value.description,
+        durationOrPages: form.value.pages || props.item.durationOrPages,
       });
 
-      console.log("Content updated:", uploadedContent);
       emit("content-added", uploadedContent);
       emit("close");
       return;
@@ -60,20 +115,14 @@ async function handleUpload() {
         return;
       }
 
-      const pdfResult = await uploadPdf(selectedFile.value);
-      console.log("PDF upload result:", pdfResult);
+      const formData = new FormData();
+      formData.append("pdfFile", selectedFile.value);
+      formData.append("title", form.value.title);
+      formData.append("description", form.value.description);
+      formData.append("type", "pdf");
+      formData.append("durationOrPages", form.value.pages || "0");
 
-      const contentPayload = {
-        title: form.value.title,
-        description: form.value.description,
-        type: "pdf",
-        url: pdfResult.data.fileName, // ÆNDRING: Brug fileName i stedet for url
-        durationOrPages: pdfResult.data.size.toString() || "0",
-      };
-      console.log("Sending to library:", contentPayload);
-
-      uploadedContent = await createLibraryContent(contentPayload);
-      console.log("PDF uploaded and saved to library:", uploadedContent);
+      uploadedContent = await uploadPdfToLibrary(formData);
     }
 
     if (form.value.type === "video") {
@@ -87,19 +136,16 @@ async function handleUpload() {
         description: form.value.description,
         type: "video",
         url: form.value.videoUrl,
-        durationOrPages: "0:00",
+        durationOrPages: form.value.duration || "0:00",
       };
-      console.log("Sending to library:", contentPayload);
-
       uploadedContent = await createLibraryContent(contentPayload);
-      console.log("Video saved to library:", uploadedContent);
     }
 
     emit("content-added", uploadedContent);
     emit("close");
   } catch (error) {
     console.error("Full error:", error);
-    alert("Error uploading content");
+    alert(`Upload fejlede: ${error.message}`);
   }
 }
 </script>
@@ -134,6 +180,16 @@ async function handleUpload() {
             rows="3"
             placeholder="Write a short description of this content"></textarea>
         </div>
+        <div v-if="form.type === 'pdf'" class="form-group">
+          <label class="form-label">Number of pages</label>
+          <input
+            v-model="form.pages"
+            type="number"
+            min="1"
+            class="form-input"
+            placeholder="e.g. 12" />
+        </div>
+
         <div class="form-group">
           <div v-if="hasExistingFile" class="existing-file">
             <span class="material-symbols-rounded existing-file__icon">
@@ -150,8 +206,12 @@ async function handleUpload() {
           </div>
           <div
             v-if="!isEditMode && form.type === 'pdf'"
-            class="dropzone"
-            @click="$refs.fileInput.click()">
+            :class="['dropzone', { 'dropzone--active': isDragging }]"
+            @click="$refs.fileInput.click()"
+            @dragover.prevent="isDragging = true"
+            @dragenter.prevent="isDragging = true"
+            @dragleave="isDragging = false"
+            @drop.prevent="handleDrop">
             <input
               ref="fileInput"
               type="file"
@@ -176,6 +236,17 @@ async function handleUpload() {
               type="text"
               class="form-input"
               placeholder="https://youtube.com/watch?v=..." />
+            <div class="form-group" style="margin-top: 8px">
+              <label class="form-label">
+                Duration
+                <span v-if="isFetchingDuration" class="fetching-label">henter...</span>
+              </label>
+              <input
+                v-model="form.duration"
+                type="text"
+                class="form-input"
+                placeholder="0:00" />
+            </div>
           </div>
         </div>
         <div class="form-actions">
@@ -308,9 +379,21 @@ async function handleUpload() {
   cursor: pointer;
 }
 
+.dropzone--active {
+  border-color: var(--color-primary);
+  background-color: rgba(239, 96, 35, 0.04);
+}
+
 .dropzone__text {
   font-size: 14px;
   color: var(--color-text);
+}
+
+.fetching-label {
+  font-size: 12px;
+  color: var(--color-primary);
+  margin-left: 6px;
+  opacity: 0.8;
 }
 
 .form-actions {
