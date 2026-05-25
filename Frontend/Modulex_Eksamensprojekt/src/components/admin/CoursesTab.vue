@@ -9,6 +9,7 @@ import {
   updateCourse,
 } from "@/services/courseService";
 import CreateCourseModal from "./CreateCourseModal.vue";
+import CourseCard from "./CourseCard.vue";
 
 const router = useRouter();
 const courses = ref([]);
@@ -77,46 +78,10 @@ async function handleCourseCreated(newCourse) {
       <p>No courses yet. Create your first course!</p>
     </div>
 
-    <div v-for="course in courses" :key="course.id" class="course-card">
-      <div class="course-card__body">
-        <div class="course-card__info">
-          <div class="course-card__title-row">
-            <h3 class="course-card__title">{{ course.title }}</h3>
-            <span
-              :class="[
-                'badge',
-                course.status === 'Published'
-                  ? 'badge--published'
-                  : 'badge--draft',
-              ]">
-              {{ course.status }}
-            </span>
-          </div>
-          <div class="course-stats">
-            <div class="course-stat">
-              <p class="course-stat__label">Modules</p>
-              <p class="course-stat__value">{{ course.modules }}</p>
-            </div>
-            <div class="course-stat">
-              <p class="course-stat__label">Enrolled Users</p>
-              <p class="course-stat__value">{{ course.enrolledUsers }}</p>
-            </div>
-            <div class="course-stat">
-              <p class="course-stat__label">Avg. Completion</p>
-              <p class="course-stat__value">{{ course.avgCompletion }}%</p>
-            </div>
-          </div>
-        </div>
-        <div class="course-card__actions">
-          <BaseButton
-            variant="muted"
-            @click="router.push('/admin/courses/' + course.id)"
-            >Edit Course</BaseButton
-          >
-          <BaseButton variant="ghost">View Analytics</BaseButton>
-        </div>
-      </div>
-    </div>
+    <CourseCard
+      v-for="course in courses"
+      :key="course.id"
+      :course="course" />
   </div>
   <CreateCourseModal
     v-if="showCreateModal"

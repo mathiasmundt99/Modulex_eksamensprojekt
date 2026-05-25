@@ -4,6 +4,7 @@ import UploadModal from "./UploadModal.vue";
 import BaseButton from "../BaseButton.vue";
 import BreadCrumb from "../BreadCrumb.vue";
 import { getPdfs, getLibraryContent } from "@/services/contentService";
+import ContentCard from "./ContentCard.vue";
 
 const showUploadModal = ref(false);
 const editingItem = ref(null);
@@ -55,43 +56,12 @@ function handleContentAdded(newContent) {
     </div>
 
     <div class="content-grid">
-      <div v-for="item in content" :key="item.id" class="content-card">
-        <div class="content-card__header">
-          <h3 class="content-card__title">{{ item.title }}</h3>
-          <div class="content-card__actions">
-            <BaseButton
-              variant="ghost"
-              class="action-btn"
-              @click="openEdit(item)">
-              <span class="material-symbols-rounded">edit_square</span>
-            </BaseButton>
-            <BaseButton
-              variant="ghost"
-              class="action-btn"
-              @click="deleteContent(item.id)">
-              <span class="material-symbols-rounded">delete</span>
-            </BaseButton>
-          </div>
-        </div>
-        <p v-if="item.description" class="content-card__description">
-          {{ item.description }}
-        </p>
-        <div class="content-card__tags">
-          <span class="tag">
-            <span class="material-symbols-rounded tag__icon">{{
-              item.type === "video" ? "play_circle" : "picture_as_pdf"
-            }}</span>
-            {{ item.type === "video" ? "Video" : "PDF" }}
-          </span>
-          <span class="tag">{{
-            item.type === "video" ? item.duration : item.pages + " pages"
-          }}</span>
-        </div>
-        <div class="content-card__footer">
-          <span>Used in {{ item.usedInCourses }} courses</span>
-          <span>Uploaded: {{ item.uploadDate }}</span>
-        </div>
-      </div>
+      <ContentCard
+        v-for="item in content"
+        :key="item.id"
+        :item="item"
+        @edit="openEdit"
+        @delete="deleteContent" />
     </div>
 
     <UploadModal
