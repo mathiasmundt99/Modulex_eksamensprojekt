@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import UserDashboardView from "../views/UserDashboardView.vue";
 import AdminDashboardView from "../views/AdminDashboardView.vue";
 import UserProfileView from "../views/UserProfileView.vue";
+import SurveyDashboard from "../views/SurveyDashboard.vue";
 import UserOverviewTab from "../components/user/OverviewTab.vue";
 import UserCoursesTab from "../components/user/CoursesTab.vue";
 import UserProgressTab from "../components/user/ProgressTab.vue";
@@ -25,6 +26,7 @@ export default createRouter({
     { path: "/overview", redirect: "/dashboard/overview" },
     { path: "/courses", redirect: "/dashboard/courses" },
     { path: "/progress", redirect: "/dashboard/progress" },
+    { path: "/survey-dashboard", component: SurveyDashboard, meta: { label: "Survey Dashboard" } },
     {
       path: "/dashboard",
       redirect: "/dashboard/overview",
