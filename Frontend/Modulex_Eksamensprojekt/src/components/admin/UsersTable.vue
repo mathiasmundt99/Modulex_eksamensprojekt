@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import BaseButton from "../BaseButton.vue";
+import { getCompanies } from "@/services/companiesService.js";
 
 const props = defineProps({
   users: { type: Array, required: true },
@@ -9,6 +10,7 @@ const props = defineProps({
 
 const router = useRouter();
 const searchQuery = ref("");
+const companies = ref([]);
 
 const filteredUsers = computed(() => {
   const q = searchQuery.value.toLowerCase();
@@ -23,6 +25,19 @@ const filteredUsers = computed(() => {
     );
   });
 });
+
+onMounted(async () => {
+  try {
+    companies.value = await getCompanies();
+  } catch (err) {
+    console.error("Failed to load companies", err);
+  }
+});
+
+const getCompanyName = (companyId) => {
+  const company = companies.value.find((c) => c.id === companyId);
+  return company?.name ?? "—";
+};
 </script>
 
 <template>
@@ -64,7 +79,7 @@ const filteredUsers = computed(() => {
               </td>
               <td>
                 <p class="td-main">
-                  {{ user.companyId ?? user.company ?? "—" }}
+                  {{ getCompanyName(user.companyId) }}
                 </p>
               </td>
               <td>

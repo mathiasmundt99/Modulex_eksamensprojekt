@@ -221,3 +221,35 @@ export async function getUsersAttention(type = "low-progress", limit = 50) {
     throw error;
   }
 }
+
+// hent brugers tilmeldte kurser med progress
+export async function getUserCourses(userId) {
+  try {
+    const response = await fetch(`${BASE_URL}/users/${userId}/courses`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("User courses not found");
+      }
+
+      if (response.status === 400) {
+        throw new Error(data?.message || "Validation error");
+      }
+
+      throw new Error("Failed to fetch user courses");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching user courses:", error);
+    throw error;
+  }
+}

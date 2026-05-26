@@ -7,7 +7,12 @@ import UserStatsCard from "../components/admin/UserStatsCard.vue";
 import UserActionsCard from "../components/admin/UserActionsCard.vue";
 import UserEnrolledCourses from "../components/admin/UserEnrolledCourses.vue";
 import UserActivityLog from "../components/admin/UserActivityLog.vue";
-import { getUserById, updateUser, deleteUser } from "../services/adminService";
+import {
+  getUserById,
+  updateUser,
+  deleteUser,
+  getUserCourses,
+} from "../services/adminService";
 import { getUserActivity } from "../services/adminService";
 import { useRouter } from "vue-router";
 
@@ -22,15 +27,31 @@ onMounted(async () => {
   loading.value = true;
 
   try {
-    const [userResponse, activityResponse] = await Promise.all([
-      getUserById(route.params.id),
-      getUserActivity(route.params.id),
-    ]);
+    const [userResponse, activityResponse, coursesResponse] = await Promise.all(
+      [
+        getUserById(route.params.id),
+        getUserActivity(route.params.id),
+        getUserCourses(route.params.id),
+      ],
+    );
 
     user.value = userResponse.data?.data || userResponse.data;
 
     activityLog.value =
       activityResponse.data?.data || activityResponse.data || [];
+
+    enrolledCourses.value = (
+      coursesResponse.data?.data ||
+      coursesResponse.data ||
+      []
+    ).map((c) => ({
+      id: c.id,
+      title: c.title,
+      progress: c.progress ?? 0,
+      enrolledDate: c.enrolledDate ?? "N/A",
+      completedDate: c.completedDate ?? null,
+      timeSpent: c.timeSpent ?? "0 hours",
+    }));
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -38,24 +59,7 @@ onMounted(async () => {
   }
 });
 
-const enrolledCourses = ref([
-  {
-    id: 1,
-    title: "Introduction to Modulex Sign Systems",
-    progress: 100,
-    enrolledDate: "2024-03-15",
-    completedDate: "2024-03-20",
-    timeSpent: "2.5 hours",
-  },
-  {
-    id: 2,
-    title: "Product Configuration & Ordering",
-    progress: 60,
-    enrolledDate: "2024-03-20",
-    completedDate: null,
-    timeSpent: "3.2 hours",
-  },
-]);
+const enrolledCourses = ref([]);
 
 const availableCourses = [
   {
