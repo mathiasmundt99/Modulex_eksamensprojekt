@@ -1,4 +1,7 @@
 <script setup>
+import { useRouter } from "vue-router";
+import BaseButton from "../BaseButton.vue";
+
 defineProps({
   title: { type: String, required: true },
   description: { type: String, required: true },
@@ -6,11 +9,17 @@ defineProps({
   total: { type: Number, required: true },
   progressPercentage: { type: Number, required: true },
 });
+
+const router = useRouter();
 </script>
 
 <template>
   <div class="course-header">
     <div class="course-header__inner">
+      <BaseButton variant="outline" class="back-btn" @click="router.push('/dashboard/courses')">
+        <span class="material-symbols-rounded">arrow_back</span>
+        My Courses
+      </BaseButton>
       <h2 class="course-header__title">{{ title }}</h2>
       <p class="course-header__desc">{{ description }}</p>
       <div class="progress-row">
@@ -34,7 +43,11 @@ defineProps({
 .course-header__inner {
   max-width: var(--site-width);
   margin: 0 auto;
-      padding: 0 24px;
+  padding: 0 24px;
+}
+
+.back-btn {
+  margin-bottom: 12px;
 }
 
 .course-header__title {

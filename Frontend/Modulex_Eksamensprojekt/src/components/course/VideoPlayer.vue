@@ -19,13 +19,13 @@ defineProps({
 
 <style scoped>
 .video-wrapper {
-  position: relative;
-  padding-bottom: 56.25%;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 540px;
 }
 
 .video-wrapper__iframe {
-  position: absolute;
-  inset: 0;
+  display: block;
   width: 100%;
   height: 100%;
 }

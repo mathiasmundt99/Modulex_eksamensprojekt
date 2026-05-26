@@ -1,4 +1,7 @@
 <script setup>
+import { useRouter } from "vue-router";
+import BaseButton from "../BaseButton.vue";
+
 defineProps({
   contentItems: { type: Array, required: true },
   currentItemIndex: { type: Number, required: true },
@@ -8,6 +11,7 @@ defineProps({
 });
 
 const emit = defineEmits(["select", "close"]);
+const router = useRouter();
 </script>
 
 <template>
@@ -54,6 +58,13 @@ const emit = defineEmits(["select", "close"]);
           {{ completedCount }} of {{ contentItems.length }} modules completed ({{ progressPercentage }}%)
         </p>
       </div>
+
+      <BaseButton
+        v-if="progressPercentage === 100"
+        @click="router.push('/dashboard/courses')">
+        <span class="material-symbols-rounded">check_circle</span>
+        Back to My Courses
+      </BaseButton>
     </div>
   </aside>
 </template>
@@ -232,4 +243,5 @@ const emit = defineEmits(["select", "close"]);
   border-radius: 999px;
   transition: width 0.4s;
 }
+
 </style>
