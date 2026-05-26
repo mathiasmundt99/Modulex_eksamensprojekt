@@ -1,9 +1,16 @@
 <script setup>
+import { useRouter } from "vue-router";
 import BaseButton from "../BaseButton.vue";
 
-defineProps({
+const props = defineProps({
   course: { type: Object, required: true },
 });
+
+const router = useRouter();
+
+function openCourse() {
+  router.push(`/course/${props.course.id}`);
+}
 </script>
 
 <template>
@@ -12,7 +19,11 @@ defineProps({
       <div class="course-card__info">
         <div class="course-card__title-row">
           <h3 class="course-card__title">{{ course.title }}</h3>
-          <span class="material-symbols-rounded icon--primary">check_circle_outline</span>
+          <span
+            v-if="course.status === 'completed'"
+            class="material-symbols-rounded icon--primary">
+            check_circle_outline
+          </span>
         </div>
         <p class="course-card__description">{{ course.description }}</p>
         <div class="course-card__meta">
@@ -20,12 +31,8 @@ defineProps({
             <span class="material-symbols-rounded">import_contacts</span>
             {{ course.modules }} modules
           </span>
-          <span class="meta-item">
-            <span class="material-symbols-rounded">schedule</span>
-            {{ course.duration }}
-          </span>
         </div>
-        <div v-if="course.status !== 'locked'" class="course-card__progress">
+        <div class="course-card__progress">
           <div class="progress-bar">
             <div class="progress-bar__fill" :style="{ width: course.progress + '%' }"></div>
           </div>
@@ -33,16 +40,20 @@ defineProps({
         </div>
       </div>
       <div class="course-card__actions">
-        <BaseButton v-if="course.status === 'completed'" variant="muted">Review</BaseButton>
-        <BaseButton v-if="course.status === 'in-progress'">Continue</BaseButton>
-        <BaseButton v-if="course.status === 'locked'" variant="disabled" disabled>Locked</BaseButton>
+        <BaseButton v-if="course.status === 'completed'" variant="muted" @click="openCourse">
+          Review
+        </BaseButton>
+        <BaseButton v-else-if="course.hasStarted" @click="openCourse">Continue</BaseButton>
+        <BaseButton v-else @click="openCourse">Start Course</BaseButton>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.icon--primary { color: var(--color-primary); }
+.icon--primary {
+  color: var(--color-primary);
+}
 
 .course-card {
   background-color: var(--color-white);
@@ -64,7 +75,9 @@ defineProps({
   flex-wrap: wrap;
 }
 
-.course-card__info { flex: 1; }
+.course-card__info {
+  flex: 1;
+}
 
 .course-card__title-row {
   display: flex;
@@ -99,7 +112,9 @@ defineProps({
   color: var(--color-text);
 }
 
-.course-card__actions { flex-shrink: 0; }
+.course-card__actions {
+  flex-shrink: 0;
+}
 
 .progress-bar {
   height: 8px;
