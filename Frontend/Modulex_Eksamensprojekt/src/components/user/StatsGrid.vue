@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { getCourseById } from "../../services/courseService.js";
 import { getUserProgress, getUserStats } from "../../services/progressService.js";
+import { getUser } from "../../utils/auth.js";
 
 const completedModules = ref(0);
 const totalModules = ref(0);
@@ -10,8 +11,7 @@ const notStarted = ref(0);
 
 onMounted(async () => {
   try {
-    const userJson = localStorage.getItem("user");
-    const user = userJson ? JSON.parse(userJson) : null;
+    const user = getUser();
     if (!user) return;
 
     const [stats, progress] = await Promise.all([

@@ -1,8 +1,6 @@
 <script setup>
-const user = (() => {
-  const json = localStorage.getItem("user");
-  return json ? JSON.parse(json) : null;
-})();
+import { getUser } from "../utils/auth.js";
+const user = getUser();
 </script>
 
 <template>

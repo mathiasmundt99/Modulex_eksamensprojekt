@@ -5,14 +5,14 @@ import HelpBanner from "../HelpBanner.vue";
 import OverallProgress from "./OverallProgress.vue";
 import OnboardingChecklist from "./OnboardingChecklist.vue";
 import { getOnboardingProgress } from "../../services/progressService.js";
+import { getUser } from "../../utils/auth.js";
 
 const overallProgress = ref(0);
 const checklistItems = ref([]);
 
 onMounted(async () => {
   try {
-    const userJson = localStorage.getItem("user");
-    const user = userJson ? JSON.parse(userJson) : null;
+    const user = getUser();
     if (!user) return;
 
     const result = await getOnboardingProgress(user.id);

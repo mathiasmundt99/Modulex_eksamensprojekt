@@ -10,6 +10,7 @@ import BaseButton from "../components/BaseButton.vue";
 import { getCourseById } from "../services/courseService.js";
 import { getLibraryContentById } from "../services/contentService.js";
 import { getUserCourseProgress, updateProgress } from "../services/progressService.js";
+import { getUser } from "../utils/auth.js";
 
 const router = useRouter();
 const route = useRoute();
@@ -21,10 +22,7 @@ const courseDescription = ref("");
 const contentItems = ref([]);
 const loading = ref(true);
 
-const user = (() => {
-  const json = localStorage.getItem("user");
-  return json ? JSON.parse(json) : null;
-})();
+const user = getUser();
 
 function toEmbedUrl(url) {
   if (!url) return "";

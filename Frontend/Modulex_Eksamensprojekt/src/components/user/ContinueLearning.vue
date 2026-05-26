@@ -3,6 +3,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import BaseButton from "../BaseButton.vue";
 import { getUserCourses } from "../../services/progressService.js";
+import { getUser } from "../../utils/auth.js";
 
 const router = useRouter();
 const courses = ref([]);
@@ -10,8 +11,7 @@ const loading = ref(true);
 
 onMounted(async () => {
   try {
-    const userJson = localStorage.getItem("user");
-    const user = userJson ? JSON.parse(userJson) : null;
+    const user = getUser();
     if (!user) return;
 
     const result = await getUserCourses(user.id);

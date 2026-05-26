@@ -2,14 +2,14 @@
 import { ref, onMounted } from "vue";
 import { getCourseById } from "../../services/courseService.js";
 import { getUserProgress } from "../../services/progressService.js";
+import { getUser } from "../../utils/auth.js";
 
 const firstName = ref("");
 const overallProgress = ref(0);
 
 onMounted(async () => {
   try {
-    const userJson = localStorage.getItem("user");
-    const user = userJson ? JSON.parse(userJson) : null;
+    const user = getUser();
     if (!user) return;
 
     firstName.value = user.firstName;

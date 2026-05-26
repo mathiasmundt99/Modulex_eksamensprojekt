@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { getUserActivity } from "../../services/progressService.js";
+import { getUser } from "../../utils/auth.js";
 
 const activities = ref([]);
 const loading = ref(true);
@@ -22,8 +23,7 @@ function iconFor(title) {
 
 onMounted(async () => {
   try {
-    const userJson = localStorage.getItem("user");
-    const user = userJson ? JSON.parse(userJson) : null;
+    const user = getUser();
     if (!user) return;
 
     const result = await getUserActivity(user.id, 5);

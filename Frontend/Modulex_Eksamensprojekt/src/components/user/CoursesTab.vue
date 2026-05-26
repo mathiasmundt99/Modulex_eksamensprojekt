@@ -5,14 +5,14 @@ import HelpBanner from "../HelpBanner.vue";
 import UserCourseCard from "./UserCourseCard.vue";
 import { getUserCourses } from "../../services/progressService.js";
 import { getCourseById } from "../../services/courseService.js";
+import { getUser } from "../../utils/auth.js";
 
 const courses = ref([]);
 const loading = ref(true);
 
 onMounted(async () => {
   try {
-    const userJson = localStorage.getItem("user");
-    const user = userJson ? JSON.parse(userJson) : null;
+    const user = getUser();
     if (!user) return;
 
     const result = await getUserCourses(user.id);
