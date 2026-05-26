@@ -1,20 +1,35 @@
 <script setup>
-import { ref } from 'vue'
-import AdminNavbar  from '../components/admin/AdminNavbar.vue'
-import AdminSidebar from '../components/admin/AdminSidebar.vue'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { logoutUser } from "../services/authService";
+import AdminNavbar from "../components/admin/AdminNavbar.vue";
+import AdminSidebar from "../components/admin/AdminSidebar.vue";
 
-const sidebarOpen = ref(false)
+const router = useRouter();
+const sidebarOpen = ref(false);
 
 function toggleSidebar() {
-  sidebarOpen.value = !sidebarOpen.value
+  sidebarOpen.value = !sidebarOpen.value;
+}
+
+async function handleLogout() {
+  try {
+    await logoutUser();
+    router.push("/login");
+  } catch (error) {
+    console.error("Logout error:", error);
+    router.push("/login");
+  }
 }
 </script>
 
 <template>
   <div class="admin-dashboard">
-    <AdminNavbar @toggleSidebar="toggleSidebar" @logout="() => {}" />
+    <AdminNavbar @toggleSidebar="toggleSidebar" @logout="handleLogout" />
     <div class="admin-dashboard__layout">
-      <AdminSidebar :sidebarOpen="sidebarOpen" @navigate="sidebarOpen = false" />
+      <AdminSidebar
+        :sidebarOpen="sidebarOpen"
+        @navigate="sidebarOpen = false" />
       <main class="dashboard">
         <RouterView />
       </main>

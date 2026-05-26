@@ -1,5 +1,6 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
+// Opret bruger
 export async function registerUser(userData) {
   try {
     const response = await fetch(`${API_URL}/auth/register`, {
@@ -32,6 +33,7 @@ export async function registerUser(userData) {
   }
 }
 
+// login bruger
 export async function loginUser(credentials) {
   try {
     const response = await fetch(`${API_URL}/auth/login`, {
@@ -63,6 +65,90 @@ export async function loginUser(credentials) {
     return data;
   } catch (error) {
     console.error("Login error:", error);
+    throw error;
+  }
+}
+
+// anmod om nulstiling af passwords
+export async function forgotPassword(email) {
+  try {
+    const response = await fetch(`${API_URL}/auth/forgot-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message ||
+          `Forgot password request failed: ${response.statusText}`,
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    throw error;
+  }
+}
+
+// Nustil password med en gyldig token
+export async function resetPassword(token, password) {
+  try {
+    const response = await fetch(`${API_URL}/auth/reset-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: token,
+        password: password,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Password reset failed: ${response.statusText}`,
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Password reset error:", error);
+    throw error;
+  }
+}
+
+// log ud af systemet
+export async function logoutUser() {
+  try {
+    const response = await fetch(`${API_URL}/auth/logout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Logout failed: ${response.statusText}`,
+      );
+    }
+
+    // Slet bruger data fra localStorage
+    localStorage.removeItem("user");
+
+    return await response.json();
+  } catch (error) {
+    console.error("Logout error:", error);
     throw error;
   }
 }
