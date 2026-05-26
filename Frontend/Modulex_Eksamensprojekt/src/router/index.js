@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import UserDashboardView from "../views/UserDashboardView.vue";
 import AdminDashboardView from "../views/AdminDashboardView.vue";
 import UserProfileView from "../views/UserProfileView.vue";
+import SurveyDashboard from "../views/SurveyDashboard.vue";
 import UserOverviewTab from "../components/user/OverviewTab.vue";
 import UserCoursesTab from "../components/user/CoursesTab.vue";
 import UserProgressTab from "../components/user/ProgressTab.vue";
@@ -14,6 +15,7 @@ import AdminCourseEditorView from "../views/AdminCourseEditorView.vue";
 import InvitationView from "../views/InvitationView.vue";
 import LoginView from "../views/LoginView.vue";
 import SignupView from "../views/SignupView.vue";
+import UserSurvey from "../views/UserSurvey.vue";
 import CourseView from "../views/CourseView.vue";
 
 export const router = createRouter({
@@ -27,6 +29,8 @@ export const router = createRouter({
     { path: "/overview", redirect: "/dashboard/overview" },
     { path: "/courses", redirect: "/dashboard/courses" },
     { path: "/progress", redirect: "/dashboard/progress" },
+    { path: "/survey-dashboard", component: SurveyDashboard, meta: { label: "Survey Dashboard" } },
+    { path: "/survey", component: UserSurvey, meta: { label: "Survey" } },
     {
       path: "/reset-password",
       name: "ResetPassword",
