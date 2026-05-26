@@ -76,6 +76,7 @@ const router = useRouter();
   width: 300px;
   background-color: var(--color-white);
   border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
   overflow-y: auto;
   position: fixed;
   top: 0;
