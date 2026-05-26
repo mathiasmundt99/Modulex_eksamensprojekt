@@ -1,23 +1,38 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { useRoute } from 'vue-router'
-import UserNavbar  from '../components/UserNavbar.vue'
-import UserSidebar from '../components/UserSidebar.vue'
+import { ref, computed } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { logoutUser } from "../services/authService";
+import UserNavbar from "../components/user/UserNavbar.vue";
+import UserSidebar from "../components/user/UserSidebar.vue";
 
-const route = useRoute()
-const sidebarOpen = ref(false)
-const isProfile = computed(() => route.path === '/dashboard/profile')
+const route = useRoute();
+const router = useRouter();
+const sidebarOpen = ref(false);
+const isProfile = computed(() => route.path === "/dashboard/profile");
 
 function toggleSidebar() {
-  sidebarOpen.value = !sidebarOpen.value
+  sidebarOpen.value = !sidebarOpen.value;
+}
+
+async function handleLogout() {
+  try {
+    await logoutUser();
+    router.push("/login");
+  } catch (error) {
+    console.error("Logout error:", error);
+    router.push("/login");
+  }
 }
 </script>
 
 <template>
   <div class="user-dashboard">
-    <UserNavbar @toggleSidebar="toggleSidebar" @logout="() => {}" />
+    <UserNavbar @toggleSidebar="toggleSidebar" @logout="handleLogout" />
     <div class="user-dashboard__layout">
-      <UserSidebar v-if="!isProfile" :sidebarOpen="sidebarOpen" @navigate="sidebarOpen = false" />
+      <UserSidebar
+        v-if="!isProfile"
+        :sidebarOpen="sidebarOpen"
+        @navigate="sidebarOpen = false" />
       <main class="dashboard">
         <RouterView />
       </main>

@@ -9,7 +9,7 @@ defineEmits(['delete'])
     <p class="danger-zone__text">
       Deleting this course will remove it from all enrolled users.
     </p>
-    <BaseButton variant="primary" class="btn--block" @click="$emit('delete')">
+    <BaseButton variant="primary" block @click="$emit('delete')">
       Delete Course
     </BaseButton>
   </div>
@@ -36,8 +36,4 @@ defineEmits(['delete'])
   margin-bottom: 16px;
 }
 
-.btn--block {
-  width: 100%;
-  justify-content: center;
-}
 </style>

@@ -23,7 +23,7 @@ const activePercent = Math.round((stats.activeUsers / stats.totalUsers) * 100)
     <div class="stat-card">
       <div class="stat-card__header">
         <span class="stat-card__label">Active Users</span>
-        <span class="material-symbols-rounded icon--accent">task_alt</span>
+        <span class="material-symbols-rounded icon--accent">check_circle_outline</span>
       </div>
       <p class="stat-card__value">{{ stats.activeUsers }}</p>
       <p class="stat-card__sub">{{ activePercent }}% active</p>

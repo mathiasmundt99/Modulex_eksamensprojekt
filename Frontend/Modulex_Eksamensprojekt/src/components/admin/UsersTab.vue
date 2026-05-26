@@ -1,27 +1,16 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import BaseButton from '../BaseButton.vue'
-import BreadCrumb from '../BreadCrumb.vue'
+import { useRouter } from "vue-router";
+import BaseButton from "../BaseButton.vue";
+import BreadCrumb from "../BreadCrumb.vue";
+import UsersTable from "./UsersTable.vue";
 
-const router = useRouter()
-const searchQuery = ref('')
+const router = useRouter();
 
 const users = [
-  { id: 1, name: 'John Doe',    email: 'john@acmesigns.com',  company: 'Acme Signs Ltd.', country: 'Denmark', progress: 45, status: 'active' },
-  { id: 2, name: 'Jane Smith',  email: 'jane@signpro.com',    company: 'SignPro Inc.',    country: 'Germany', progress: 80, status: 'active' },
-  { id: 3, name: 'Mike Johnson', email: 'mike@visualsign.com', company: 'Visual Sign Co.', country: 'UK',     progress: 20, status: 'active' }
+  { id: 1, name: 'John Doe',     email: 'john@acmesigns.com',  company: 'Acme Signs Ltd.', country: 'Denmark', role: 'user' },
+  { id: 2, name: 'Jane Smith',   email: 'jane@signpro.com',    company: 'SignPro Inc.',    country: 'Germany', role: 'user' },
+  { id: 3, name: 'Mike Johnson', email: 'mike@visualsign.com', company: 'Visual Sign Co.', country: 'UK',      role: 'user' },
 ]
-
-const filteredUsers = computed(() => {
-  const q = searchQuery.value.toLowerCase()
-  if (!q) return users
-  return users.filter(u =>
-    u.name.toLowerCase().includes(q) ||
-    u.email.toLowerCase().includes(q) ||
-    u.company.toLowerCase().includes(q)
-  )
-})
 </script>
 
 <template>
@@ -32,72 +21,15 @@ const filteredUsers = computed(() => {
         <h2 class="page-title">Manage Users</h2>
         <p class="page-subtitle">Track and manage partner onboarding</p>
       </div>
-      <BaseButton>
+      <BaseButton @click="router.push('/admin/invite')">
         <span class="material-symbols-rounded">add</span>
         Invite User
       </BaseButton>
     </div>
 
-    <div class="card">
-      <div class="search-wrap">
-        <span class="material-symbols-rounded search-icon">search</span>
-        <input
-          v-model="searchQuery"
-          type="text"
-          class="search-input"
-          placeholder="Search users by name, email, or company..."
-        />
-      </div>
-    </div>
-
-    <div class="card card--flush">
-      <div class="table-wrap">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Company</th>
-              <th>Progress</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="user in filteredUsers" :key="user.id" class="table-row">
-              <td>
-                <p class="td-name">{{ user.name }}</p>
-                <p class="td-sub">{{ user.email }}</p>
-              </td>
-              <td>
-                <p class="td-main">{{ user.company }}</p>
-                <p class="td-sub">{{ user.country }}</p>
-              </td>
-              <td>
-                <div class="progress-wrap">
-                  <div class="progress-bar">
-                    <div class="progress-bar__fill" :style="{ width: user.progress + '%' }"></div>
-                  </div>
-                  <p class="progress-label">{{ user.progress }}%</p>
-                </div>
-              </td>
-              <td>
-                <span class="badge">Active</span>
-              </td>
-              <td>
-                <div class="action-btns">
-                  <BaseButton variant="ghost" class="action-btn" @click="router.push('/admin/users/' + user.id)">
-                    <span class="material-symbols-rounded">edit_square</span>
-                  </BaseButton>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <UsersTable :users="users" />
   </div>
 </template>
-
 
 <style scoped>
 .tab-content {
@@ -126,156 +58,16 @@ const filteredUsers = computed(() => {
   margin-top: 4px;
 }
 
-.card {
-  background-color: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 16px;
-}
-
-.card--flush {
-  padding: 0;
-  overflow: hidden;
-}
-
-.search-wrap {
-  position: relative;
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
   color: var(--color-text);
-  pointer-events: none;
+  opacity: 0.6;
 }
 
-.search-input {
-  width: 100%;
-  padding: 10px 16px 10px 42px;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  font-size: 14px;
-  color: var(--color-text);
-  background-color: var(--color-white);
-  outline: none;
-  font-family: inherit;
-}
-
-.search-input:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(239, 96, 35, 0.15);
-}
-
-.table-wrap {
-  overflow-x: auto;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.table thead {
-  background-color: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.table th {
-  padding: 12px 24px;
-  text-align: left;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text);
-}
-
-.table-row {
-  border-bottom: 1px solid var(--color-border);
-  transition: background-color 0.15s;
-}
-
-.table-row:last-child {
-  border-bottom: none;
-}
-
-.table-row:hover {
-  background-color: var(--color-bg);
-}
-
-.table td {
-  padding: 16px 24px;
-  vertical-align: middle;
-}
-
-.td-name {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--color-text);
-}
-
-.td-main {
-  font-size: 15px;
-  color: var(--color-text);
-}
-
-.td-sub {
-  font-size: 13px;
-  color: var(--color-text);
-  margin-top: 2px;
-}
-
-.progress-wrap {
-  width: 128px;
-}
-
-.progress-bar {
-  height: 8px;
-  background-color: var(--color-border);
-  border-radius: 9999px;
-  overflow: hidden;
-  margin-bottom: 4px;
-}
-
-.progress-bar__fill {
-  height: 100%;
-  background-color: var(--color-primary);
-  border-radius: 9999px;
-  transition: width 0.5s;
-}
-
-.progress-label {
-  font-size: 12px;
-  color: var(--color-text);
-}
-
-.badge {
-  display: inline-block;
-  padding: 4px 12px;
-  background-color: var(--color-accent);
-  color: var(--color-white);
-  font-size: 12px;
-  border-radius: 9999px;
-}
-
-.action-btns {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  color: var(--color-text);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: color 0.15s;
-}
-
-.action-btn:hover {
-  color: var(--color-primary);
+.error-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #c33;
 }
 </style>

@@ -1,12 +1,56 @@
 <script setup>
-import BaseButton from '../BaseButton.vue'
-defineEmits(['close'])
+import { ref, onMounted } from "vue";
+import BaseButton from "../BaseButton.vue";
+import { createCourse, linkContentToCourse } from "@/services/courseService";
+import { getLibraryContent } from "@/services/contentService";
 
-const contentItems = [
-  { id: 1, title: 'Introduction to Modulex Products' },
-  { id: 2, title: 'Product Catalog 2024' },
-  { id: 3, title: 'Installation Guidelines' }
-]
+const emit = defineEmits(["close", "course-created"]);
+
+const title = ref("");
+const description = ref("");
+const isLoading = ref(false);
+const error = ref(null);
+const contentItems = ref([]);
+const selectedContentIds = ref([]);
+
+onMounted(async () => {
+  try {
+    contentItems.value = await getLibraryContent();
+  } catch {
+    // content listen er valgfri — ignorer fejl
+  }
+});
+
+async function handleCreateCourse() {
+  if (!title.value.trim() || !description.value.trim()) {
+    error.value = "Please fill in all fields";
+    return;
+  }
+
+  isLoading.value = true;
+  error.value = null;
+
+  try {
+    const newCourse = await createCourse({
+      title: title.value,
+      description: description.value,
+    });
+
+    await Promise.all(
+      selectedContentIds.value.map((id) =>
+        linkContentToCourse(newCourse.id, id),
+      ),
+    );
+
+    emit("course-created", newCourse);
+    emit("close");
+  } catch (err) {
+    console.error("Failed to create course:", err);
+    error.value = "Failed to create course";
+  } finally {
+    isLoading.value = false;
+  }
+}
 </script>
 
 <template>
@@ -14,26 +58,49 @@ const contentItems = [
     <div class="modal">
       <h3 class="modal__title">Create New Course</h3>
       <div class="form">
+        <div v-if="error" class="error-message">{{ error }}</div>
         <div class="form-group">
           <label class="form-label">Course Title</label>
-          <input type="text" class="form-input" placeholder="Enter course title" />
+          <input
+            v-model="title"
+            type="text"
+            class="form-input"
+            placeholder="Enter course title" />
         </div>
         <div class="form-group">
           <label class="form-label">Description</label>
-          <textarea class="form-input form-textarea" rows="3" placeholder="Enter course description"></textarea>
+          <textarea
+            v-model="description"
+            class="form-input form-textarea"
+            rows="3"
+            placeholder="Enter course description"></textarea>
         </div>
         <div class="form-group">
           <label class="form-label">Select Content</label>
           <div class="content-list">
-            <label v-for="item in contentItems" :key="item.id" class="content-list__item">
-              <input type="checkbox" class="checkbox" />
+            <p v-if="contentItems.length === 0" class="content-list__empty">
+              No content available
+            </p>
+            <label
+              v-for="item in contentItems"
+              :key="item.id"
+              class="content-list__item">
+              <input
+                v-model="selectedContentIds"
+                type="checkbox"
+                :value="item.id"
+                class="checkbox" />
               <span>{{ item.title }}</span>
             </label>
           </div>
         </div>
         <div class="form-actions">
-          <BaseButton variant="outline" @click="$emit('close')">Cancel</BaseButton>
-          <BaseButton>Create Course</BaseButton>
+          <BaseButton variant="outline" @click="$emit('close')"
+            >Cancel</BaseButton
+          >
+          <BaseButton @click="handleCreateCourse" :disabled="isLoading">
+            {{ isLoading ? "Creating..." : "Create Course" }}
+          </BaseButton>
         </div>
       </div>
     </div>
@@ -96,12 +163,16 @@ const contentItems = [
   background-color: var(--color-white);
   outline: none;
   font-family: inherit;
-  resize: vertical;
+  box-sizing: border-box;
 }
 
 .form-input:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px rgba(239, 96, 35, 0.15);
+}
+
+.form-textarea {
+  resize: vertical;
 }
 
 .content-list {
@@ -124,11 +195,28 @@ const contentItems = [
   color: var(--color-text);
 }
 
+.content-list__empty {
+  font-size: 14px;
+  color: var(--color-text);
+  opacity: 0.5;
+  text-align: center;
+  padding: 8px 0;
+}
+
 .checkbox {
   width: 16px;
   height: 16px;
   accent-color: var(--color-primary);
   cursor: pointer;
+  flex-shrink: 0;
+}
+
+.error-message {
+  padding: 10px 16px;
+  background-color: #fee;
+  color: #c33;
+  border-radius: 8px;
+  font-size: 14px;
 }
 
 .form-actions {

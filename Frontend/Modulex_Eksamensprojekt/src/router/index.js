@@ -16,29 +16,52 @@ import InvitationView from "../views/InvitationView.vue";
 import LoginView from "../views/LoginView.vue";
 import SignupView from "../views/SignupView.vue";
 import UserSurvey from "../views/UserSurvey.vue";
+import CourseView from "../views/CourseView.vue";
 
-export default createRouter({
+export const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: "/", redirect: "/dashboard" },
+    { path: "/", redirect: "/invitation" },
     { path: "/invitation", component: InvitationView },
     { path: "/login", component: LoginView },
     { path: "/signup", component: SignupView },
+    { path: "/course", component: CourseView },
     { path: "/overview", redirect: "/dashboard/overview" },
     { path: "/courses", redirect: "/dashboard/courses" },
     { path: "/progress", redirect: "/dashboard/progress" },
     { path: "/survey-dashboard", component: SurveyDashboard, meta: { label: "Survey Dashboard" } },
     { path: "/survey", component: UserSurvey, meta: { label: "Survey" } },
     {
+      path: "/reset-password",
+      name: "ResetPassword",
+      component: () => import("../views/ResetPasswordView.vue"),
+    },
+    {
       path: "/dashboard",
       redirect: "/dashboard/overview",
       component: UserDashboardView,
       meta: { label: "Dashboard" },
       children: [
-        { path: "overview", component: UserOverviewTab,  meta: { label: "Overview" } },
-        { path: "courses",  component: UserCoursesTab,   meta: { label: "Courses" } },
-        { path: "progress", component: UserProgressTab,  meta: { label: "Progress" } },
-        { path: "profile",  component: UserProfileView,  meta: { label: "Profile" } },
+        {
+          path: "overview",
+          component: UserOverviewTab,
+          meta: { label: "Overview" },
+        },
+        {
+          path: "courses",
+          component: UserCoursesTab,
+          meta: { label: "Courses" },
+        },
+        {
+          path: "progress",
+          component: UserProgressTab,
+          meta: { label: "Progress" },
+        },
+        {
+          path: "profile",
+          component: UserProfileView,
+          meta: { label: "Profile" },
+        },
       ],
     },
     {
@@ -47,14 +70,65 @@ export default createRouter({
       component: AdminDashboardView,
       meta: { label: "Admin" },
       children: [
-        { path: "overview",  component: AdminOverviewTab,     meta: { label: "Overview" } },
-        { path: "users",     component: AdminUsersTab,        meta: { label: "Users" } },
-        { path: "users/:id", component: AdminUserDetailView,  meta: { label: "User Detail" } },
-        { path: "content",         component: AdminContentTab,       meta: { label: "Content" } },
-        { path: "courses",         component: AdminCoursesTab,       meta: { label: "Courses" } },
-        { path: "courses/new",     component: AdminCourseEditorView, meta: { label: "New Course" } },
-        { path: "courses/:courseId", component: AdminCourseEditorView, meta: { label: "Edit Course" } },
+        {
+          path: "overview",
+          component: AdminOverviewTab,
+          meta: { label: "Overview" },
+        },
+        { path: "users", component: AdminUsersTab, meta: { label: "Users" } },
+        {
+          path: "users/:id",
+          component: AdminUserDetailView,
+          meta: { label: "User Detail" },
+        },
+        {
+          path: "content",
+          component: AdminContentTab,
+          meta: { label: "Content" },
+        },
+        {
+          path: "courses",
+          component: AdminCoursesTab,
+          meta: { label: "Courses" },
+        },
+        {
+          path: "courses/new",
+          component: AdminCourseEditorView,
+          meta: { label: "New Course" },
+        },
+        {
+          path: "courses/:courseId",
+          component: AdminCourseEditorView,
+          meta: { label: "Edit Course" },
+        },
       ],
     },
   ],
 });
+
+// router.beforeEach((to, from, next) => {
+//   const userJson = localStorage.getItem("user");
+//   const user = userJson ? JSON.parse(userJson) : null;
+
+//   const publicRoutes = ["/login", "/signup", "/invitation"];
+//   const isPublicRoute = publicRoutes.includes(to.path);
+
+//   // Hvis ikke logget ind
+//   if (!user && !isPublicRoute) {
+//     return next("/login");
+//   }
+
+//   // Hvis logget ind og prøver at gå til login/signup
+//   if (user && (to.path === "/login" || to.path === "/signup")) {
+//     return next(user.role === "admin" ? "/admin" : "/dashboard");
+//   }
+
+//   // Admin routes kræver admin rolle
+//   if (to.path.startsWith("/admin") && user?.role !== "admin") {
+//     return next("/dashboard");
+//   }
+
+//   next();
+// });
+
+export default router;

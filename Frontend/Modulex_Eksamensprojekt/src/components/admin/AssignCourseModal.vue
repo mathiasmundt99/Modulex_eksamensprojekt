@@ -41,7 +41,7 @@ const emit = defineEmits(['close', 'assign'])
         </div>
 
         <div class="modal-footer">
-          <BaseButton variant="outline" class="btn--block" @click="emit('close')">
+          <BaseButton variant="outline" block @click="emit('close')">
             Close
           </BaseButton>
         </div>
@@ -145,11 +145,6 @@ const emit = defineEmits(['close', 'assign'])
 
 .meta-icon--gap {
   margin-left: 12px;
-}
-
-.btn--block {
-  width: 100%;
-  justify-content: center;
 }
 
 .course-title {

@@ -56,6 +56,7 @@ function assignCourse(course) {
 </script>
 
 <template>
+  <div>
   <div v-if="user" class="detail-root">
     <BreadCrumb :items="[
       { label: 'Admin', to: '/admin' },
@@ -85,6 +86,7 @@ function assignCourse(course) {
 
   <div v-else class="not-found">
     User not found.
+  </div>
   </div>
 </template>
 

@@ -8,7 +8,7 @@ const totalModules = 7
     <div class="stat-card">
       <div class="stat-card__header">
         <span class="stat-card__label">Completed Modules</span>
-        <span class="material-symbols-rounded icon--primary">task_alt</span>
+        <span class="material-symbols-rounded icon--primary">check_circle_outline</span>
       </div>
       <p class="stat-card__value">{{ completedModules }}/{{ totalModules }}</p>
     </div>

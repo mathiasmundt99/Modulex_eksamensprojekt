@@ -1,0 +1,185 @@
+<script setup>
+import FormInputBox from "./FormInputBox.vue";
+import BaseButton from "../BaseButton.vue";
+import ForgotPasswordModal from "./ForgotPasswordModal.vue";
+import { ref } from "vue";
+import { loginUser } from "../../services/authService";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const email = ref("");
+const password = ref("");
+const remember = ref(false);
+const loading = ref(false);
+const error = ref("");
+const showForgotPasswordModal = ref(false);
+
+const handleLogin = async () => {
+  error.value = "";
+  loading.value = true;
+
+  try {
+    if (!email.value || !password.value) {
+      throw new Error("Venligst udfyld email og adgangskode");
+    }
+
+    // Gem husk mig
+    if (remember.value) {
+      localStorage.setItem("rememberEmail", email.value);
+    }
+
+    const result = await loginUser({
+      email: email.value,
+      password: password.value,
+    });
+
+    // Redirect baseret på rolle fra login response
+    const redirectPath =
+      result.user?.role === "admin" ? "/admin" : "/dashboard";
+    router.push(redirectPath);
+  } catch (err) {
+    error.value = err.message || "Login mislykkedes";
+  } finally {
+    loading.value = false;
+  }
+};
+</script>
+
+<template>
+  <div class="login-card">
+    <h2>Welcome Back</h2>
+
+    <form @submit.prevent>
+      <label>Email address:</label>
+      <FormInputBox
+        v-model="email"
+        icon="mail"
+        type="email"
+        placeholder="partner@example.com" />
+
+      <label>Password:</label>
+      <FormInputBox
+        v-model="password"
+        icon="lock"
+        type="password"
+        placeholder="Enter your password"
+        suffix-icon="visibility_off" />
+
+      <div class="options">
+        <label class="remember">
+          <input v-model="remember" type="checkbox" />
+          <span>Remember me</span>
+        </label>
+        <a href="#" @click.prevent="showForgotPasswordModal = true"
+          >Forgot password?</a
+        >
+      </div>
+
+      <BaseButton block @click="handleLogin" :disabled="loading">
+        {{ loading ? "Logging in..." : "Sign in" }}
+      </BaseButton>
+
+      <div v-if="error" class="error-message">{{ error }}</div>
+    </form>
+
+    <div class="divider"></div>
+
+    <p class="note">
+      Don't have an account? Check your email for an<br />
+      invitation link
+    </p>
+
+    <p class="footer-text">
+      Questions? Contact us at
+      <a href="#">academy@modulex.com</a>
+    </p>
+
+    <ForgotPasswordModal
+      :show="showForgotPasswordModal"
+      @close="showForgotPasswordModal = false" />
+  </div>
+</template>
+
+<style scoped>
+.login-card {
+  width: 390px;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  padding: 34px 38px 24px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+h2 {
+  font-size: 2.35rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--color-text);
+}
+
+form {
+  text-align: left;
+}
+
+form > label {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+  margin-top: 0;
+  color: var(--color-text);
+}
+
+form > label + .input-box-wrap,
+form :deep(.input-box) {
+  margin-bottom: 26px;
+}
+
+.options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0 34px;
+  font-size: 0.86rem;
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+}
+
+.remember input {
+  width: 20px;
+  height: 20px;
+}
+
+.options a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 26px 0 14px;
+}
+
+.note {
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--color-text);
+  margin-bottom: 18px;
+}
+
+.footer-text {
+  font-size: 0.75rem;
+  color: var(--color-text);
+}
+
+.footer-text a {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+</style>

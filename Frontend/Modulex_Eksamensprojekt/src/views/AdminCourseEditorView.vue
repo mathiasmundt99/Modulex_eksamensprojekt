@@ -1,125 +1,137 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import BreadCrumb        from '../components/BreadCrumb.vue'
-import BaseButton        from '../components/BaseButton.vue'
-import CourseDetailsCard from '../components/admin/CourseDetailsCard.vue'
-import CourseStatsCard   from '../components/admin/CourseStatsCard.vue'
-import CourseDangerZone  from '../components/admin/CourseDangerZone.vue'
-import CourseModulesList from '../components/admin/CourseModulesList.vue'
+import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import BreadCrumb from "../components/BreadCrumb.vue";
+import BaseButton from "../components/BaseButton.vue";
+import CourseDetailsCard from "../components/admin/CourseDetailsCard.vue";
+import CourseStatsCard from "../components/admin/CourseStatsCard.vue";
+import CourseDangerZone from "../components/admin/CourseDangerZone.vue";
+import CourseModulesList from "../components/admin/CourseModulesList.vue";
+import {
+  getCourseById,
+  updateCourse,
+  deleteCourse,
+  linkContentToCourse,
+  unlinkContentFromCourse,
+} from "@/services/courseService";
+import { getLibraryContent } from "@/services/contentService";
 
-const route  = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
-const isNew = computed(() => !route.params.courseId)
+const isNew = computed(() => !route.params.courseId);
 
-// Mock data — replace with API call using route.params.courseId
-const allCourses = [
-  {
-    id: 1,
-    title: 'Introduction to Modulex Sign Systems',
-    description: 'Learn the basics of our modular signage solutions',
-    status: 'published',
-    enrolledUsers: 24,
-  },
-  {
-    id: 2,
-    title: 'Product Configuration & Ordering',
-    description: 'Master the ordering process and configuration tools for Modulex sign systems',
-    status: 'published',
-    enrolledUsers: 18,
-  },
-  {
-    id: 3,
-    title: 'Advanced Installation Techniques',
-    description: 'Professional installation techniques and quality control standards',
-    status: 'draft',
-    enrolledUsers: 0,
-  },
-]
+const courseData = ref({
+  title: "",
+  description: "",
+  modulesId: [],
+});
 
-const allModules = {
-  1: [
-    { id: 1, title: 'Welcome to Modulex',    type: 'video', duration: '5 min',  contentId: 101 },
-    { id: 2, title: 'Product Overview',       type: 'video', duration: '10 min', contentId: 102 },
-    { id: 3, title: 'Sign Systems Catalog',   type: 'pdf',   pages: 18,          contentId: 103 },
-    { id: 4, title: 'Getting Started Quiz',   type: 'pdf',   pages: 4,           contentId: 104 },
-  ],
-  2: [
-    { id: 1, title: 'Welcome to Product Configuration',   type: 'video', duration: '5 min',  contentId: 101 },
-    { id: 2, title: 'Understanding Modular Sign Systems', type: 'video', duration: '12 min', contentId: 102 },
-    { id: 3, title: 'Product Catalog Overview',           type: 'pdf',   pages: 24,          contentId: 103 },
-    { id: 4, title: 'Configuration Tool Tutorial',        type: 'video', duration: '18 min', contentId: 104 },
-    { id: 5, title: 'Pricing & Quotes Guide',             type: 'pdf',   pages: 12,          contentId: 105 },
-  ],
-  3: [],
-}
-
-const availableContent = [
-  { id: 201, title: 'Advanced Installation Techniques',       type: 'video', duration: '15 min' },
-  { id: 202, title: 'Quality Control Standards',              type: 'pdf',   pages: 18 },
-  { id: 203, title: 'Customer Communication Best Practices',  type: 'video', duration: '10 min' },
-]
-
-const foundCourse = isNew.value
-  ? null
-  : allCourses.find(c => c.id === Number(route.params.courseId))
-
-const courseData = ref(
-  foundCourse
-    ? { ...foundCourse }
-    : { title: '', description: '', status: 'draft', enrolledUsers: 0 }
-)
-
-const modules = ref(
-  isNew.value ? [] : [...(allModules[Number(route.params.courseId)] || [])]
-)
-
-const isEditing = ref(isNew.value)
+const modules = ref([]);
+const availableContent = ref([]);
+const isEditing = ref(isNew.value);
+const isLoading = ref(false);
+const error = ref(null);
 
 const breadcrumbItems = computed(() => [
-  { label: 'Admin',   to: '/admin' },
-  { label: 'Courses', to: '/admin/courses' },
-  { label: isNew.value ? 'New Course' : courseData.value.title },
-])
+  { label: "Admin", to: "/admin" },
+  { label: "Courses", to: "/admin/courses" },
+  { label: isNew.value ? "New Course" : courseData.value.title },
+]);
 
-function handleSave() {
-  isEditing.value = false
+function contentToModule(item) {
+  return {
+    id: item.id,
+    title: item.title,
+    type: item.type,
+    duration: item.type === "video" ? item.durationOrPages : undefined,
+    pages: item.type === "pdf" ? item.durationOrPages : undefined,
+  };
+}
+
+onMounted(async () => {
+  isLoading.value = true;
+  error.value = null;
+
+  try {
+    const [allContent, course] = await Promise.all([
+      getLibraryContent(),
+      isNew.value ? null : getCourseById(route.params.courseId),
+    ]);
+
+    availableContent.value = allContent;
+
+    if (course) {
+      courseData.value = { ...course };
+      const linkedIds = new Set(course.contentIds ?? []);
+      modules.value = allContent
+        .filter((item) => linkedIds.has(item.id))
+        .sort((a, b) => course.contentIds.indexOf(a.id) - course.contentIds.indexOf(b.id))
+        .map(contentToModule);
+    }
+  } catch (err) {
+    console.error("Failed to load course:", err);
+    error.value = "Failed to load course data";
+  } finally {
+    isLoading.value = false;
+  }
+});
+
+async function handleSave() {
+  try {
+    await updateCourse(route.params.courseId, {
+      title: courseData.value.title,
+      description: courseData.value.description,
+    });
+    isEditing.value = false;
+  } catch (err) {
+    console.error("Failed to save course:", err);
+    error.value = "Failed to save course";
+  }
 }
 
 function handleCancel() {
   if (isNew.value) {
-    router.push('/admin/courses')
+    router.push("/admin/courses");
   } else {
-    isEditing.value = false
+    isEditing.value = false;
   }
 }
 
-function handleDelete() {
-  router.push('/admin/courses')
+async function handleDelete() {
+  try {
+    await deleteCourse(route.params.courseId);
+    router.push("/admin/courses");
+  } catch (err) {
+    console.error("Failed to delete course:", err);
+    error.value = "Failed to delete course";
+  }
 }
 
-function removeModule(id) {
-  const idx = modules.value.findIndex(m => m.id === id)
-  if (idx !== -1) modules.value.splice(idx, 1)
+async function removeModule(id) {
+  try {
+    await unlinkContentFromCourse(route.params.courseId, id);
+    modules.value = modules.value.filter((m) => m.id !== id);
+  } catch (err) {
+    console.error("Failed to remove module:", err);
+  }
 }
 
-function addModule(content) {
-  modules.value.push({
-    id: Date.now(),
-    title: content.title,
-    type: content.type,
-    duration: content.type === 'video' ? content.duration : undefined,
-    pages:    content.type === 'pdf'   ? content.pages    : undefined,
-    contentId: content.id,
-  })
+async function addModule(content) {
+  if (modules.value.some((m) => m.id === content.id)) return;
+  try {
+    await linkContentToCourse(route.params.courseId, content.id);
+    modules.value.push(contentToModule(content));
+  } catch (err) {
+    console.error("Failed to add module:", err);
+  }
 }
 
 function reorderModules({ from, to }) {
-  const list = [...modules.value]
-  const [moved] = list.splice(from, 1)
-  list.splice(to, 0, moved)
-  modules.value = list
+  const list = [...modules.value];
+  const [moved] = list.splice(from, 1);
+  list.splice(to, 0, moved);
+  modules.value = list;
 }
 </script>
 
@@ -129,18 +141,28 @@ function reorderModules({ from, to }) {
 
     <div class="editor__header">
       <div class="editor__heading">
-        <h1 class="editor__title">{{ isNew ? 'Create Course' : 'Edit Course' }}</h1>
+        <h1 class="editor__title">
+          {{ isNew ? "Create Course" : "Edit Course" }}
+        </h1>
         <p class="editor__subtitle">
-          {{ isNew ? 'Set up your new course' : 'Manage course content and settings' }}
+          {{
+            isNew
+              ? "Set up your new course"
+              : "Manage course content and settings"
+          }}
         </p>
       </div>
       <div class="editor__actions">
         <template v-if="isNew">
-          <BaseButton variant="outline" @click="handleCancel">Cancel</BaseButton>
+          <BaseButton variant="outline" @click="handleCancel"
+            >Cancel</BaseButton
+          >
           <BaseButton @click="handleSave">Save Course</BaseButton>
         </template>
         <template v-else-if="isEditing">
-          <BaseButton variant="outline" @click="handleCancel">Cancel</BaseButton>
+          <BaseButton variant="outline" @click="handleCancel"
+            >Cancel</BaseButton
+          >
           <BaseButton @click="handleSave">
             <span class="material-symbols-rounded">save</span>
             Save Changes
@@ -160,16 +182,11 @@ function reorderModules({ from, to }) {
         <CourseDetailsCard
           :courseData="courseData"
           :isEditing="isEditing"
-          @update:courseData="courseData = $event"
-        />
+          @update:courseData="courseData = $event" />
         <CourseStatsCard
           :modules="modules"
-          :enrolledUsers="courseData.enrolledUsers"
-        />
-        <CourseDangerZone
-          v-if="isEditing && !isNew"
-          @delete="handleDelete"
-        />
+          :enrolledUsers="courseData.enrolledUsers" />
+        <CourseDangerZone v-if="isEditing && !isNew" @delete="handleDelete" />
       </div>
       <div class="col">
         <CourseModulesList
@@ -178,8 +195,7 @@ function reorderModules({ from, to }) {
           :availableContent="availableContent"
           @remove-module="removeModule"
           @add-module="addModule"
-          @reorder="reorderModules"
-        />
+          @reorder="reorderModules" />
       </div>
     </div>
   </div>

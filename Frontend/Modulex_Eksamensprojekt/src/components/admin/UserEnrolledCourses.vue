@@ -37,7 +37,7 @@ const showModal = ref(false)
               <span
                 v-if="course.progress === 100"
                 class="material-symbols-rounded completed-icon"
-              >task_alt</span>
+              >check_circle_outline</span>
             </div>
             <div class="course-meta">
               <span><span class="meta-label">Enrolled:</span> {{ course.enrolledDate }}</span>

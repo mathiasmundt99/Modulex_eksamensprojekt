@@ -10,9 +10,9 @@ defineEmits(['navigate'])
 const route = useRoute()
 
 const navItems = [
-  { to: '/dashboard/overview', label: 'Overview',    icon: 'dashboard' },
-  { to: '/dashboard/courses',  label: 'My Courses',  icon: 'videocam' },
-  { to: '/dashboard/progress', label: 'Progress',    icon: 'task_alt' }
+  { to: '/dashboard/overview', label: 'Overview',   icon: 'dashboard' },
+  { to: '/dashboard/courses',  label: 'My Courses', icon: 'videocam'  },
+  { to: '/dashboard/progress', label: 'Progress',   icon: 'check_circle_outline'  },
 ]
 </script>
 
@@ -25,8 +25,7 @@ const navItems = [
           :key="item.to"
           :to="item.to"
           :class="['nav-item', { 'nav-item--active': route.path === item.to }]"
-          @click="$emit('navigate')"
-        >
+          @click="$emit('navigate')">
           <span class="material-symbols-rounded">{{ item.icon }}</span>
           <span>{{ item.label }}</span>
         </RouterLink>
@@ -43,14 +42,8 @@ const navItems = [
 }
 
 @media (max-width: 1023px) {
-  .sidebar {
-    display: none;
-    width: 100%;
-  }
-
-  .sidebar--open {
-    display: block;
-  }
+  .sidebar { display: none; width: 100%; }
+  .sidebar--open { display: block; }
 }
 
 .sidebar-card {
@@ -81,16 +74,12 @@ const navItems = [
   background: var(--color-white);
 }
 
-.nav-item:hover {
-  background-color: var(--color-bg);
-}
+.nav-item:hover { background-color: var(--color-bg); }
 
 .nav-item--active {
   background-color: var(--color-primary);
   color: var(--color-white);
 }
 
-.nav-item--active:hover {
-  background-color: var(--color-primary-hover);
-}
+.nav-item--active:hover { background-color: var(--color-primary-hover); }
 </style>

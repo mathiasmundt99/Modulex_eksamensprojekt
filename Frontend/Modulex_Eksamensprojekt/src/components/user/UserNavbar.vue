@@ -10,7 +10,7 @@ defineEmits(['toggleSidebar', 'logout'])
           <span class="material-symbols-rounded">menu</span>
         </button>
         <RouterLink to="/dashboard/overview" class="brand-link">
-          <img class="brand-logo" src="../assets/images/modulex-logo.png" alt="">
+          <img class="brand-logo" src="../../assets/images/modulex-logo.png" alt="">
           <h1 class="brand-name">Modulex Billund Academy</h1>
         </RouterLink>
       </div>
@@ -62,14 +62,10 @@ defineEmits(['toggleSidebar', 'logout'])
   transition: color 0.15s;
 }
 
-.menu-btn:hover {
-  color: var(--color-primary);
-}
+.menu-btn:hover { color: var(--color-primary); }
 
 @media (max-width: 1023px) {
-  .menu-btn {
-    display: flex;
-  }
+  .menu-btn { display: flex; }
 }
 
 .brand-link {
@@ -79,9 +75,7 @@ defineEmits(['toggleSidebar', 'logout'])
   text-decoration: none;
 }
 
-.brand-logo {
-  height: 40px;
-}
+.brand-logo { height: 40px; }
 
 .brand-name {
   font-size: 18px;
@@ -115,9 +109,7 @@ defineEmits(['toggleSidebar', 'logout'])
 }
 
 @media (max-width: 767px) {
-  .user-badge {
-    display: none;
-  }
+  .user-badge { display: none; }
 }
 
 .logout-btn {
@@ -132,19 +124,13 @@ defineEmits(['toggleSidebar', 'logout'])
   transition: color 0.15s;
 }
 
-.logout-btn:hover {
-  color: var(--color-primary);
-}
+.logout-btn:hover { color: var(--color-primary); }
 
 @media (max-width: 767px) {
-  .logout-btn span {
-    display: none;
-  }
+  .logout-btn span { display: none; }
 }
 
 @media (max-width: 530px) {
-  .brand-name {
-    display: none;
-  }
+  .brand-name { display: none; }
 }
 </style>
