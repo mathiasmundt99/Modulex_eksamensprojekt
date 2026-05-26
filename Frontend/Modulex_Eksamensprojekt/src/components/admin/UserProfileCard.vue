@@ -2,12 +2,11 @@
 import { ref, watch } from "vue";
 
 const props = defineProps({
-  user: { type: Object, required: true },
+  user: Object,
+  isEditing: Boolean,
 });
 
-const emit = defineEmits(["save-user"]);
-
-const isEditing = ref(false);
+const emit = defineEmits(["save-user", "start-edit", "cancel-edit"]);
 
 const form = ref({
   firstName: "",
@@ -21,23 +20,22 @@ const form = ref({
 watch(
   () => props.user,
   (newUser) => {
-    if (newUser) {
-      form.value = {
-        firstName: newUser.firstName || "",
-        lastName: newUser.lastName || "",
-        email: newUser.email || "",
-        phoneNumber: newUser.phoneNumber || "",
-        companyName: newUser.companyName || "",
-        country: newUser.country || "",
-      };
-    }
+    if (!newUser) return;
+
+    form.value = structuredClone({
+      firstName: newUser.firstName || "",
+      lastName: newUser.lastName || "",
+      email: newUser.email || "",
+      phoneNumber: newUser.phoneNumber || "",
+      companyName: newUser.companyName || "",
+      country: newUser.country || "",
+    });
   },
-  { immediate: true },
+  { immediate: true, deep: true },
 );
 
 function saveChanges() {
   emit("save-user", form.value);
-  isEditing.value = false;
 }
 </script>
 
@@ -47,8 +45,14 @@ function saveChanges() {
       <span class="material-symbols-rounded avatar-icon">person</span>
     </div>
     <div v-if="isEditing" class="name-fields">
-      <input v-model="form.firstName" placeholder="First name" />
-      <input v-model="form.lastName" placeholder="Last name" />
+      <input
+        v-model="form.firstName"
+        placeholder="First name"
+        class="edit-input" />
+      <input
+        v-model="form.lastName"
+        placeholder="Last name"
+        class="edit-input" />
     </div>
 
     <h2 v-else class="user-name">{{ user.firstName }} {{ user.lastName }}</h2>
@@ -106,14 +110,22 @@ function saveChanges() {
       </li>
     </ul>
     <div class="actions">
-      <button v-if="!isEditing" @click="isEditing = true">Edit User</button>
+      <button v-if="!isEditing" @click="$emit('start-edit')">Edit User</button>
 
-      <button v-else @click="saveChanges">Save Changes</button>
+      <div v-else class="buttonGroup">
+        <button @click="saveChanges">Save Changes</button>
+        <button @click="$emit('cancel-edit')">Cancel</button>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+}
+
 .card {
   background-color: var(--color-white);
   border: 1px solid var(--color-border);

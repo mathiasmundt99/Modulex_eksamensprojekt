@@ -7,17 +7,16 @@ import UserStatsCard from "../components/admin/UserStatsCard.vue";
 import UserActionsCard from "../components/admin/UserActionsCard.vue";
 import UserEnrolledCourses from "../components/admin/UserEnrolledCourses.vue";
 import UserActivityLog from "../components/admin/UserActivityLog.vue";
-import {
-  getUserById,
-  updateUser,
-  deleteUser,
-  getRecentActivity,
-} from "../services/adminService";
+import { getUserById, updateUser, deleteUser } from "../services/adminService";
+import { getUserActivity } from "../services/adminService";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const route = useRoute();
 const user = ref(null);
 const loading = ref(false);
 const error = ref(null);
+const isEditing = ref(false);
 
 onMounted(async () => {
   loading.value = true;
@@ -25,12 +24,13 @@ onMounted(async () => {
   try {
     const [userResponse, activityResponse] = await Promise.all([
       getUserById(route.params.id),
-      getRecentActivity(10),
+      getUserActivity(route.params.id),
     ]);
 
     user.value = userResponse.data?.data || userResponse.data;
 
-    activityLog.value = activityResponse.data; // 👈 backend array
+    activityLog.value =
+      activityResponse.data?.data || activityResponse.data || [];
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -100,22 +100,16 @@ async function saveUser(updatedUser) {
   try {
     loading.value = true;
 
-    const payload = {
-      firstName: updatedUser.firstName,
-      lastName: updatedUser.lastName,
-      email: updatedUser.email,
-      companyName: updatedUser.companyName,
-      country: updatedUser.country,
+    const response = await updateUser(user.value.id, updatedUser);
+
+    user.value = {
+      ...(response.data?.data || response.data),
+      id: response.data?.data?.userId || response.data?.userId,
     };
 
-    const response = await updateUser(updatedUser.id, payload);
-
-    user.value = response.data?.data || response.data;
-
-    alert("User updated successfully");
+    isEditing.value = false;
   } catch (err) {
     console.error(err);
-    alert("Failed to update user");
   } finally {
     loading.value = false;
   }
@@ -137,7 +131,7 @@ async function handleDeleteUser() {
 
     alert("User deleted successfully");
 
-    route.push("/admin/users");
+    router.push("/admin/users");
   } catch (err) {
     console.error(err);
     alert("Failed to delete user");
@@ -161,7 +155,12 @@ async function handleDeleteUser() {
 
       <div class="detail-grid">
         <div class="col">
-          <UserProfileCard :user="user" @save-user="saveUser" />
+          <UserProfileCard
+            :user="user"
+            :is-editing="isEditing"
+            @start-edit="isEditing = true"
+            @save-user="saveUser"
+            @cancel-edit="isEditing = false" />
           <UserStatsCard :user="user" />
           <UserActionsCard @delete-user="handleDeleteUser" />
         </div>

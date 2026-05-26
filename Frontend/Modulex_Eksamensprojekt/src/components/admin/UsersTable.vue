@@ -15,7 +15,7 @@ const filteredUsers = computed(() => {
   if (!q) return props.users;
   return props.users.filter((u) => {
     const name = `${u.firstName ?? ""} ${u.lastName ?? ""}`.toLowerCase();
-    const company = (u.companyName ?? "").toLowerCase();
+    const company = (u.companyId ?? "").toLowerCase();
     return (
       name.includes(q) ||
       u.email.toLowerCase().includes(q) ||
@@ -64,7 +64,7 @@ const filteredUsers = computed(() => {
               </td>
               <td>
                 <p class="td-main">
-                  {{ user.companyName ?? user.company ?? "—" }}
+                  {{ user.companyId ?? user.company ?? "—" }}
                 </p>
               </td>
               <td>

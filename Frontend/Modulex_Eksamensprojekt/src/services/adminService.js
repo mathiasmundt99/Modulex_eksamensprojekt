@@ -64,11 +64,14 @@ export async function updateUser(userId, userData) {
       body: JSON.stringify(userData),
     });
 
+    const data = await response.json().catch(() => null);
+
     if (!response.ok) {
-      throw new Error("Failed to update user");
+      console.error("PUT error response:", data);
+      throw new Error(data?.message || "Failed to update user");
     }
 
-    return await response.json();
+    return data;
   } catch (error) {
     console.error("Error updating user:", error);
     throw error;
@@ -119,6 +122,36 @@ export async function getRecentActivity(limit = 10) {
   }
 }
 
+// hent specifik brugers aktivitetslog
+export async function getUserActivity(userId) {
+  try {
+    const response = await fetch(`${BASE_URL}/users/${userId}/activity`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("User activity not found");
+      }
+
+      if (response.status === 400) {
+        throw new Error("Validation error");
+      }
+
+      throw new Error("Failed to fetch user activity");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching user activity:", error);
+    throw error;
+  }
+}
+
 // slet bruger permanent
 export async function deleteUser(userId) {
   try {
@@ -151,6 +184,40 @@ export async function deleteUser(userId) {
     return { success: true };
   } catch (error) {
     console.error("Error deleting user:", error);
+    throw error;
+  }
+}
+
+// hent brugere der kræver opmærksomhed (inaktive / low progress)
+export async function getUsersAttention(type = "low-progress", limit = 50) {
+  try {
+    const params = new URLSearchParams();
+
+    if (type) params.append("type", type);
+    if (limit) params.append("limit", limit);
+
+    const response = await fetch(
+      `${BASE_URL}/users/attention?${params.toString()}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data?.message || "Failed to fetch users requiring attention",
+      );
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching attention users:", error);
     throw error;
   }
 }
