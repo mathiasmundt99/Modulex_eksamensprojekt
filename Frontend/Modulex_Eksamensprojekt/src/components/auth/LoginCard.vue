@@ -21,18 +21,20 @@ const handleLogin = async () => {
       throw new Error("Venligst udfyld email og adgangskode");
     }
 
-    await loginUser({
-      email: email.value,
-      password: password.value,
-    });
-
     // Gem husk mig
     if (remember.value) {
       localStorage.setItem("rememberEmail", email.value);
     }
 
-    // Redirect til dashboard
-    router.push("/dashboard");
+    const result = await loginUser({
+      email: email.value,
+      password: password.value,
+    });
+
+    // Redirect baseret på rolle fra login response
+    const redirectPath =
+      result.user?.role === "admin" ? "/admin" : "/dashboard";
+    router.push(redirectPath);
   } catch (err) {
     error.value = err.message || "Login mislykkedes";
   } finally {

@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3000/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 export async function registerUser(userData) {
   try {
@@ -14,7 +14,7 @@ export async function registerUser(userData) {
         phoneNumber: userData.phone,
         companyName: userData.companyName,
         cvr: userData.cvr,
-        companyAdress: userData.companyAddress, // OBS: API'et bruger "companyAdress" (stavefejl)
+        companyAdress: userData.companyAddress,
         country: userData.country,
         password: userData.password,
         confirmPassword: userData.confirmPassword,
@@ -39,6 +39,7 @@ export async function loginUser(credentials) {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({
         email: credentials.email,
         password: credentials.password,
@@ -53,10 +54,12 @@ export async function loginUser(credentials) {
     }
 
     const data = await response.json();
-    // Gem token hvis backend returnerer det
-    if (data.token) {
-      localStorage.setItem("authToken", data.token);
+
+    // Gem bruger data (token er automatisk i HttpOnly cookie)
+    if (data.user) {
+      localStorage.setItem("user", JSON.stringify(data.user));
     }
+
     return data;
   } catch (error) {
     console.error("Login error:", error);
