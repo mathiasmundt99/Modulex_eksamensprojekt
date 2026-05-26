@@ -32,7 +32,9 @@ const router = useRouter();
           :class="{ 'module-item--active': index === currentItemIndex }"
           @click="emit('select', index)">
           <div class="module-item__status">
-            <span class="material-symbols-rounded">
+            <span
+              class="material-symbols-rounded"
+              :class="{ 'icon--completed': item.completed && index !== currentItemIndex }">
               {{ item.completed ? "check_circle" : "radio_button_unchecked" }}
             </span>
           </div>
@@ -172,6 +174,10 @@ const router = useRouter();
   flex-shrink: 0;
   font-size: 20px;
   margin-top: 2px;
+}
+
+.icon--completed {
+  color: var(--color-primary);
 }
 
 .module-item__body {
