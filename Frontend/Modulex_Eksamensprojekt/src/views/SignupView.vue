@@ -1,24 +1,72 @@
 <script setup>
-import SignupSection from '../components/auth/SignupSection.vue'
-import FormInputBox from '../components/auth/FormInputBox.vue'
-import BaseButton from '../components/BaseButton.vue'
-import { ref } from 'vue'
+import SignupSection from "../components/auth/SignupSection.vue";
+import FormInputBox from "../components/auth/FormInputBox.vue";
+import BaseButton from "../components/BaseButton.vue";
+import { ref } from "vue";
+import { registerUser } from "../services/authService";
+import { useRouter } from "vue-router";
 
-const firstName       = ref('')
-const lastName        = ref('')
-const email           = ref('')
-const phone           = ref('')
-const companyName     = ref('')
-const cvr             = ref('')
-const companyAddress  = ref('')
-const country         = ref('')
-const password        = ref('')
-const confirmPassword = ref('')
+const firstName = ref("");
+const lastName = ref("");
+const email = ref("");
+const phone = ref("");
+const companyName = ref("");
+const cvr = ref("");
+const companyAddress = ref("");
+const country = ref("");
+const password = ref("");
+const confirmPassword = ref("");
+
+const router = useRouter();
+const loading = ref(false);
+const error = ref("");
+
+const handleSignup = async () => {
+  error.value = "";
+  loading.value = true;
+
+  try {
+    // Validation
+    if (!firstName.value || !lastName.value || !email.value) {
+      throw new Error("Venligst udfyld alle påkrævede felter");
+    }
+
+    if (password.value !== confirmPassword.value) {
+      throw new Error("Adgangskoderne matcher ikke");
+    }
+
+    if (password.value.length < 8) {
+      throw new Error("Adgangskoden skal være mindst 8 tegn");
+    }
+
+    const result = await registerUser({
+      firstName: firstName.value,
+      lastName: lastName.value,
+      email: email.value,
+      phone: phone.value,
+      companyName: companyName.value,
+      cvr: cvr.value,
+      companyAddress: companyAddress.value,
+      country: country.value,
+      password: password.value,
+      confirmPassword: confirmPassword.value,
+    });
+
+    router.push("/login");
+  } catch (err) {
+    error.value = err.message || "Der skete en fejl under registrering";
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
   <div class="signup-page">
-    <img class="logo" src="../assets/images/modulex-logo.png" alt="Modulex logo" />
+    <img
+      class="logo"
+      src="../assets/images/modulex-logo.png"
+      alt="Modulex logo" />
 
     <header class="header">
       <h1>Modulex Billund Academy</h1>
@@ -33,26 +81,40 @@ const confirmPassword = ref('')
         </label>
         <label>
           Last Name *
-          <FormInputBox v-model="lastName" icon="person" placeholder="Andersen" />
+          <FormInputBox
+            v-model="lastName"
+            icon="person"
+            placeholder="Andersen" />
         </label>
       </SignupSection>
 
       <SignupSection title="Contact Information">
         <label>
           Email *
-          <FormInputBox v-model="email" icon="mail" type="email" placeholder="partner@example.com" />
+          <FormInputBox
+            v-model="email"
+            icon="mail"
+            type="email"
+            placeholder="partner@example.com" />
           <small>This is the email from your invitation</small>
         </label>
         <label>
           Phone Number *
-          <FormInputBox v-model="phone" icon="call" type="tel" placeholder="+45 12 23 45 67" />
+          <FormInputBox
+            v-model="phone"
+            icon="call"
+            type="tel"
+            placeholder="+45 12 23 45 67" />
         </label>
       </SignupSection>
 
       <SignupSection title="Company Information">
         <label>
           Company Name *
-          <FormInputBox v-model="companyName" icon="apartment" placeholder="Firma ApS" />
+          <FormInputBox
+            v-model="companyName"
+            icon="apartment"
+            placeholder="Firma ApS" />
         </label>
         <label>
           CVR *
@@ -60,26 +122,50 @@ const confirmPassword = ref('')
         </label>
         <label>
           Company Address *
-          <FormInputBox v-model="companyAddress" icon="location_on" placeholder="Eksempelgade 1" />
+          <FormInputBox
+            v-model="companyAddress"
+            icon="location_on"
+            placeholder="Eksempelgade 1" />
         </label>
         <label>
           Country *
-          <FormInputBox v-model="country" icon="globe_location_pin" placeholder="Denmark" />
+          <FormInputBox
+            v-model="country"
+            icon="globe_location_pin"
+            placeholder="Denmark" />
         </label>
       </SignupSection>
 
       <SignupSection title="Create Password">
         <label>
           Password *
-          <FormInputBox v-model="password" icon="lock" type="password" placeholder="Min. 8 characters" suffix-icon="visibility_off" />
+          <FormInputBox
+            v-model="password"
+            icon="lock"
+            type="password"
+            placeholder="Min. 8 characters"
+            suffix-icon="visibility_off" />
         </label>
         <label>
           Confirm Password *
-          <FormInputBox v-model="confirmPassword" icon="lock" type="password" placeholder="Min. 8 characters" suffix-icon="visibility_off" />
+          <FormInputBox
+            v-model="confirmPassword"
+            icon="lock"
+            type="password"
+            placeholder="Min. 8 characters"
+            suffix-icon="visibility_off" />
         </label>
       </SignupSection>
 
-      <BaseButton block style="margin-top: 10px">Create Account</BaseButton>
+      <BaseButton
+        block
+        style="margin-top: 10px"
+        @click="handleSignup"
+        :disabled="loading">
+        {{ loading ? "Creating user..." : "Create Account" }}
+      </BaseButton>
+
+      <div v-if="error" class="error-message">{{ error }}</div>
     </form>
   </div>
 </template>
@@ -139,13 +225,14 @@ small {
   font-weight: 400;
 }
 
-
 @media (max-width: 900px) {
   .signup-card {
     width: 100%;
     max-width: 820px;
   }
 
-  .header h1 { font-size: 2.2rem; }
+  .header h1 {
+    font-size: 2.2rem;
+  }
 }
 </style>

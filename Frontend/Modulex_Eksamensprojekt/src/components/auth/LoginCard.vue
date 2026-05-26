@@ -1,11 +1,46 @@
 <script setup>
-import FormInputBox from './FormInputBox.vue'
-import BaseButton from '../BaseButton.vue'
-import { ref } from 'vue'
+import FormInputBox from "./FormInputBox.vue";
+import BaseButton from "../BaseButton.vue";
+import { ref } from "vue";
+import { loginUser } from "../../services/authService";
+import { useRouter } from "vue-router";
 
-const email    = ref('')
-const password = ref('')
-const remember = ref(false)
+const router = useRouter();
+const email = ref("");
+const password = ref("");
+const remember = ref(false);
+const loading = ref(false);
+const error = ref("");
+
+const handleLogin = async () => {
+  error.value = "";
+  loading.value = true;
+
+  try {
+    if (!email.value || !password.value) {
+      throw new Error("Venligst udfyld email og adgangskode");
+    }
+
+    // Gem husk mig
+    if (remember.value) {
+      localStorage.setItem("rememberEmail", email.value);
+    }
+
+    const result = await loginUser({
+      email: email.value,
+      password: password.value,
+    });
+
+    // Redirect baseret på rolle fra login response
+    const redirectPath =
+      result.user?.role === "admin" ? "/admin" : "/dashboard";
+    router.push(redirectPath);
+  } catch (err) {
+    error.value = err.message || "Login mislykkedes";
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -36,7 +71,11 @@ const remember = ref(false)
         <a href="#">Forgot password?</a>
       </div>
 
-      <BaseButton block>Sign in</BaseButton>
+      <BaseButton block @click="handleLogin" :disabled="loading">
+        {{ loading ? "Logging in..." : "Sign in" }}
+      </BaseButton>
+
+      <div v-if="error" class="error-message">{{ error }}</div>
     </form>
 
     <div class="divider"></div>
@@ -112,7 +151,6 @@ form :deep(.input-box) {
   color: var(--color-primary);
   text-decoration: none;
 }
-
 
 .divider {
   height: 1px;
