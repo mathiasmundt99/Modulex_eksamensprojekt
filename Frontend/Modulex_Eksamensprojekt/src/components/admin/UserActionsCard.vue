@@ -1,19 +1,20 @@
 <script setup>
-import BaseButton from '../BaseButton.vue'
+import BaseButton from "../BaseButton.vue";
+
+const emit = defineEmits(["delete-user"]);
+
+function handleDelete() {
+  emit("delete-user");
+}
 </script>
 
 <template>
   <div class="card">
     <h3 class="card-title">Actions</h3>
     <div class="actions-list">
-      <BaseButton variant="muted" block>
-        Send Message
-      </BaseButton>
-      <BaseButton variant="outline" block>
-        Reset Password
-      </BaseButton>
-      <BaseButton variant="outline" block>
-        Deactivate User
+      <BaseButton variant="outline" block> Reset Password </BaseButton>
+      <BaseButton variant="muted" block @click="handleDelete">
+        Delete User
       </BaseButton>
     </div>
   </div>
@@ -27,12 +28,15 @@ import BaseButton from '../BaseButton.vue'
   padding: 24px;
 }
 
-.card-title { 
-  font-size: 18px; color: var(--color-text); 
+.card-title {
+  font-size: 18px;
+  color: var(--color-text);
 }
 
-.actions-list { 
-  display: flex; flex-direction: column; gap: 8px; margin-top: 16px; 
+.actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
 }
-
 </style>

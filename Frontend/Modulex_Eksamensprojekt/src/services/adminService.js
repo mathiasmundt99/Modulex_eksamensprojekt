@@ -26,17 +26,26 @@ export async function getAllUsers(search = "", limit = 50) {
   }
 }
 
-// hent en bruger
+// hent specifik bruger
 export async function getUserById(userId) {
   try {
-    const response = await getAllUsers();
-    const user = response.data?.find((u) => u.id === userId);
+    const response = await fetch(`${BASE_URL}/users/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
 
-    if (!user) {
-      throw new Error("User not found");
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("User not found");
+      }
+
+      throw new Error("Failed to fetch user");
     }
 
-    return { success: true, data: user };
+    return await response.json();
   } catch (error) {
     console.error("Error fetching user:", error);
     throw error;
@@ -106,6 +115,42 @@ export async function getRecentActivity(limit = 10) {
     return await response.json();
   } catch (error) {
     console.error("Error fetching recent activity:", error);
+    throw error;
+  }
+}
+
+// slet bruger permanent
+export async function deleteUser(userId) {
+  try {
+    const response = await fetch(`${BASE_URL}/users/${userId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("User not found");
+      }
+
+      if (response.status === 400) {
+        throw new Error("Validation error");
+      }
+
+      throw new Error("Failed to delete user");
+    }
+
+    const contentType = response.headers.get("content-type");
+
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting user:", error);
     throw error;
   }
 }

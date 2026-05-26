@@ -14,7 +14,7 @@ const form = ref({
   lastName: "",
   email: "",
   phoneNumber: "",
-  company: "",
+  companyName: "",
   country: "",
 });
 
@@ -27,11 +27,8 @@ watch(
         lastName: newUser.lastName || "",
         email: newUser.email || "",
         phoneNumber: newUser.phoneNumber || "",
-        company: newUser.company || "",
+        companyName: newUser.companyName || "",
         country: newUser.country || "",
-        status: newUser.status || "active",
-        progress: newUser.progress || 0,
-        id: newUser.id,
       };
     }
   },
@@ -86,10 +83,13 @@ function saveChanges() {
         <span class="material-symbols-rounded info-icon">business</span>
         <div>
           <p class="info-label">Company</p>
-          <input v-if="isEditing" v-model="form.company" class="edit-input" />
+          <input
+            v-if="isEditing"
+            v-model="form.companyName"
+            class="edit-input" />
 
           <p v-else class="info-value">
-            {{ user.company }}
+            {{ user.companyName || "No company" }}
           </p>
         </div>
       </li>

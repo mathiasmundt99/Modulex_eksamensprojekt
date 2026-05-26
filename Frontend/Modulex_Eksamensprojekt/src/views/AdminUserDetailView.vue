@@ -7,7 +7,12 @@ import UserStatsCard from "../components/admin/UserStatsCard.vue";
 import UserActionsCard from "../components/admin/UserActionsCard.vue";
 import UserEnrolledCourses from "../components/admin/UserEnrolledCourses.vue";
 import UserActivityLog from "../components/admin/UserActivityLog.vue";
-import { getUserById, updateUser } from "../services/adminService";
+import {
+  getUserById,
+  updateUser,
+  deleteUser,
+  getRecentActivity,
+} from "../services/adminService";
 
 const route = useRoute();
 const user = ref(null);
@@ -16,9 +21,16 @@ const error = ref(null);
 
 onMounted(async () => {
   loading.value = true;
+
   try {
-    const response = await getUserById(route.params.id);
-    user.value = response.data;
+    const [userResponse, activityResponse] = await Promise.all([
+      getUserById(route.params.id),
+      getRecentActivity(10),
+    ]);
+
+    user.value = userResponse.data?.data || userResponse.data;
+
+    activityLog.value = activityResponse.data; // 👈 backend array
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -66,29 +78,7 @@ const availableCourses = [
   },
 ];
 
-const activityLog = [
-  {
-    id: 1,
-    action: "Completed module: Product Materials Overview",
-    timestamp: "2024-03-25 14:30",
-    course: "Product Configuration & Ordering",
-    status: "completed",
-  },
-  {
-    id: 2,
-    action: "Started course: Product Configuration & Ordering",
-    timestamp: "2024-03-20 10:15",
-    course: "Product Configuration & Ordering",
-    status: "started",
-  },
-  {
-    id: 3,
-    action: "Completed course: Introduction to Modulex Sign Systems",
-    timestamp: "2024-03-20 09:45",
-    course: "Introduction to Modulex Sign Systems",
-    status: "completed",
-  },
-];
+const activityLog = ref([]);
 
 function removeCourse(id) {
   const idx = enrolledCourses.value.findIndex((c) => c.id === id);
@@ -111,22 +101,46 @@ async function saveUser(updatedUser) {
     loading.value = true;
 
     const payload = {
-      name: `${updatedUser.firstName} ${updatedUser.lastName}`,
+      firstName: updatedUser.firstName,
+      lastName: updatedUser.lastName,
       email: updatedUser.email,
-      company: updatedUser.company,
+      companyName: updatedUser.companyName,
       country: updatedUser.country,
-      status: updatedUser.status,
-      progress: updatedUser.progress,
     };
 
     const response = await updateUser(updatedUser.id, payload);
 
-    user.value = response.data;
+    user.value = response.data?.data || response.data;
 
     alert("User updated successfully");
   } catch (err) {
     console.error(err);
     alert("Failed to update user");
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function handleDeleteUser() {
+  if (!user.value) return;
+
+  const confirmDelete = confirm(
+    `Are you sure you want to delete ${user.value.firstName} ${user.value.lastName}?`,
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    loading.value = true;
+
+    await deleteUser(user.value.id);
+
+    alert("User deleted successfully");
+
+    route.push("/admin/users");
+  } catch (err) {
+    console.error(err);
+    alert("Failed to delete user");
   } finally {
     loading.value = false;
   }
@@ -140,21 +154,23 @@ async function saveUser(updatedUser) {
         :items="[
           { label: 'Admin', to: '/admin' },
           { label: 'Users', to: '/admin/users' },
-          { label: user.name },
+          {
+            label: `${user.firstName} ${user.lastName}`,
+          },
         ]" />
 
       <div class="detail-grid">
         <div class="col">
           <UserProfileCard :user="user" @save-user="saveUser" />
           <UserStatsCard :user="user" />
-          <UserActionsCard />
+          <UserActionsCard @delete-user="handleDeleteUser" />
         </div>
 
         <div class="col">
           <UserEnrolledCourses
             :courses="enrolledCourses"
             :availableCourses="availableCourses"
-            :userName="user.name"
+            :userName="`${user.firstName} ${user.lastName}`"
             @remove-course="removeCourse"
             @assign-course="assignCourse" />
           <UserActivityLog :log="activityLog" />
