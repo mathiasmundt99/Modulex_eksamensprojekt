@@ -19,7 +19,7 @@ import CourseView from "../views/CourseView.vue";
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: "/", redirect: "/dashboard" },
+    { path: "/", redirect: "/invitation" },
     { path: "/invitation", component: InvitationView },
     { path: "/login", component: LoginView },
     { path: "/signup", component: SignupView },
@@ -27,6 +27,11 @@ export const router = createRouter({
     { path: "/overview", redirect: "/dashboard/overview" },
     { path: "/courses", redirect: "/dashboard/courses" },
     { path: "/progress", redirect: "/dashboard/progress" },
+    {
+      path: "/reset-password",
+      name: "ResetPassword",
+      component: () => import("../views/ResetPasswordView.vue"),
+    },
     {
       path: "/dashboard",
       redirect: "/dashboard/overview",

@@ -1,14 +1,23 @@
 <script setup>
-import BaseButton from '../BaseButton.vue'
+import BaseButton from "../BaseButton.vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+const handleInvitation = () => {
+  router.push("/signup");
+};
 
 defineProps({
-  email: { type: String, default: 'partner@example.com' },
-})
+  email: { type: String, default: "partner@example.com" },
+});
 </script>
 
 <template>
   <div class="invite-card">
-    <div class="icon-circle"><span class="material-symbols-rounded">school</span></div>
+    <div class="icon-circle">
+      <span class="material-symbols-rounded">school</span>
+    </div>
 
     <h2>You're Invited!</h2>
 
@@ -17,12 +26,9 @@ defineProps({
       invitation to get started with your onboarding.
     </p>
 
-    <div class="invite-box">
-      <span>Invitation for:</span>
-      <p>{{ email }}</p>
-    </div>
-
-    <BaseButton block style="margin-bottom: 40px">Accept invitation</BaseButton>
+    <BaseButton block style="margin-bottom: 40px" @click="handleInvitation"
+      >Accept invitation</BaseButton
+    >
 
     <p class="footer-text">
       Questions? Contact us at
@@ -87,7 +93,6 @@ h2 {
 .invite-box p {
   color: #bbb;
 }
-
 
 .footer-text {
   font-size: 14px;

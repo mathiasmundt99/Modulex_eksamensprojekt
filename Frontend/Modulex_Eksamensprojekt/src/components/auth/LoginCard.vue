@@ -1,6 +1,7 @@
 <script setup>
 import FormInputBox from "./FormInputBox.vue";
 import BaseButton from "../BaseButton.vue";
+import ForgotPasswordModal from "./ForgotPasswordModal.vue";
 import { ref } from "vue";
 import { loginUser } from "../../services/authService";
 import { useRouter } from "vue-router";
@@ -11,6 +12,7 @@ const password = ref("");
 const remember = ref(false);
 const loading = ref(false);
 const error = ref("");
+const showForgotPasswordModal = ref(false);
 
 const handleLogin = async () => {
   error.value = "";
@@ -68,7 +70,9 @@ const handleLogin = async () => {
           <input v-model="remember" type="checkbox" />
           <span>Remember me</span>
         </label>
-        <a href="#">Forgot password?</a>
+        <a href="#" @click.prevent="showForgotPasswordModal = true"
+          >Forgot password?</a
+        >
       </div>
 
       <BaseButton block @click="handleLogin" :disabled="loading">
@@ -89,6 +93,10 @@ const handleLogin = async () => {
       Questions? Contact us at
       <a href="#">academy@modulex.com</a>
     </p>
+
+    <ForgotPasswordModal
+      :show="showForgotPasswordModal"
+      @close="showForgotPasswordModal = false" />
   </div>
 </template>
 
