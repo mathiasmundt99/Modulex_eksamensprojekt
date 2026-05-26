@@ -24,6 +24,14 @@ export async function getUserProgress(userId) {
   return await response.json();
 }
 
+export async function getOnboardingProgress(userId) {
+  const response = await fetch(`${BASE_URL}/${userId}/onboarding`, {
+    credentials: "include",
+  });
+  if (!response.ok) throw new Error("Failed to fetch onboarding progress");
+  return await response.json();
+}
+
 export async function getUserStats(userId) {
   const response = await fetch(`${BASE_URL}/${userId}/stats`, {
     credentials: "include",

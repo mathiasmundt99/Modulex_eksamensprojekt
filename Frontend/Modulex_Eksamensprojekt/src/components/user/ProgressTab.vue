@@ -4,8 +4,7 @@ import BreadCrumb from "../BreadCrumb.vue";
 import HelpBanner from "../HelpBanner.vue";
 import OverallProgress from "./OverallProgress.vue";
 import OnboardingChecklist from "./OnboardingChecklist.vue";
-import { getCourseById } from "../../services/courseService.js";
-import { getUserProgress } from "../../services/progressService.js";
+import { getOnboardingProgress } from "../../services/progressService.js";
 
 const overallProgress = ref(0);
 const checklistItems = ref([]);
@@ -16,24 +15,9 @@ onMounted(async () => {
     const user = userJson ? JSON.parse(userJson) : null;
     if (!user) return;
 
-    const result = await getUserProgress(user.id);
-    const courses = result.data?.courses ?? [];
-
-    const completedModules = courses.reduce(
-      (sum, c) => sum + (c.completedContentIds?.length ?? 0),
-      0,
-    );
-    const courseDetails = await Promise.all(courses.map((c) => getCourseById(c.courseId)));
-    const totalModules = courseDetails.reduce((sum, c) => sum + (c.contentIds?.length ?? 0), 0);
-
-    overallProgress.value =
-      totalModules === 0 ? 0 : Math.round((completedModules / totalModules) * 100);
-
-    checklistItems.value = courses.map((c) => ({
-      id: c.courseId,
-      title: c.courseName,
-      completed: c.status === "completed",
-    }));
+    const result = await getOnboardingProgress(user.id);
+    overallProgress.value = result.data?.overallCompletion ?? 0;
+    checklistItems.value = result.data?.checklistItems ?? [];
   } catch (err) {
     console.error("Failed to load progress:", err);
   }
