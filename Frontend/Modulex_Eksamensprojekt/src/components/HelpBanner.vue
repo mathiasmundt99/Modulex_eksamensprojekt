@@ -1,4 +1,9 @@
-<script setup></script>
+<script setup>
+const user = (() => {
+  const json = localStorage.getItem("user");
+  return json ? JSON.parse(json) : null;
+})();
+</script>
 
 <template>
   <div class="help-banner">
@@ -7,7 +12,7 @@
         <span class="material-symbols-rounded">live_help</span>
       </div>
       <div class="help-banner__text">
-        <p class="help-banner__title">Need help?</p>
+        <p class="help-banner__title">Need help, {{ user?.firstName }}?</p>
         <p class="help-banner__subtitle">Our support team is ready to assist you with any questions about the academy.</p>
       </div>
       <a href="mailto:support@modulex.com" class="help-banner__btn">Contact Support</a>
