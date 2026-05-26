@@ -42,7 +42,7 @@ async function handleCreateCourse() {
       ),
     );
 
-    emit("course-created", newCourse);
+    emit("course-created", { ...newCourse, contentIds: selectedContentIds.value });
     emit("close");
   } catch (err) {
     console.error("Failed to create course:", err);
