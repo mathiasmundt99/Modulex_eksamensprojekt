@@ -1,19 +1,27 @@
 <script setup>
-import BreadCrumb from '../BreadCrumb.vue'
-import HelpBanner from '../HelpBanner.vue'
-import OverallProgress from './OverallProgress.vue'
-import OnboardingChecklist from './OnboardingChecklist.vue'
+import { ref, onMounted } from "vue";
+import BreadCrumb from "../BreadCrumb.vue";
+import HelpBanner from "../HelpBanner.vue";
+import OverallProgress from "./OverallProgress.vue";
+import OnboardingChecklist from "./OnboardingChecklist.vue";
+import { getOnboardingProgress } from "../../services/progressService.js";
 
-const onboardingProgress = 45
+const overallProgress = ref(0);
+const checklistItems = ref([]);
 
-const checklistItems = [
-  { id: 1, title: 'Complete welcome survey',                 completed: true  },
-  { id: 2, title: 'Watch introduction video',               completed: true  },
-  { id: 3, title: 'Review product catalog',                 completed: true  },
-  { id: 4, title: 'Complete product configuration course',  completed: false },
-  { id: 5, title: 'Access ordering system',                 completed: false },
-  { id: 6, title: 'Complete first test order',              completed: false },
-]
+onMounted(async () => {
+  try {
+    const userJson = localStorage.getItem("user");
+    const user = userJson ? JSON.parse(userJson) : null;
+    if (!user) return;
+
+    const result = await getOnboardingProgress(user.id);
+    overallProgress.value = result.data?.overallCompletion ?? 0;
+    checklistItems.value = result.data?.checklistItems ?? [];
+  } catch (err) {
+    console.error("Failed to load progress:", err);
+  }
+});
 </script>
 
 <template>
@@ -23,7 +31,7 @@ const checklistItems = [
       <h2 class="page-title">Onboarding Progress</h2>
       <p class="page-subtitle">Track your journey to becoming a certified partner</p>
     </div>
-    <OverallProgress :progress="onboardingProgress" />
+    <OverallProgress :progress="overallProgress" />
     <OnboardingChecklist :items="checklistItems" />
     <HelpBanner />
   </div>

@@ -1,421 +1,315 @@
 <script setup>
-import { computed, ref } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import UserNavbar from "../components/user/UserNavbar.vue";
+import CourseHeader from "../components/course/CourseHeader.vue";
+import CourseModuleSidebar from "../components/course/CourseModuleSidebar.vue";
+import VideoPlayer from "../components/course/VideoPlayer.vue";
+import PdfViewer from "../components/course/PdfViewer.vue";
+import BaseButton from "../components/BaseButton.vue";
+import { getCourseById } from "../services/courseService.js";
+import { getLibraryContentById } from "../services/contentService.js";
+import { getUserCourseProgress, updateProgress } from "../services/progressService.js";
 
-const currentStep = ref(0);
+const router = useRouter();
+const route = useRoute();
 
-const steps = [
-  {
-    type: "video",
-    title: "Welcome to Product Configuration",
-    module: "Module 1 of 5",
-    meta: "5 min",
-  },
-  {
-    type: "video",
-    title: "Configuration Basics",
-    module: "Module 2 of 5",
-    meta: "5 min",
-  },
-  {
-    type: "pdf",
-    title: "Product Catalog Overview",
-    module: "Module 3 of 5",
-    meta: "24 pages",
-  },
-  {
-    type: "video",
-    title: "Ordering Process",
-    module: "Module 4 of 5",
-    meta: "5 min",
-  },
-];
+const sidebarOpen = ref(true);
+const currentItemIndex = ref(0);
+const courseTitle = ref("");
+const courseDescription = ref("");
+const contentItems = ref([]);
+const loading = ref(true);
 
-const activeStep = computed(() => steps[currentStep.value]);
+const user = (() => {
+  const json = localStorage.getItem("user");
+  return json ? JSON.parse(json) : null;
+})();
 
-const nextStep = () => {
-  if (currentStep.value < steps.length - 1) currentStep.value++;
-};
+function toEmbedUrl(url) {
+  if (!url) return "";
+  const match = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
+  if (match) return `https://www.youtube.com/embed/${match[1]}`;
+  return url;
+}
 
-const previousStep = () => {
-  if (currentStep.value > 0) currentStep.value--;
-};
+function toPdfUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  return `http://localhost:3000${url}`;
+}
+
+onMounted(async () => {
+  try {
+    const courseId = route.params.courseId;
+
+    const [courseRes, progressRes] = await Promise.all([
+      getCourseById(courseId),
+      user ? getUserCourseProgress(user.id, courseId) : Promise.resolve(null),
+    ]);
+
+    courseTitle.value = courseRes.title;
+    courseDescription.value = courseRes.description;
+
+    const completedIds = progressRes?.data?.completedContentIds ?? [];
+
+    const items = await Promise.all(
+      courseRes.contentIds.map(async (id) => {
+        const item = await getLibraryContentById(id);
+        return {
+          id: item.id,
+          title: item.title,
+          description: item.description ?? "",
+          type: item.type,
+          duration: item.type === "video" ? item.durationOrPages : null,
+          pages: item.type === "pdf" ? Number(item.durationOrPages) || null : null,
+          videoUrl: item.type === "video" ? toEmbedUrl(item.url) : null,
+          pdfUrl: item.type === "pdf" ? toPdfUrl(item.url) : null,
+          completed: completedIds.includes(id),
+        };
+      }),
+    );
+
+    contentItems.value = items;
+  } catch (err) {
+    console.error("Failed to load course:", err);
+  } finally {
+    loading.value = false;
+  }
+});
+
+const currentItem = computed(() => contentItems.value[currentItemIndex.value]);
+const completedCount = computed(() => contentItems.value.filter((i) => i.completed).length);
+const progressPercentage = computed(() =>
+  contentItems.value.length === 0
+    ? 0
+    : Math.round((completedCount.value / contentItems.value.length) * 100),
+);
+
+async function handleMarkComplete() {
+  const item = contentItems.value[currentItemIndex.value];
+  if (item.completed) return;
+  item.completed = true;
+  if (user) {
+    try {
+      await updateProgress(user.id, route.params.courseId, item.id, true);
+    } catch (err) {
+      console.error("Failed to save progress:", err);
+    }
+  }
+  if (currentItemIndex.value < contentItems.value.length - 1) {
+    currentItemIndex.value++;
+  }
+}
+
+function handleSelectModule(index) {
+  currentItemIndex.value = index;
+  sidebarOpen.value = false;
+}
+
+function handleLogout() {
+  localStorage.removeItem("user");
+  router.push("/login");
+}
 </script>
 
 <template>
   <div class="course-page">
-    <header class="topbar">
-      <h1>Modulex Billund Academy</h1>
+    <UserNavbar @toggleSidebar="sidebarOpen = !sidebarOpen" @logout="handleLogout" />
 
-      <div class="top-actions">
-        <button class="user-btn">
-          <span class="material-symbols-rounded"> person </span> Amalie
-        </button>
-        <button class="back-btn">‹ Back to dashboard</button>
-      </div>
-    </header>
+    <div v-if="loading" class="loading-state">Loading course...</div>
 
-    <section class="course-header">
-      <h2>Product Configuration & Ordering</h2>
-      <p>Master the ordering process and configuration tools</p>
+    <template v-else>
+      <CourseHeader
+        :title="courseTitle"
+        :description="courseDescription"
+        :completedCount="completedCount"
+        :total="contentItems.length"
+        :progressPercentage="progressPercentage" />
 
-      <div class="progress-row">
-        <span>2 of 5 completed</span>
-        <div class="progress-track">
-          <div class="progress-fill"></div>
-        </div>
-        <span>40%</span>
-      </div>
-    </section>
-
-    <main class="layout">
-      <section class="lesson-area">
-        <div class="lesson-heading">
-          <div class="lesson-left">
-            <span class="lesson-icon">
-              {{ activeStep.type === "pdf" ? "▣" : "▣" }}
-            </span>
-
-            <div>
-              <h3>{{ activeStep.title }}</h3>
-              <div class="meta">
-                <span>{{ activeStep.module }}</span>
-                <span>{{ activeStep.meta }}</span>
+      <div class="layout">
+        <div class="viewer">
+          <div class="viewer__inner">
+            <div class="item-heading">
+              <div class="item-heading__top">
+                <span class="material-symbols-rounded item-heading__icon">
+                  {{ currentItem.type === "video" ? "play_circle" : "picture_as_pdf" }}
+                </span>
+                <h3 class="item-heading__title">{{ currentItem.title }}</h3>
+              </div>
+              <p v-if="currentItem.description" class="item-heading__desc">
+                {{ currentItem.description }}
+              </p>
+              <div class="item-heading__meta">
+                <span>Module {{ currentItemIndex + 1 }} of {{ contentItems.length }}</span>
+                <span v-if="currentItem.duration">{{ currentItem.duration }}</span>
+                <span v-if="currentItem.pages">{{ currentItem.pages }} pages</span>
               </div>
             </div>
-          </div>
 
-          <button class="complete-btn">
-            Mark as completed
-            <span class="material-symbols-rounded"> check </span>
-          </button>
-        </div>
+            <div class="content-box">
+              <VideoPlayer
+                v-if="currentItem.type === 'video'"
+                :videoUrl="currentItem.videoUrl"
+                :title="currentItem.title" />
+              <PdfViewer
+                v-else
+                :title="currentItem.title"
+                :pages="currentItem.pages"
+                :pdfUrl="currentItem.pdfUrl" />
+            </div>
 
-        <div v-if="activeStep.type === 'video'" class="video-placeholder"></div>
+            <div class="nav-buttons">
+              <BaseButton
+                variant="outline"
+                :disabled="currentItemIndex === 0"
+                @click="currentItemIndex--">
+                <span class="material-symbols-rounded">chevron_left</span>
+                Previous
+              </BaseButton>
 
-        <div v-else class="pdf-card">
-          <div class="pdf-preview">
-            <div class="pdf-center">
-              <div class="pdf-small-icon">
-                <span class="material-symbols-rounded"> picture_as_pdf </span>
-              </div>
-              <h3>{{ activeStep.title }}</h3>
-              <p>{{ activeStep.meta }}</p>
+              <BaseButton
+                v-if="!currentItem.completed"
+                variant="muted"
+                @click="handleMarkComplete">
+                <span class="material-symbols-rounded">check_circle</span>
+                Mark as Complete
+              </BaseButton>
 
-              <button class="download-btn">
-                <span class="material-symbols-rounded"> download </span>
-                Download PDF
-              </button>
-              <a href="#">Or view in browser</a>
+              <BaseButton
+                :disabled="currentItemIndex === contentItems.length - 1"
+                @click="currentItemIndex++">
+                Next
+                <span class="material-symbols-rounded">chevron_right</span>
+              </BaseButton>
             </div>
           </div>
         </div>
 
-        <div class="nav-buttons">
-          <button
-            class="prev-btn"
-            :disabled="currentStep === 0"
-            @click="previousStep">
-            ‹ Previous
-          </button>
+        <CourseModuleSidebar
+          :contentItems="contentItems"
+          :currentItemIndex="currentItemIndex"
+          :completedCount="completedCount"
+          :progressPercentage="progressPercentage"
+          :isOpen="sidebarOpen"
+          @select="handleSelectModule"
+          @close="sidebarOpen = false" />
+      </div>
 
-          <button
-            class="next-btn"
-            :disabled="currentStep === steps.length - 1"
-            @click="nextStep">
-            Next ›
-          </button>
-        </div>
-      </section>
-
-      <aside class="sidebar">
-        <h4>Course content</h4>
-
-        <button
-          v-for="(step, index) in steps"
-          :key="step.title"
-          class="content-card"
-          :class="{ active: currentStep === index }"
-          @click="currentStep = index">
-          <span class="circle" :class="{ checked: index < 2 }">
-            {{ index < 2 ? "✓" : "" }}
-          </span>
-
-          <div>
-            <strong>▣ {{ step.type === "pdf" ? "PDF" : "Video" }}</strong>
-            <p>{{ step.title }}</p>
-            <span>{{ step.meta }}</span>
-          </div>
-        </button>
-      </aside>
-    </main>
+      <div
+        v-if="sidebarOpen"
+        class="sidebar-overlay"
+        @click="sidebarOpen = false" />
+    </template>
   </div>
 </template>
 
 <style scoped>
 .course-page {
   min-height: 100vh;
-  background: #f1f2f2;
-  color: var(--color-text);
-}
-
-.topbar {
-  height: 98px;
-  background: white;
+  background-color: var(--color-white);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
+  flex-direction: column;
 }
 
-.topbar h1 {
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-.top-actions {
-  display: flex;
-  gap: 20px;
-}
-
-.top-actions button {
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-weight: 700;
-  height: 34px;
-  padding: 0 18px;
-  cursor: pointer;
-}
-
-.user-btn {
-  background: #9bb6d5;
-}
-
-.back-btn {
-  background: var(--color-primary);
-}
-
-.course-header {
-  padding: 26px 26px 20px;
-  border-bottom: 1px solid #d2d2d2;
-}
-
-.course-header h2 {
-  font-size: 1.75rem;
-  margin-bottom: 10px;
-}
-
-.course-header p {
-  margin-bottom: 12px;
-}
-
-.progress-row {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  font-size: 0.9rem;
-}
-
-.progress-track {
-  width: 350px;
-  height: 10px;
-  background: white;
-  border-radius: 999px;
-}
-
-.progress-fill {
-  width: 40%;
-  height: 100%;
-  background: var(--color-primary);
-  border-radius: 999px;
-}
-
-.layout {
-  display: grid;
-  grid-template-columns: 1fr 215px;
-}
-
-.lesson-area {
-  padding: 38px;
-}
-
-.lesson-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 26px;
-}
-
-.lesson-left {
-  display: flex;
-  align-items: flex-start;
-  gap: 22px;
-}
-
-.lesson-icon {
-  font-size: 34px;
-  color: #222;
-}
-
-.lesson-left h3 {
-  font-size: 1.35rem;
-  margin-bottom: 14px;
-}
-
-.meta {
-  display: flex;
-  gap: 70px;
-  font-size: 0.9rem;
-}
-
-.complete-btn {
-  height: 32px;
-  border: none;
-  border-radius: 4px;
-  background: #9bb6d5;
-  color: white;
-  font-weight: 700;
-  padding: 0 18px;
-}
-
-.video-placeholder {
-  height: 432px;
-  background: #d4d4d4;
-}
-
-.pdf-card {
-  background: white;
-  border: 1px solid #d7d7d7;
-  border-radius: 14px;
-  padding: 20px 28px;
-}
-
-.pdf-preview {
-  height: 490px;
-  border: 1px dotted #777;
-  border-radius: 14px;
-  background: #f4f4f4;
+.loading-state {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.pdf-center {
-  text-align: center;
-}
-
-.pdf-small-icon {
-  color: #9bb6d5;
-  font-size: 32px;
-  margin-bottom: 18px;
-}
-
-.pdf-center h3 {
-  font-size: 1.35rem;
-  margin-bottom: 12px;
-}
-
-.pdf-center p {
-  margin-bottom: 28px;
-}
-
-.download-btn {
-  border: none;
-  border-radius: 4px;
-  background: var(--color-primary);
-  color: white;
-  font-weight: 700;
-  padding: 10px 22px;
-  margin-bottom: 16px;
-}
-
-.pdf-center a {
-  display: block;
+  font-size: 15px;
   color: var(--color-text);
-  text-decoration: none;
-  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+.layout {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  max-width: var(--site-width);
+  margin: 0 auto;
+  width: 100%;
+}
+
+.viewer {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.viewer__inner {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--color-bg);
+}
+
+.item-heading__top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.item-heading__icon {
+  color: var(--color-primary);
+  font-size: 22px;
+}
+
+.item-heading__title {
+  font-size: 20px;
+  color: var(--color-text);
+}
+
+.item-heading__desc {
+  font-size: 14px;
+  color: var(--color-text);
+  opacity: 0.75;
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+.item-heading__meta {
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+  color: var(--color-text);
+  opacity: 0.7;
+}
+
+.content-box {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .content-box {
+    max-width: 80%;
+  }
 }
 
 .nav-buttons {
   display: flex;
-  justify-content: space-between;
-  margin-top: 12px;
-}
-
-.prev-btn,
-.next-btn {
-  height: 32px;
-  min-width: 124px;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-weight: 700;
-  background: var(--color-primary);
-  cursor: pointer;
-}
-
-.prev-btn:disabled,
-.next-btn:disabled {
-  background: #cfd4d8;
-  cursor: not-allowed;
-}
-
-.sidebar {
-  background: white;
-  padding: 12px 15px;
-}
-
-.sidebar h4 {
-  text-align: center;
-  margin-bottom: 12px;
-}
-
-.content-card {
-  width: 100%;
-  min-height: 92px;
-  border: 1px solid #e1e1e1;
-  border-radius: 18px;
-  padding: 14px 16px;
-  display: flex;
-  gap: 14px;
-  margin-bottom: 10px;
-  background: white;
-  color: var(--color-text);
-  text-align: left;
-  cursor: pointer;
-}
-
-.content-card.active {
-  background: var(--color-primary);
-  color: white;
-}
-
-.circle {
-  width: 22px;
-  height: 22px;
-  border: 2px solid currentColor;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.checked {
-  display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 12px;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.content-card strong {
-  font-size: 0.9rem;
-  font-weight: 500;
+.sidebar-overlay {
+  display: block;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 20;
 }
 
-.content-card p {
-  font-size: 0.75rem;
-  margin: 8px 0;
-}
-
-.content-card span {
-  font-size: 0.85rem;
+@media (min-width: 1024px) {
+  .sidebar-overlay {
+    display: none;
+  }
 }
 </style>

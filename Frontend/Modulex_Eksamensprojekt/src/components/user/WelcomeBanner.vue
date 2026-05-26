@@ -1,18 +1,48 @@
 <script setup>
-const onboardingProgress = 45
+import { ref, onMounted } from "vue";
+import { getCourseById } from "../../services/courseService.js";
+import { getUserProgress } from "../../services/progressService.js";
+
+const firstName = ref("");
+const overallProgress = ref(0);
+
+onMounted(async () => {
+  try {
+    const userJson = localStorage.getItem("user");
+    const user = userJson ? JSON.parse(userJson) : null;
+    if (!user) return;
+
+    firstName.value = user.firstName;
+
+    const result = await getUserProgress(user.id);
+    const courses = result.data?.courses ?? [];
+
+    const completedModules = courses.reduce(
+      (sum, c) => sum + (c.completedContentIds?.length ?? 0),
+      0,
+    );
+    const courseDetails = await Promise.all(courses.map((c) => getCourseById(c.courseId)));
+    const totalModules = courseDetails.reduce((sum, c) => sum + (c.contentIds?.length ?? 0), 0);
+
+    overallProgress.value =
+      totalModules === 0 ? 0 : Math.round((completedModules / totalModules) * 100);
+  } catch (err) {
+    console.error("Failed to load welcome banner data:", err);
+  }
+});
 </script>
 
 <template>
   <div class="welcome-banner">
-    <h2 class="welcome-banner__title">Welcome back, John!</h2>
-    <p class="welcome-banner__subtitle">Continue your onboarding journey</p>
+    <h2 class="welcome-banner__title">Welcome back, {{ firstName }}!</h2>
+    <p class="welcome-banner__subtitle">Continue your learning journey</p>
     <div class="welcome-banner__progress">
       <div class="progress-header">
         <span>Overall Progress</span>
-        <span>{{ onboardingProgress }}%</span>
+        <span>{{ overallProgress }}%</span>
       </div>
       <div class="progress-bar">
-        <div class="progress-bar__fill" :style="{ width: onboardingProgress + '%' }"></div>
+        <div class="progress-bar__fill" :style="{ width: overallProgress + '%' }"></div>
       </div>
     </div>
   </div>

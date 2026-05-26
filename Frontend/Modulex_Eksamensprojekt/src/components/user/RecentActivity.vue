@@ -1,25 +1,61 @@
 <script setup>
-const recentActivities = [
-  { id: 1, title: 'Completed: Product Materials Overview', time: '2 hours ago', status: 'completed' },
-  { id: 2, title: 'Started: Pricing & Quotes Module',      time: '1 day ago',   status: 'started' },
-  { id: 3, title: 'Completed: Welcome Survey',             time: '3 days ago',  status: 'completed' }
-]
+import { ref, onMounted } from "vue";
+import { getUserActivity } from "../../services/progressService.js";
+
+const activities = ref([]);
+const loading = ref(true);
+
+function timeAgo(timestamp) {
+  const diff = Date.now() - new Date(timestamp).getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (minutes < 60) return `${minutes} min ago`;
+  if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  return `${days} day${days > 1 ? "s" : ""} ago`;
+}
+
+function iconFor(title) {
+  if (title.startsWith("Completed")) return "sports_score";
+  return "start";
+}
+
+onMounted(async () => {
+  try {
+    const userJson = localStorage.getItem("user");
+    const user = userJson ? JSON.parse(userJson) : null;
+    if (!user) return;
+
+    const result = await getUserActivity(user.id, 5);
+    activities.value = result.data ?? [];
+  } catch (err) {
+    console.error("Failed to load activity:", err);
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
 
 <template>
   <div class="card">
     <h3 class="card__title">Recent Activity</h3>
-    <div class="activity-list">
-      <div v-for="activity in recentActivities" :key="activity.id" class="activity-item">
+
+    <div v-if="loading" class="empty-state">Loading...</div>
+
+    <div v-else-if="activities.length === 0" class="empty-state">
+      No activity yet.
+    </div>
+
+    <div v-else class="activity-list">
+      <div v-for="activity in activities" :key="activity.id" class="activity-item">
         <span
           class="material-symbols-rounded"
-          :class="activity.status === 'completed' ? 'icon--primary' : 'icon--accent'"
-        >
-          {{ activity.status === 'completed' ? 'sports_score' : 'start' }}
+          :class="activity.title.startsWith('Completed') ? 'icon--primary' : 'icon--accent'">
+          {{ iconFor(activity.title) }}
         </span>
         <div class="activity-item__text">
           <p class="activity-item__title">{{ activity.title }}</p>
-          <p class="activity-item__time">{{ activity.time }}</p>
+          <p class="activity-item__time">{{ timeAgo(activity.timestamp) }}</p>
         </div>
       </div>
     </div>
@@ -43,6 +79,12 @@ const recentActivities = [
   margin-bottom: 16px;
 }
 
+.empty-state {
+  font-size: 14px;
+  color: var(--color-text);
+  opacity: 0.6;
+}
+
 .activity-list {
   display: flex;
   flex-direction: column;
@@ -60,13 +102,14 @@ const recentActivities = [
 
 .activity-item__title {
   font-size: 14px;
-  font-weight: 500;;
+  font-weight: 500;
   color: var(--color-text);
 }
 
 .activity-item__time {
   font-size: 12px;
   color: var(--color-text);
+  opacity: 0.6;
   margin-top: 2px;
 }
 </style>

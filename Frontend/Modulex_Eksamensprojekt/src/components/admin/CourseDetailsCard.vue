@@ -38,24 +38,6 @@ function update(field, value) {
         ></textarea>
         <p v-else class="field__text">{{ courseData.description || '—' }}</p>
       </div>
-      <div class="field">
-        <label class="field__label">Status</label>
-        <select
-          v-if="isEditing"
-          class="field__input"
-          :value="courseData.status"
-          @change="update('status', $event.target.value)"
-        >
-          <option value="published">Published</option>
-          <option value="draft">Draft</option>
-        </select>
-        <span
-          v-else
-          :class="['badge', courseData.status === 'published' ? 'badge--published' : 'badge--draft']"
-        >
-          {{ courseData.status || 'draft' }}
-        </span>
-      </div>
     </div>
   </div>
 </template>
@@ -125,23 +107,5 @@ function update(field, value) {
   border-radius: 8px;
   background-color: var(--color-bg);
   min-height: 42px;
-}
-
-.badge {
-  display: inline-block;
-  padding: 4px 12px;
-  font-size: 12px;
-  border-radius: 9999px;
-  width: fit-content;
-}
-
-.badge--published {
-  background-color: var(--color-accent);
-  color: var(--color-white);
-}
-
-.badge--draft {
-  background-color: var(--color-border);
-  color: var(--color-text);
 }
 </style>

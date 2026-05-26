@@ -15,13 +15,6 @@ const router = useRouter();
       <div class="course-card__info">
         <div class="course-card__title-row">
           <h3 class="course-card__title">{{ course.title }}</h3>
-          <span
-            :class="[
-              'badge',
-              course.status === 'Published' ? 'badge--published' : 'badge--draft',
-            ]">
-            {{ course.status ?? 'Draft' }}
-          </span>
         </div>
         <div class="course-stats">
           <div class="course-stat">
@@ -84,22 +77,6 @@ const router = useRouter();
 
 .course-card__title {
   font-size: 20px;
-  color: var(--color-text);
-}
-
-.badge {
-  padding: 4px 12px;
-  font-size: 12px;
-  border-radius: 9999px;
-}
-
-.badge--published {
-  background-color: var(--color-accent);
-  color: var(--color-white);
-}
-
-.badge--draft {
-  background-color: var(--color-border);
   color: var(--color-text);
 }
 
