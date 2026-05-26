@@ -97,29 +97,29 @@ export const router = createRouter({
   ],
 });
 
-router.beforeEach((to, from, next) => {
-  const userJson = localStorage.getItem("user");
-  const user = userJson ? JSON.parse(userJson) : null;
+// router.beforeEach((to, from, next) => {
+//   const userJson = localStorage.getItem("user");
+//   const user = userJson ? JSON.parse(userJson) : null;
 
-  const publicRoutes = ["/login", "/signup", "/invitation"];
-  const isPublicRoute = publicRoutes.includes(to.path);
+//   const publicRoutes = ["/login", "/signup", "/invitation"];
+//   const isPublicRoute = publicRoutes.includes(to.path);
 
-  // Hvis ikke logget ind
-  if (!user && !isPublicRoute) {
-    return next("/login");
-  }
+//   // Hvis ikke logget ind
+//   if (!user && !isPublicRoute) {
+//     return next("/login");
+//   }
 
-  // Hvis logget ind og prøver at gå til login/signup
-  if (user && (to.path === "/login" || to.path === "/signup")) {
-    return next(user.role === "admin" ? "/admin" : "/dashboard");
-  }
+//   // Hvis logget ind og prøver at gå til login/signup
+//   if (user && (to.path === "/login" || to.path === "/signup")) {
+//     return next(user.role === "admin" ? "/admin" : "/dashboard");
+//   }
 
-  // Admin routes kræver admin rolle
-  if (to.path.startsWith("/admin") && user?.role !== "admin") {
-    return next("/dashboard");
-  }
+//   // Admin routes kræver admin rolle
+//   if (to.path.startsWith("/admin") && user?.role !== "admin") {
+//     return next("/dashboard");
+//   }
 
-  next();
-});
+//   next();
+// });
 
 export default router;
