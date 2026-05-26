@@ -7,15 +7,7 @@ import OnboardingChecklist from "./OnboardingChecklist.vue";
 import { getCourseById } from "../../services/courseService.js";
 
 const overallProgress = ref(0);
-
-const checklistItems = [
-  { id: 1, title: "Complete welcome survey", completed: true },
-  { id: 2, title: "Watch introduction video", completed: true },
-  { id: 3, title: "Review product catalog", completed: true },
-  { id: 4, title: "Complete product configuration course", completed: false },
-  { id: 5, title: "Access ordering system", completed: false },
-  { id: 6, title: "Complete first test order", completed: false },
-];
+const checklistItems = ref([]);
 
 onMounted(async () => {
   try {
@@ -39,6 +31,12 @@ onMounted(async () => {
 
     overallProgress.value =
       totalModules === 0 ? 0 : Math.round((completedModules / totalModules) * 100);
+
+    checklistItems.value = courses.map((c) => ({
+      id: c.courseId,
+      title: c.courseName,
+      completed: c.status === "completed",
+    }));
   } catch (err) {
     console.error("Failed to load progress:", err);
   }
