@@ -59,6 +59,7 @@ onMounted(async () => {
         return {
           id: item.id,
           title: item.title,
+          description: item.description ?? "",
           type: item.type,
           duration: item.type === "video" ? item.durationOrPages : null,
           pages: item.type === "pdf" ? Number(item.durationOrPages) || null : null,
@@ -136,6 +137,9 @@ function handleLogout() {
                 </span>
                 <h3 class="item-heading__title">{{ currentItem.title }}</h3>
               </div>
+              <p v-if="currentItem.description" class="item-heading__desc">
+                {{ currentItem.description }}
+              </p>
               <div class="item-heading__meta">
                 <span>Module {{ currentItemIndex + 1 }} of {{ contentItems.length }}</span>
                 <span v-if="currentItem.duration">{{ currentItem.duration }}</span>
@@ -258,6 +262,14 @@ function handleLogout() {
   color: var(--color-text);
 }
 
+.item-heading__desc {
+  font-size: 14px;
+  color: var(--color-text);
+  opacity: 0.75;
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
 .item-heading__meta {
   display: flex;
   gap: 24px;
@@ -271,7 +283,12 @@ function handleLogout() {
   border: 1px solid var(--color-border);
   border-radius: 10px;
   overflow: hidden;
-  max-width: 80%;
+}
+
+@media (min-width: 1024px) {
+  .content-box {
+    max-width: 80%;
+  }
 }
 
 .nav-buttons {
