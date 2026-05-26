@@ -65,3 +65,47 @@ export async function updateUser(userId, userData) {
     throw error;
   }
 }
+
+// hent dashboard statistik
+export async function getDashboardStatistics() {
+  try {
+    const response = await fetch(`${BASE_URL}/stats/dashboard`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to get statistics");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching dashboard statistics:", error);
+    throw error;
+  }
+}
+
+// hent seneste aktiviteter
+export async function getRecentActivity(limit = 10) {
+  try {
+    const response = await fetch(`${BASE_URL}/activity/recent?limit=${limit}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch recent activity");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching recent activity:", error);
+    throw error;
+  }
+}

@@ -1,34 +1,83 @@
 <script setup>
-const activities = [
-  { id: 1, text: 'John Doe completed "Product Configuration"',       time: '2 hours ago', status: 'completed' },
-  { id: 2, text: 'New user registered: Mike Johnson',                time: '5 hours ago', status: 'registered' },
-  { id: 3, text: 'Jane Smith started "Installation Best Practices"', time: '1 day ago',   status: 'started' }
-]
+import { ref, onMounted } from "vue";
+import { getRecentActivity } from "@/services/adminService";
+
+const activities = ref([]);
+const loading = ref(false);
+const error = ref(null);
+
+onMounted(async () => {
+  loading.value = true;
+
+  try {
+    const res = await getRecentActivity(10);
+    activities.value = res.data; // 👈 backend array
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    loading.value = false;
+  }
+});
+
+function formatTime(timestamp) {
+  if (!timestamp) return "";
+
+  const date = new Date(timestamp);
+  return date.toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 </script>
 
 <template>
   <div class="card">
     <h3 class="card__title">Recent User Activity</h3>
-    <div class="activity-list">
-      <div v-for="activity in activities" :key="activity.id" class="activity-item">
+
+    <div v-if="activities.length" class="activity-list">
+      <div
+        v-for="activity in activities"
+        :key="activity.id"
+        class="activity-item">
         <span
           class="material-symbols-rounded"
-          :class="activity.status === 'completed' ? 'icon--primary' : 'icon--accent'"
-        >
-          {{ activity.status === 'completed' ? 'sports_score' : activity.status === 'registered' ? 'person' : 'start' }}
+          :class="
+            activity.status === 'completed' ? 'icon--primary' : 'icon--accent'
+          ">
+          {{
+            activity.status === "completed"
+              ? "sports_score"
+              : activity.status === "registered"
+                ? "person"
+                : "start"
+          }}
         </span>
+
         <div>
-          <p class="activity-item__text">{{ activity.text }}</p>
-          <p class="activity-item__time">{{ activity.time }}</p>
+          <p class="activity-item__text">
+            {{ activity.text }}
+          </p>
+
+          <p class="activity-item__time">
+            {{ formatTime(activity.timestamp) }}
+          </p>
         </div>
       </div>
     </div>
+
+    <div v-else class="empty">No recent activity</div>
   </div>
 </template>
 
 <style scoped>
-.icon--primary { color: var(--color-primary); }
-.icon--accent  { color: var(--color-accent); }
+.icon--primary {
+  color: var(--color-primary);
+}
+.icon--accent {
+  color: var(--color-accent);
+}
 
 .card {
   background-color: var(--color-white);
