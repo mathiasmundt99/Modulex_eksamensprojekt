@@ -69,6 +69,9 @@ onMounted(async () => {
     );
 
     contentItems.value = items;
+
+    const firstUncompleted = items.findIndex((i) => !i.completed);
+    currentItemIndex.value = firstUncompleted === -1 ? 0 : firstUncompleted;
   } catch (err) {
     console.error("Failed to load course:", err);
   } finally {
