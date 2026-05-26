@@ -15,7 +15,7 @@ export async function registerUser(userData) {
         phoneNumber: userData.phone,
         companyName: userData.companyName,
         cvr: userData.cvr,
-        companyAdress: userData.companyAddress,
+        companyAddress: userData.companyAddress,
         country: userData.country,
         password: userData.password,
         confirmPassword: userData.confirmPassword,

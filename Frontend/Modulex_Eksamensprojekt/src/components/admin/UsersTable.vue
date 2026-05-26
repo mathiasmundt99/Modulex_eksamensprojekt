@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import BaseButton from "../BaseButton.vue";
+import { getCompanies } from "@/services/companiesService.js";
 
 const props = defineProps({
   users: { type: Array, required: true },
@@ -9,76 +10,99 @@ const props = defineProps({
 
 const router = useRouter();
 const searchQuery = ref("");
+const companies = ref([]);
 
 const filteredUsers = computed(() => {
   const q = searchQuery.value.toLowerCase();
   if (!q) return props.users;
   return props.users.filter((u) => {
-    const name = `${u.firstName ?? ""} ${u.lastName ?? ""} ${u.name ?? ""}`.toLowerCase();
-    const company = (u.companyName ?? u.company ?? "").toLowerCase();
-    return name.includes(q) || u.email.toLowerCase().includes(q) || company.includes(q);
+    const name = `${u.firstName ?? ""} ${u.lastName ?? ""}`.toLowerCase();
+    const company = (u.companyId ?? "").toLowerCase();
+    return (
+      name.includes(q) ||
+      u.email.toLowerCase().includes(q) ||
+      company.includes(q)
+    );
   });
 });
+
+onMounted(async () => {
+  try {
+    companies.value = await getCompanies();
+  } catch (err) {
+    console.error("Failed to load companies", err);
+  }
+});
+
+const getCompanyName = (companyId) => {
+  const company = companies.value.find((c) => c.id === companyId);
+  return company?.name ?? "—";
+};
 </script>
 
 <template>
   <div class="users-table">
-  <div class="card search-card">
-    <div class="search-wrap">
-      <span class="material-symbols-rounded search-icon">search</span>
-      <input
-        v-model="searchQuery"
-        type="text"
-        class="search-input"
-        placeholder="Search users by name, email, or company..." />
+    <div class="card search-card">
+      <div class="search-wrap">
+        <span class="material-symbols-rounded search-icon">search</span>
+        <input
+          v-model="searchQuery"
+          type="text"
+          class="search-input"
+          placeholder="Search users by name, email, or company..." />
+      </div>
     </div>
-  </div>
 
-  <div class="card card--flush">
-    <div class="table-wrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>User</th>
-            <th>Company</th>
-            <th>Country</th>
-            <th>Role</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="filteredUsers.length === 0">
-            <td colspan="5" class="empty-row">Ingen brugere fundet</td>
-          </tr>
-          <tr v-for="user in filteredUsers" :key="user.id" class="table-row">
-            <td>
-              <p class="td-name">{{ user.firstName ?? "" }} {{ user.lastName ?? user.name ?? "" }}</p>
-              <p class="td-sub">{{ user.email }}</p>
-            </td>
-            <td>
-              <p class="td-main">{{ user.companyName ?? user.company ?? "—" }}</p>
-            </td>
-            <td>
-              <p class="td-main">{{ user.country ?? "—" }}</p>
-            </td>
-            <td>
-              <span class="badge">{{ user.role ?? "user" }}</span>
-            </td>
-            <td>
-              <div class="action-btns">
-                <BaseButton
-                  variant="ghost"
-                  class="action-btn"
-                  @click="router.push('/admin/users/' + user.id)">
-                  <span class="material-symbols-rounded">edit_square</span>
-                </BaseButton>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="card card--flush">
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Company</th>
+              <th>Country</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="filteredUsers.length === 0">
+              <td colspan="5" class="empty-row">Ingen brugere fundet</td>
+            </tr>
+            <tr v-for="user in filteredUsers" :key="user.id" class="table-row">
+              <td>
+                <p class="td-name">
+                  {{ user.firstName ?? "" }}
+                  {{ user.lastName ?? user.name ?? "" }}
+                </p>
+                <p class="td-sub">{{ user.email }}</p>
+              </td>
+              <td>
+                <p class="td-main">
+                  {{ getCompanyName(user.companyId) }}
+                </p>
+              </td>
+              <td>
+                <p class="td-main">{{ user.country ?? "—" }}</p>
+              </td>
+              <td>
+                <span class="badge">{{ user.role ?? "user" }}</span>
+              </td>
+              <td>
+                <div class="action-btns">
+                  <BaseButton
+                    variant="ghost"
+                    class="action-btn"
+                    @click="router.push('/admin/users/' + user.id)">
+                    <span class="material-symbols-rounded">edit_square</span>
+                  </BaseButton>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
   </div>
 </template>
 

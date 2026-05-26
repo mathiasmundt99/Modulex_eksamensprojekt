@@ -1,29 +1,48 @@
 <script setup>
-const stats = {
-  totalUsers: 24,
-  activeUsers: 18,
-  totalCourses: 8,
-  totalContent: 45
-}
+import { ref, computed, onMounted } from "vue";
+import { getDashboardStatistics } from "@/services/adminService";
 
-const activePercent = Math.round((stats.activeUsers / stats.totalUsers) * 100)
+const stats = ref(null);
+const loading = ref(false);
+const error = ref(null);
+
+onMounted(async () => {
+  loading.value = true;
+
+  try {
+    const res = await getDashboardStatistics();
+    stats.value = res.data;
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    loading.value = false;
+  }
+});
+
+const activePercent = computed(() => {
+  if (!stats.value) return 0;
+  if (stats.value.totalUsers === 0) return 0;
+
+  return Math.round((stats.value.activeUsers / stats.value.totalUsers) * 100);
+});
 </script>
 
 <template>
-  <div class="stats-grid">
+  <div v-if="stats" class="stats-grid">
     <div class="stat-card">
       <div class="stat-card__header">
         <span class="stat-card__label">Total Users</span>
         <span class="material-symbols-rounded icon--primary">group</span>
       </div>
       <p class="stat-card__value">{{ stats.totalUsers }}</p>
-      <p class="stat-card__sub">+3 this month</p>
     </div>
 
     <div class="stat-card">
       <div class="stat-card__header">
         <span class="stat-card__label">Active Users</span>
-        <span class="material-symbols-rounded icon--accent">check_circle_outline</span>
+        <span class="material-symbols-rounded icon--accent"
+          >check_circle_outline</span
+        >
       </div>
       <p class="stat-card__value">{{ stats.activeUsers }}</p>
       <p class="stat-card__sub">{{ activePercent }}% active</p>
@@ -32,10 +51,11 @@ const activePercent = Math.round((stats.activeUsers / stats.totalUsers) * 100)
     <div class="stat-card">
       <div class="stat-card__header">
         <span class="stat-card__label">Total Courses</span>
-        <span class="material-symbols-rounded icon--accent">import_contacts</span>
+        <span class="material-symbols-rounded icon--accent"
+          >import_contacts</span
+        >
       </div>
       <p class="stat-card__value">{{ stats.totalCourses }}</p>
-      <p class="stat-card__sub">2 published</p>
     </div>
 
     <div class="stat-card">
@@ -44,14 +64,19 @@ const activePercent = Math.round((stats.activeUsers / stats.totalUsers) * 100)
         <span class="material-symbols-rounded icon--accent">cloud_upload</span>
       </div>
       <p class="stat-card__value">{{ stats.totalContent }}</p>
-      <p class="stat-card__sub">Videos &amp; PDFs</p>
     </div>
   </div>
+
+  <div v-else class="loading">Loading stats...</div>
 </template>
 
 <style scoped>
-.icon--primary { color: var(--color-primary); }
-.icon--accent  { color: var(--color-accent); }
+.icon--primary {
+  color: var(--color-primary);
+}
+.icon--accent {
+  color: var(--color-accent);
+}
 
 .stats-grid {
   display: grid;
@@ -60,11 +85,15 @@ const activePercent = Math.round((stats.activeUsers / stats.totalUsers) * 100)
 }
 
 @media (max-width: 1023px) {
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 599px) {
-  .stats-grid { grid-template-columns: 1fr; }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .stat-card {
