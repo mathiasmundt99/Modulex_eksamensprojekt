@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3000/api/content";
+const BASE_URL = `${import.meta.env.VITE_API_URL}/content`;
 
 // upload pdf og opret library item i ét request
 export async function uploadPdfToLibrary(formData) {
