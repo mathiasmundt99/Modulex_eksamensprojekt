@@ -3,14 +3,26 @@ import { useRouter } from "vue-router";
 import BaseButton from "../BaseButton.vue";
 import BreadCrumb from "../BreadCrumb.vue";
 import UsersTable from "./UsersTable.vue";
+import { ref, onMounted } from "vue";
+import { getAllUsers } from "../../services/adminService";
 
 const router = useRouter();
 
-const users = [
-  { id: 1, name: 'John Doe',     email: 'john@acmesigns.com',  company: 'Acme Signs Ltd.', country: 'Denmark', role: 'user' },
-  { id: 2, name: 'Jane Smith',   email: 'jane@signpro.com',    company: 'SignPro Inc.',    country: 'Germany', role: 'user' },
-  { id: 3, name: 'Mike Johnson', email: 'mike@visualsign.com', company: 'Visual Sign Co.', country: 'UK',      role: 'user' },
-]
+const users = ref([]);
+const loading = ref(false);
+const error = ref(null);
+
+onMounted(async () => {
+  loading.value = true;
+  try {
+    const response = await getAllUsers();
+    users.value = response.data || [];
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
 
 <template>
