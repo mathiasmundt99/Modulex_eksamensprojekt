@@ -1,421 +1,258 @@
 <script setup>
-import { computed, ref } from "vue";
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import UserNavbar from "../components/user/UserNavbar.vue";
+import CourseHeader from "../components/course/CourseHeader.vue";
+import CourseModuleSidebar from "../components/course/CourseModuleSidebar.vue";
+import VideoPlayer from "../components/course/VideoPlayer.vue";
+import PdfViewer from "../components/course/PdfViewer.vue";
+import BaseButton from "../components/BaseButton.vue";
 
-const currentStep = ref(0);
+const router = useRouter();
 
-const steps = [
+const sidebarOpen = ref(true);
+const currentItemIndex = ref(0);
+
+const courseTitle = "Product Configuration & Ordering";
+const courseDescription = "Master the ordering process and configuration tools";
+
+const contentItems = ref([
   {
-    type: "video",
+    id: 1,
     title: "Welcome to Product Configuration",
-    module: "Module 1 of 5",
-    meta: "5 min",
-  },
-  {
     type: "video",
-    title: "Configuration Basics",
-    module: "Module 2 of 5",
-    meta: "5 min",
+    duration: "5 min",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    completed: true,
   },
   {
-    type: "pdf",
+    id: 2,
+    title: "Understanding Modular Sign Systems",
+    type: "video",
+    duration: "12 min",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    completed: true,
+  },
+  {
+    id: 3,
     title: "Product Catalog Overview",
-    module: "Module 3 of 5",
-    meta: "24 pages",
+    type: "pdf",
+    pages: 24,
+    pdfUrl: "sample.pdf",
+    completed: false,
   },
   {
+    id: 4,
+    title: "Configuration Tool Tutorial",
     type: "video",
-    title: "Ordering Process",
-    module: "Module 4 of 5",
-    meta: "5 min",
+    duration: "18 min",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    completed: false,
   },
-];
+  {
+    id: 5,
+    title: "Pricing & Quotes Guide",
+    type: "pdf",
+    pages: 12,
+    pdfUrl: "sample.pdf",
+    completed: false,
+  },
+]);
 
-const activeStep = computed(() => steps[currentStep.value]);
+const currentItem = computed(() => contentItems.value[currentItemIndex.value]);
+const completedCount = computed(() => contentItems.value.filter((i) => i.completed).length);
+const progressPercentage = computed(() =>
+  Math.round((completedCount.value / contentItems.value.length) * 100),
+);
 
-const nextStep = () => {
-  if (currentStep.value < steps.length - 1) currentStep.value++;
-};
+function handleMarkComplete() {
+  contentItems.value[currentItemIndex.value].completed = true;
+  if (currentItemIndex.value < contentItems.value.length - 1) {
+    currentItemIndex.value++;
+  }
+}
 
-const previousStep = () => {
-  if (currentStep.value > 0) currentStep.value--;
-};
+function handleSelectModule(index) {
+  currentItemIndex.value = index;
+  sidebarOpen.value = false;
+}
+
+function handleLogout() {
+  localStorage.removeItem("user");
+  router.push("/login");
+}
 </script>
 
 <template>
   <div class="course-page">
-    <header class="topbar">
-      <h1>Modulex Billund Academy</h1>
+    <UserNavbar @toggleSidebar="sidebarOpen = !sidebarOpen" @logout="handleLogout" />
 
-      <div class="top-actions">
-        <button class="user-btn">
-          <span class="material-symbols-rounded"> person </span> Amalie
-        </button>
-        <button class="back-btn">‹ Back to dashboard</button>
-      </div>
-    </header>
+    <CourseHeader
+      :title="courseTitle"
+      :description="courseDescription"
+      :completedCount="completedCount"
+      :total="contentItems.length"
+      :progressPercentage="progressPercentage" />
 
-    <section class="course-header">
-      <h2>Product Configuration & Ordering</h2>
-      <p>Master the ordering process and configuration tools</p>
-
-      <div class="progress-row">
-        <span>2 of 5 completed</span>
-        <div class="progress-track">
-          <div class="progress-fill"></div>
-        </div>
-        <span>40%</span>
-      </div>
-    </section>
-
-    <main class="layout">
-      <section class="lesson-area">
-        <div class="lesson-heading">
-          <div class="lesson-left">
-            <span class="lesson-icon">
-              {{ activeStep.type === "pdf" ? "▣" : "▣" }}
-            </span>
-
-            <div>
-              <h3>{{ activeStep.title }}</h3>
-              <div class="meta">
-                <span>{{ activeStep.module }}</span>
-                <span>{{ activeStep.meta }}</span>
-              </div>
+    <div class="layout">
+      <div class="viewer">
+        <div class="viewer__inner">
+          <!-- Item heading -->
+          <div class="item-heading">
+            <div class="item-heading__top">
+              <span class="material-symbols-rounded item-heading__icon">
+                {{ currentItem.type === "video" ? "play_circle" : "picture_as_pdf" }}
+              </span>
+              <h3 class="item-heading__title">{{ currentItem.title }}</h3>
+            </div>
+            <div class="item-heading__meta">
+              <span>Module {{ currentItemIndex + 1 }} of {{ contentItems.length }}</span>
+              <span v-if="currentItem.duration">{{ currentItem.duration }}</span>
+              <span v-if="currentItem.pages">{{ currentItem.pages }} pages</span>
             </div>
           </div>
 
-          <button class="complete-btn">
-            Mark as completed
-            <span class="material-symbols-rounded"> check </span>
-          </button>
-        </div>
+          <!-- Content -->
+          <div class="content-box">
+            <VideoPlayer
+              v-if="currentItem.type === 'video'"
+              :videoUrl="currentItem.videoUrl"
+              :title="currentItem.title" />
+            <PdfViewer
+              v-else
+              :title="currentItem.title"
+              :pages="currentItem.pages"
+              :pdfUrl="currentItem.pdfUrl" />
+          </div>
 
-        <div v-if="activeStep.type === 'video'" class="video-placeholder"></div>
+          <!-- Navigation -->
+          <div class="nav-buttons">
+            <BaseButton
+              variant="outline"
+              :disabled="currentItemIndex === 0"
+              @click="currentItemIndex--">
+              <span class="material-symbols-rounded">chevron_left</span>
+              Previous
+            </BaseButton>
 
-        <div v-else class="pdf-card">
-          <div class="pdf-preview">
-            <div class="pdf-center">
-              <div class="pdf-small-icon">
-                <span class="material-symbols-rounded"> picture_as_pdf </span>
-              </div>
-              <h3>{{ activeStep.title }}</h3>
-              <p>{{ activeStep.meta }}</p>
+            <BaseButton
+              v-if="!currentItem.completed"
+              variant="muted"
+              @click="handleMarkComplete">
+              <span class="material-symbols-rounded">check_circle</span>
+              Mark as Complete
+            </BaseButton>
 
-              <button class="download-btn">
-                <span class="material-symbols-rounded"> download </span>
-                Download PDF
-              </button>
-              <a href="#">Or view in browser</a>
-            </div>
+            <BaseButton
+              :disabled="currentItemIndex === contentItems.length - 1"
+              @click="currentItemIndex++">
+              Next
+              <span class="material-symbols-rounded">chevron_right</span>
+            </BaseButton>
           </div>
         </div>
+      </div>
 
-        <div class="nav-buttons">
-          <button
-            class="prev-btn"
-            :disabled="currentStep === 0"
-            @click="previousStep">
-            ‹ Previous
-          </button>
+      <CourseModuleSidebar
+        :contentItems="contentItems"
+        :currentItemIndex="currentItemIndex"
+        :completedCount="completedCount"
+        :progressPercentage="progressPercentage"
+        :isOpen="sidebarOpen"
+        @select="handleSelectModule"
+        @close="sidebarOpen = false" />
+    </div>
 
-          <button
-            class="next-btn"
-            :disabled="currentStep === steps.length - 1"
-            @click="nextStep">
-            Next ›
-          </button>
-        </div>
-      </section>
-
-      <aside class="sidebar">
-        <h4>Course content</h4>
-
-        <button
-          v-for="(step, index) in steps"
-          :key="step.title"
-          class="content-card"
-          :class="{ active: currentStep === index }"
-          @click="currentStep = index">
-          <span class="circle" :class="{ checked: index < 2 }">
-            {{ index < 2 ? "✓" : "" }}
-          </span>
-
-          <div>
-            <strong>▣ {{ step.type === "pdf" ? "PDF" : "Video" }}</strong>
-            <p>{{ step.title }}</p>
-            <span>{{ step.meta }}</span>
-          </div>
-        </button>
-      </aside>
-    </main>
+    <div
+      v-if="sidebarOpen"
+      class="sidebar-overlay"
+      @click="sidebarOpen = false" />
   </div>
 </template>
 
 <style scoped>
 .course-page {
   min-height: 100vh;
-  background: #f1f2f2;
-  color: var(--color-text);
-}
-
-.topbar {
-  height: 98px;
-  background: white;
+  background-color: var(--color-white);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-}
-
-.topbar h1 {
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-.top-actions {
-  display: flex;
-  gap: 20px;
-}
-
-.top-actions button {
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-weight: 700;
-  height: 34px;
-  padding: 0 18px;
-  cursor: pointer;
-}
-
-.user-btn {
-  background: #9bb6d5;
-}
-
-.back-btn {
-  background: var(--color-primary);
-}
-
-.course-header {
-  padding: 26px 26px 20px;
-  border-bottom: 1px solid #d2d2d2;
-}
-
-.course-header h2 {
-  font-size: 1.75rem;
-  margin-bottom: 10px;
-}
-
-.course-header p {
-  margin-bottom: 12px;
-}
-
-.progress-row {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  font-size: 0.9rem;
-}
-
-.progress-track {
-  width: 350px;
-  height: 10px;
-  background: white;
-  border-radius: 999px;
-}
-
-.progress-fill {
-  width: 40%;
-  height: 100%;
-  background: var(--color-primary);
-  border-radius: 999px;
+  flex-direction: column;
 }
 
 .layout {
-  display: grid;
-  grid-template-columns: 1fr 215px;
-}
-
-.lesson-area {
-  padding: 38px;
-}
-
-.lesson-heading {
+  flex: 1;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 26px;
+  overflow: hidden;
+  position: relative;
+  max-width: var(--site-width);
+  margin: 0 auto;
+  width: 100%;
 }
 
-.lesson-left {
+.viewer {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.viewer__inner {
+  padding: 24px;
   display: flex;
-  align-items: flex-start;
-  gap: 22px;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--color-bg);
 }
 
-.lesson-icon {
-  font-size: 34px;
-  color: #222;
-}
-
-.lesson-left h3 {
-  font-size: 1.35rem;
-  margin-bottom: 14px;
-}
-
-.meta {
-  display: flex;
-  gap: 70px;
-  font-size: 0.9rem;
-}
-
-.complete-btn {
-  height: 32px;
-  border: none;
-  border-radius: 4px;
-  background: #9bb6d5;
-  color: white;
-  font-weight: 700;
-  padding: 0 18px;
-}
-
-.video-placeholder {
-  height: 432px;
-  background: #d4d4d4;
-}
-
-.pdf-card {
-  background: white;
-  border: 1px solid #d7d7d7;
-  border-radius: 14px;
-  padding: 20px 28px;
-}
-
-.pdf-preview {
-  height: 490px;
-  border: 1px dotted #777;
-  border-radius: 14px;
-  background: #f4f4f4;
+.item-heading__top {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
-.pdf-center {
-  text-align: center;
+.item-heading__icon {
+  color: var(--color-primary);
+  font-size: 22px;
 }
 
-.pdf-small-icon {
-  color: #9bb6d5;
-  font-size: 32px;
-  margin-bottom: 18px;
-}
-
-.pdf-center h3 {
-  font-size: 1.35rem;
-  margin-bottom: 12px;
-}
-
-.pdf-center p {
-  margin-bottom: 28px;
-}
-
-.download-btn {
-  border: none;
-  border-radius: 4px;
-  background: var(--color-primary);
-  color: white;
-  font-weight: 700;
-  padding: 10px 22px;
-  margin-bottom: 16px;
-}
-
-.pdf-center a {
-  display: block;
+.item-heading__title {
+  font-size: 20px;
   color: var(--color-text);
-  text-decoration: none;
-  font-size: 0.85rem;
+}
+
+.item-heading__meta {
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+  color: var(--color-text);
+  opacity: 0.7;
+}
+
+.content-box {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .nav-buttons {
   display: flex;
-  justify-content: space-between;
-  margin-top: 12px;
-}
-
-.prev-btn,
-.next-btn {
-  height: 32px;
-  min-width: 124px;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  font-weight: 700;
-  background: var(--color-primary);
-  cursor: pointer;
-}
-
-.prev-btn:disabled,
-.next-btn:disabled {
-  background: #cfd4d8;
-  cursor: not-allowed;
-}
-
-.sidebar {
-  background: white;
-  padding: 12px 15px;
-}
-
-.sidebar h4 {
-  text-align: center;
-  margin-bottom: 12px;
-}
-
-.content-card {
-  width: 100%;
-  min-height: 92px;
-  border: 1px solid #e1e1e1;
-  border-radius: 18px;
-  padding: 14px 16px;
-  display: flex;
-  gap: 14px;
-  margin-bottom: 10px;
-  background: white;
-  color: var(--color-text);
-  text-align: left;
-  cursor: pointer;
-}
-
-.content-card.active {
-  background: var(--color-primary);
-  color: white;
-}
-
-.circle {
-  width: 22px;
-  height: 22px;
-  border: 2px solid currentColor;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.checked {
-  display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 12px;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.content-card strong {
-  font-size: 0.9rem;
-  font-weight: 500;
+
+.sidebar-overlay {
+  display: block;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 20;
 }
 
-.content-card p {
-  font-size: 0.75rem;
-  margin: 8px 0;
-}
-
-.content-card span {
-  font-size: 0.85rem;
+@media (min-width: 1024px) {
+  .sidebar-overlay {
+    display: none;
+  }
 }
 </style>
