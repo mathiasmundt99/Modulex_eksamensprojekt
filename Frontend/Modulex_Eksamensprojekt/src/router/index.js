@@ -15,6 +15,7 @@ import AdminCourseEditorView from "../views/AdminCourseEditorView.vue";
 import InvitationView from "../views/InvitationView.vue";
 import LoginView from "../views/LoginView.vue";
 import SignupView from "../views/SignupView.vue";
+import UserSurvey from "../views/UserSurvey.vue";
 
 export default createRouter({
   history: createWebHistory(),
@@ -27,6 +28,7 @@ export default createRouter({
     { path: "/courses", redirect: "/dashboard/courses" },
     { path: "/progress", redirect: "/dashboard/progress" },
     { path: "/survey-dashboard", component: SurveyDashboard, meta: { label: "Survey Dashboard" } },
+    { path: "/survey", component: UserSurvey, meta: { label: "Survey" } },
     {
       path: "/dashboard",
       redirect: "/dashboard/overview",
