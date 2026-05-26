@@ -19,7 +19,7 @@ import CourseView from "../views/CourseView.vue";
 export const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: "/", redirect: "/login" },
+    { path: "/", redirect: "/invitation" },
     { path: "/invitation", component: InvitationView },
     { path: "/login", component: LoginView },
     { path: "/signup", component: SignupView },
