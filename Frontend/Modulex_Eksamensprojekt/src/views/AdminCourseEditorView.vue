@@ -13,6 +13,7 @@ import {
   deleteCourse,
   linkContentToCourse,
   unlinkContentFromCourse,
+  reorderCourseContent,
 } from "@/services/courseService";
 import { getLibraryContent } from "@/services/contentService";
 
@@ -127,11 +128,16 @@ async function addModule(content) {
   }
 }
 
-function reorderModules({ from, to }) {
+async function reorderModules({ from, to }) {
   const list = [...modules.value];
   const [moved] = list.splice(from, 1);
   list.splice(to, 0, moved);
   modules.value = list;
+  try {
+    await reorderCourseContent(route.params.courseId, list.map((m) => m.id));
+  } catch (err) {
+    console.error("Failed to save new order:", err);
+  }
 }
 </script>
 
