@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { getCourseById } from "../../services/courseService.js";
+import { getUserProgress } from "../../services/progressService.js";
 
 const firstName = ref("");
 const overallProgress = ref(0);
@@ -13,11 +14,7 @@ onMounted(async () => {
 
     firstName.value = user.firstName;
 
-    const response = await fetch(`http://localhost:3000/api/progress/${user.id}`, {
-      credentials: "include",
-    });
-    if (!response.ok) return;
-    const result = await response.json();
+    const result = await getUserProgress(user.id);
     const courses = result.data?.courses ?? [];
 
     const completedModules = courses.reduce(
@@ -27,7 +24,8 @@ onMounted(async () => {
     const courseDetails = await Promise.all(courses.map((c) => getCourseById(c.courseId)));
     const totalModules = courseDetails.reduce((sum, c) => sum + (c.contentIds?.length ?? 0), 0);
 
-    overallProgress.value = totalModules === 0 ? 0 : Math.round((completedModules / totalModules) * 100);
+    overallProgress.value =
+      totalModules === 0 ? 0 : Math.round((completedModules / totalModules) * 100);
   } catch (err) {
     console.error("Failed to load welcome banner data:", err);
   }

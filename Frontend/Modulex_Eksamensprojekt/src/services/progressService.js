@@ -16,6 +16,30 @@ export async function getUserCourseProgress(userId, courseId) {
   return await response.json();
 }
 
+export async function getUserProgress(userId) {
+  const response = await fetch(`${BASE_URL}/${userId}`, {
+    credentials: "include",
+  });
+  if (!response.ok) throw new Error("Failed to fetch user progress");
+  return await response.json();
+}
+
+export async function getUserStats(userId) {
+  const response = await fetch(`${BASE_URL}/${userId}/stats`, {
+    credentials: "include",
+  });
+  if (!response.ok) throw new Error("Failed to fetch user stats");
+  return await response.json();
+}
+
+export async function getUserActivity(userId, limit = 5) {
+  const response = await fetch(`${BASE_URL}/${userId}/activity?limit=${limit}`, {
+    credentials: "include",
+  });
+  if (!response.ok) throw new Error("Failed to fetch user activity");
+  return await response.json();
+}
+
 export async function updateProgress(userId, courseId, contentId, completed) {
   const response = await fetch(`${BASE_URL}/${userId}/update`, {
     method: "PUT",

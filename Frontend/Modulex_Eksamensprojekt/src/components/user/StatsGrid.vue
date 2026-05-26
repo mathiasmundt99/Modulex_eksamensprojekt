@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { getCourseById } from "../../services/courseService.js";
+import { getUserProgress, getUserStats } from "../../services/progressService.js";
 
 const completedModules = ref(0);
 const totalModules = ref(0);
@@ -13,30 +14,24 @@ onMounted(async () => {
     const user = userJson ? JSON.parse(userJson) : null;
     if (!user) return;
 
-    const [statsRes, progressRes] = await Promise.all([
-      fetch(`http://localhost:3000/api/progress/${user.id}/stats`, { credentials: "include" }),
-      fetch(`http://localhost:3000/api/progress/${user.id}`, { credentials: "include" }),
+    const [stats, progress] = await Promise.all([
+      getUserStats(user.id),
+      getUserProgress(user.id),
     ]);
 
-    if (statsRes.ok) {
-      const stats = await statsRes.json();
-      activeCourses.value = stats.data?.activeCourses ?? 0;
-    }
+    activeCourses.value = stats.data?.activeCourses ?? 0;
 
-    if (progressRes.ok) {
-      const progress = await progressRes.json();
-      const courses = progress.data?.courses ?? [];
-      completedModules.value = courses.reduce(
-        (sum, c) => sum + (c.completedContentIds?.length ?? 0),
-        0,
-      );
-      notStarted.value = courses.filter((c) => !c.hasStarted).length;
-      const courseDetails = await Promise.all(courses.map((c) => getCourseById(c.courseId)));
-      totalModules.value = courseDetails.reduce(
-        (sum, c) => sum + (c.contentIds?.length ?? 0),
-        0,
-      );
-    }
+    const courses = progress.data?.courses ?? [];
+    completedModules.value = courses.reduce(
+      (sum, c) => sum + (c.completedContentIds?.length ?? 0),
+      0,
+    );
+    notStarted.value = courses.filter((c) => !c.hasStarted).length;
+    const courseDetails = await Promise.all(courses.map((c) => getCourseById(c.courseId)));
+    totalModules.value = courseDetails.reduce(
+      (sum, c) => sum + (c.contentIds?.length ?? 0),
+      0,
+    );
   } catch (err) {
     console.error("Failed to load stats:", err);
   }

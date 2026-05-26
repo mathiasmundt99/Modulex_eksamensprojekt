@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { getUserActivity } from "../../services/progressService.js";
 
 const activities = ref([]);
 const loading = ref(true);
@@ -25,12 +26,7 @@ onMounted(async () => {
     const user = userJson ? JSON.parse(userJson) : null;
     if (!user) return;
 
-    const response = await fetch(
-      `http://localhost:3000/api/progress/${user.id}/activity?limit=5`,
-      { credentials: "include" },
-    );
-    if (!response.ok) throw new Error("Failed to fetch activity");
-    const result = await response.json();
+    const result = await getUserActivity(user.id, 5);
     activities.value = result.data ?? [];
   } catch (err) {
     console.error("Failed to load activity:", err);

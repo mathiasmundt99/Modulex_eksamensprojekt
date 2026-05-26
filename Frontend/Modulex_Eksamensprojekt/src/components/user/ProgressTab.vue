@@ -5,6 +5,7 @@ import HelpBanner from "../HelpBanner.vue";
 import OverallProgress from "./OverallProgress.vue";
 import OnboardingChecklist from "./OnboardingChecklist.vue";
 import { getCourseById } from "../../services/courseService.js";
+import { getUserProgress } from "../../services/progressService.js";
 
 const overallProgress = ref(0);
 const checklistItems = ref([]);
@@ -15,11 +16,7 @@ onMounted(async () => {
     const user = userJson ? JSON.parse(userJson) : null;
     if (!user) return;
 
-    const response = await fetch(`http://localhost:3000/api/progress/${user.id}`, {
-      credentials: "include",
-    });
-    if (!response.ok) return;
-    const result = await response.json();
+    const result = await getUserProgress(user.id);
     const courses = result.data?.courses ?? [];
 
     const completedModules = courses.reduce(
