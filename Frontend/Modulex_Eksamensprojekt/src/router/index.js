@@ -23,7 +23,7 @@ export const router = createRouter({
     { path: "/invitation", component: InvitationView },
     { path: "/login", component: LoginView },
     { path: "/signup", component: SignupView },
-    { path: "/course", component: CourseView },
+    { path: "/course/:courseId", component: CourseView },
     { path: "/overview", redirect: "/dashboard/overview" },
     { path: "/courses", redirect: "/dashboard/courses" },
     { path: "/progress", redirect: "/dashboard/progress" },

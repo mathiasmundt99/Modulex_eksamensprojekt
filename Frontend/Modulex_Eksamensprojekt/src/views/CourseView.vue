@@ -1,72 +1,101 @@
 <script setup>
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import UserNavbar from "../components/user/UserNavbar.vue";
 import CourseHeader from "../components/course/CourseHeader.vue";
 import CourseModuleSidebar from "../components/course/CourseModuleSidebar.vue";
 import VideoPlayer from "../components/course/VideoPlayer.vue";
 import PdfViewer from "../components/course/PdfViewer.vue";
 import BaseButton from "../components/BaseButton.vue";
+import { getCourseById } from "../services/courseService.js";
+import { getLibraryContentById } from "../services/contentService.js";
+import { getUserCourseProgress, updateProgress } from "../services/progressService.js";
 
 const router = useRouter();
+const route = useRoute();
 
 const sidebarOpen = ref(true);
 const currentItemIndex = ref(0);
+const courseTitle = ref("");
+const courseDescription = ref("");
+const contentItems = ref([]);
+const loading = ref(true);
 
-const courseTitle = "Product Configuration & Ordering";
-const courseDescription = "Master the ordering process and configuration tools";
+const user = (() => {
+  const json = localStorage.getItem("user");
+  return json ? JSON.parse(json) : null;
+})();
 
-const contentItems = ref([
-  {
-    id: 1,
-    title: "Welcome to Product Configuration",
-    type: "video",
-    duration: "5 min",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    completed: true,
-  },
-  {
-    id: 2,
-    title: "Understanding Modular Sign Systems",
-    type: "video",
-    duration: "12 min",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    completed: true,
-  },
-  {
-    id: 3,
-    title: "Product Catalog Overview",
-    type: "pdf",
-    pages: 24,
-    pdfUrl: "sample.pdf",
-    completed: false,
-  },
-  {
-    id: 4,
-    title: "Configuration Tool Tutorial",
-    type: "video",
-    duration: "18 min",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    completed: false,
-  },
-  {
-    id: 5,
-    title: "Pricing & Quotes Guide",
-    type: "pdf",
-    pages: 12,
-    pdfUrl: "sample.pdf",
-    completed: false,
-  },
-]);
+function toEmbedUrl(url) {
+  if (!url) return "";
+  const match = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
+  if (match) return `https://www.youtube.com/embed/${match[1]}`;
+  return url;
+}
+
+function toPdfUrl(url) {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  return `http://localhost:3000${url}`;
+}
+
+onMounted(async () => {
+  try {
+    const courseId = route.params.courseId;
+
+    const [courseRes, progressRes] = await Promise.all([
+      getCourseById(courseId),
+      user ? getUserCourseProgress(user.id, courseId) : Promise.resolve(null),
+    ]);
+
+    courseTitle.value = courseRes.title;
+    courseDescription.value = courseRes.description;
+
+    const completedIds = progressRes?.data?.completedContentIds ?? [];
+
+    const items = await Promise.all(
+      courseRes.contentIds.map(async (id) => {
+        const item = await getLibraryContentById(id);
+        return {
+          id: item.id,
+          title: item.title,
+          type: item.type,
+          duration: item.type === "video" ? item.durationOrPages : null,
+          pages: item.type === "pdf" ? Number(item.durationOrPages) || null : null,
+          videoUrl: item.type === "video" ? toEmbedUrl(item.url) : null,
+          pdfUrl: item.type === "pdf" ? toPdfUrl(item.url) : null,
+          completed: completedIds.includes(id),
+        };
+      }),
+    );
+
+    contentItems.value = items;
+  } catch (err) {
+    console.error("Failed to load course:", err);
+  } finally {
+    loading.value = false;
+  }
+});
 
 const currentItem = computed(() => contentItems.value[currentItemIndex.value]);
 const completedCount = computed(() => contentItems.value.filter((i) => i.completed).length);
 const progressPercentage = computed(() =>
-  Math.round((completedCount.value / contentItems.value.length) * 100),
+  contentItems.value.length === 0
+    ? 0
+    : Math.round((completedCount.value / contentItems.value.length) * 100),
 );
 
-function handleMarkComplete() {
-  contentItems.value[currentItemIndex.value].completed = true;
+async function handleMarkComplete() {
+  const item = contentItems.value[currentItemIndex.value];
+  if (item.completed) return;
+  item.completed = true;
+  if (user) {
+    try {
+      await updateProgress(user.id, route.params.courseId, item.id, true);
+    } catch (err) {
+      console.error("Failed to save progress:", err);
+    }
+  }
   if (currentItemIndex.value < contentItems.value.length - 1) {
     currentItemIndex.value++;
   }
@@ -87,86 +116,87 @@ function handleLogout() {
   <div class="course-page">
     <UserNavbar @toggleSidebar="sidebarOpen = !sidebarOpen" @logout="handleLogout" />
 
-    <CourseHeader
-      :title="courseTitle"
-      :description="courseDescription"
-      :completedCount="completedCount"
-      :total="contentItems.length"
-      :progressPercentage="progressPercentage" />
+    <div v-if="loading" class="loading-state">Loading course...</div>
 
-    <div class="layout">
-      <div class="viewer">
-        <div class="viewer__inner">
-          <!-- Item heading -->
-          <div class="item-heading">
-            <div class="item-heading__top">
-              <span class="material-symbols-rounded item-heading__icon">
-                {{ currentItem.type === "video" ? "play_circle" : "picture_as_pdf" }}
-              </span>
-              <h3 class="item-heading__title">{{ currentItem.title }}</h3>
+    <template v-else>
+      <CourseHeader
+        :title="courseTitle"
+        :description="courseDescription"
+        :completedCount="completedCount"
+        :total="contentItems.length"
+        :progressPercentage="progressPercentage" />
+
+      <div class="layout">
+        <div class="viewer">
+          <div class="viewer__inner">
+            <div class="item-heading">
+              <div class="item-heading__top">
+                <span class="material-symbols-rounded item-heading__icon">
+                  {{ currentItem.type === "video" ? "play_circle" : "picture_as_pdf" }}
+                </span>
+                <h3 class="item-heading__title">{{ currentItem.title }}</h3>
+              </div>
+              <div class="item-heading__meta">
+                <span>Module {{ currentItemIndex + 1 }} of {{ contentItems.length }}</span>
+                <span v-if="currentItem.duration">{{ currentItem.duration }}</span>
+                <span v-if="currentItem.pages">{{ currentItem.pages }} pages</span>
+              </div>
             </div>
-            <div class="item-heading__meta">
-              <span>Module {{ currentItemIndex + 1 }} of {{ contentItems.length }}</span>
-              <span v-if="currentItem.duration">{{ currentItem.duration }}</span>
-              <span v-if="currentItem.pages">{{ currentItem.pages }} pages</span>
+
+            <div class="content-box">
+              <VideoPlayer
+                v-if="currentItem.type === 'video'"
+                :videoUrl="currentItem.videoUrl"
+                :title="currentItem.title" />
+              <PdfViewer
+                v-else
+                :title="currentItem.title"
+                :pages="currentItem.pages"
+                :pdfUrl="currentItem.pdfUrl" />
             </div>
-          </div>
 
-          <!-- Content -->
-          <div class="content-box">
-            <VideoPlayer
-              v-if="currentItem.type === 'video'"
-              :videoUrl="currentItem.videoUrl"
-              :title="currentItem.title" />
-            <PdfViewer
-              v-else
-              :title="currentItem.title"
-              :pages="currentItem.pages"
-              :pdfUrl="currentItem.pdfUrl" />
-          </div>
+            <div class="nav-buttons">
+              <BaseButton
+                variant="outline"
+                :disabled="currentItemIndex === 0"
+                @click="currentItemIndex--">
+                <span class="material-symbols-rounded">chevron_left</span>
+                Previous
+              </BaseButton>
 
-          <!-- Navigation -->
-          <div class="nav-buttons">
-            <BaseButton
-              variant="outline"
-              :disabled="currentItemIndex === 0"
-              @click="currentItemIndex--">
-              <span class="material-symbols-rounded">chevron_left</span>
-              Previous
-            </BaseButton>
+              <BaseButton
+                v-if="!currentItem.completed"
+                variant="muted"
+                @click="handleMarkComplete">
+                <span class="material-symbols-rounded">check_circle</span>
+                Mark as Complete
+              </BaseButton>
 
-            <BaseButton
-              v-if="!currentItem.completed"
-              variant="muted"
-              @click="handleMarkComplete">
-              <span class="material-symbols-rounded">check_circle</span>
-              Mark as Complete
-            </BaseButton>
-
-            <BaseButton
-              :disabled="currentItemIndex === contentItems.length - 1"
-              @click="currentItemIndex++">
-              Next
-              <span class="material-symbols-rounded">chevron_right</span>
-            </BaseButton>
+              <BaseButton
+                :disabled="currentItemIndex === contentItems.length - 1"
+                @click="currentItemIndex++">
+                Next
+                <span class="material-symbols-rounded">chevron_right</span>
+              </BaseButton>
+            </div>
           </div>
         </div>
+
+        <CourseModuleSidebar
+          :contentItems="contentItems"
+          :currentItemIndex="currentItemIndex"
+          :completedCount="completedCount"
+          :progressPercentage="progressPercentage"
+          :isOpen="sidebarOpen"
+          @select="handleSelectModule"
+          @close="sidebarOpen = false" />
       </div>
 
-      <CourseModuleSidebar
-        :contentItems="contentItems"
-        :currentItemIndex="currentItemIndex"
-        :completedCount="completedCount"
-        :progressPercentage="progressPercentage"
-        :isOpen="sidebarOpen"
-        @select="handleSelectModule"
-        @close="sidebarOpen = false" />
-    </div>
-
-    <div
-      v-if="sidebarOpen"
-      class="sidebar-overlay"
-      @click="sidebarOpen = false" />
+      <div
+        v-if="sidebarOpen"
+        class="sidebar-overlay"
+        @click="sidebarOpen = false" />
+    </template>
   </div>
 </template>
 
@@ -176,6 +206,16 @@ function handleLogout() {
   background-color: var(--color-white);
   display: flex;
   flex-direction: column;
+}
+
+.loading-state {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: var(--color-text);
+  opacity: 0.6;
 }
 
 .layout {
@@ -231,6 +271,7 @@ function handleLogout() {
   border: 1px solid var(--color-border);
   border-radius: 10px;
   overflow: hidden;
+  max-width: 80%;
 }
 
 .nav-buttons {
@@ -240,7 +281,6 @@ function handleLogout() {
   gap: 12px;
   flex-wrap: wrap;
 }
-
 
 .sidebar-overlay {
   display: block;
