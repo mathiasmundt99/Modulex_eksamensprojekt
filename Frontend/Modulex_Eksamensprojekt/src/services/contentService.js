@@ -5,6 +5,7 @@ export async function uploadPdfToLibrary(formData) {
   try {
     const response = await fetch(`${BASE_URL}/library`, {
       method: "POST",
+      credentials: "include",
       body: formData,
     });
 
@@ -24,6 +25,7 @@ export async function getPdfs() {
   try {
     const response = await fetch(`${BASE_URL}/pdfs`, {
       method: "GET",
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -42,6 +44,7 @@ export async function createLibraryContent(contentData) {
   try {
     const response = await fetch(`${BASE_URL}/library`, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -64,6 +67,7 @@ export async function getLibraryContent() {
   try {
     const response = await fetch(`${BASE_URL}/library`, {
       method: "GET",
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -82,6 +86,7 @@ export async function getLibraryContentById(contentId) {
   try {
     const response = await fetch(`${BASE_URL}/library/${contentId}`, {
       method: "GET",
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -103,6 +108,7 @@ export async function updateLibraryContent(contentId, updateData) {
     const response = await fetch(url, {
       method: "PATCH",
       mode: "cors",
+      credentials: "include",
       headers: {
         accept: "*/*",
         "Content-Type": "application/json",
@@ -132,6 +138,7 @@ export async function deleteLibraryContent(contentId) {
   try {
     const response = await fetch(`${BASE_URL}/library/${contentId}`, {
       method: "DELETE",
+      credentials: "include",
     });
 
     if (!response.ok) {
