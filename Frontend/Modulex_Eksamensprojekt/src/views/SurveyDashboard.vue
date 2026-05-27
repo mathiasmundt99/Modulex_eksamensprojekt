@@ -5,6 +5,7 @@ import SurveyResponsesCard from '../components/survey/SurveyResponseCard.vue'
 import AssignCoursesDropdown from '../components/survey/AssignCoursesDropdown.vue'
 import UserNavbar from '../components/user/UserNavbar.vue'
 import UserSidebar from '../components/user/UserSidebar.vue'
+import AssignCourseModal from '@/components/admin/AssignCourseModal.vue'
 
 import { getUserSurveyAnswers } from '../services/surveyService'
 
