@@ -1,59 +1,132 @@
 <script setup>
+import { ref, onMounted } from 'vue'
+
 import SurveyResponsesCard from '../components/survey/SurveyResponseCard.vue'
 import AssignCoursesDropdown from '../components/survey/AssignCoursesDropdown.vue'
 import UserNavbar from '../components/user/UserNavbar.vue'
 import UserSidebar from '../components/user/UserSidebar.vue'
-import { ref } from 'vue'
+
+import { getUserSurveyAnswers } from '../services/surveyService'
 
 const sidebarOpen = ref(false)
+
 function toggleSidebar() {
   sidebarOpen.value = !sidebarOpen.value
 }
 
-const responses = {
-  businessType: 'Distributor & Installer',
-  companySize: '21-50 employees',
-  experienceLevel: 'Basic experience',
-  primaryMarkets: [
-    'Corporate Offices',
-    'Healthcare',
-    'Education'
-  ],
-  productInterest: [
-    'Directory Systems',
-    'Room Identification',
-    'Wayfinding Solutions'
-  ],
-  challenges: [
-    'Product Selection',
-    'Configuration',
-    'Pricing & Quotes'
-  ],
-  timeline: 'Within 1 month',
-  submitted: '2024-03-15'
-}
+const responses = ref({
+  businessType: '',
+  companySize: '',
+  leadSource: '',
+  primaryMarket: '',
+  experienceLevel: '',
+  challenge: '',
+  submitted: ''
+})
 
+onMounted(async () => {
+  try {
+    const user = JSON.parse(
+      localStorage.getItem('user')
+    )
+
+    const surveyData =
+      await getUserSurveyAnswers(user.id)
+
+    console.log(
+      'Survey answers:',
+      surveyData
+    )
+
+    if (!surveyData.length) {
+      return
+    }
+
+    const latestSurvey =
+      surveyData[surveyData.length - 1]
+
+    console.log(
+      'Latest survey:',
+      latestSurvey
+    )
+
+    const answers =
+      latestSurvey.answers
+
+    console.log(
+      'Answers:',
+      answers
+    )
+
+    responses.value = {
+      businessType:
+        answers.find(a => a.step === 1)
+          ?.selected_option || '',
+
+      companySize:
+        answers.find(a => a.step === 2)
+          ?.selected_option || '',
+
+      leadSource:
+        answers.find(a => a.step === 3)
+          ?.selected_option || '',
+
+      primaryMarket:
+        answers.find(a => a.step === 4)
+          ?.selected_option || '',
+
+      experienceLevel:
+        answers.find(a => a.step === 5)
+          ?.selected_option || '',
+
+      challenge:
+        answers.find(a => a.step === 6)
+          ?.selected_option || '',
+
+      submitted:
+        latestSurvey.createdAt
+          ? new Date(
+            latestSurvey.createdAt
+          ).toLocaleDateString()
+          : ''
+    }
+
+    console.log(
+      'Mapped responses:',
+      responses.value
+    )
+
+  } catch (error) {
+    console.error(error)
+  }
+})
 </script>
 
 <template>
   <div class="user-dashboard">
     <UserNavbar @toggleSidebar="toggleSidebar" @logout="() => { }" />
+
     <div class="user-dashboard__layout">
       <main class="dashboard">
+
         <PageHeader title="Survey Results & Onboarding Plan" subtitle="John Doe" />
+
         <div class="content-grid">
           <div class="responses-row">
+
             <SurveyResponsesCard :responses="responses" />
+
             <AssignCoursesDropdown />
+
           </div>
         </div>
+
       </main>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* --- Dashboard Layout Styles (copied from UserDashboardView) --- */
 .user-dashboard {
   min-height: 100vh;
   display: flex;
@@ -72,20 +145,11 @@ const responses = {
   align-items: flex-start;
 }
 
-@media (max-width: 1023px) {
-  .user-dashboard__layout {
-    flex-direction: column;
-  }
-}
-
 .dashboard {
   flex: 1;
   min-width: 0;
   width: 100%;
 }
-
-/* --- Survey Content Styles --- */
-/* --- Survey Content Styles --- */
 
 .content-grid {
   width: 100%;
@@ -100,45 +164,36 @@ const responses = {
   width: 100%;
 }
 
-@media (max-width: 900px) {
-  .responses-row {
+@media (max-width: 1023px) {
+  .user-dashboard__layout {
     flex-direction: column;
-    gap: 16px;
-    max-width: 100%;
-    align-items: stretch;
   }
 }
 
 @media (max-width: 900px) {
+  .responses-row {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+
   .content-grid {
     gap: 8px;
-    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .user-dashboard__layout {
+    padding: 8px;
+    gap: 8px;
   }
 
-  @media (max-width: 600px) {
-    .user-dashboard__layout {
-      padding: 8px;
-      gap: 8px;
-    }
-
-    .dashboard {
-      padding: 0;
-    }
-
-    .content-grid {
-      gap: 8px;
-    }
-
-    .sidebar {
-      flex-direction: column;
-      gap: 8px;
-    }
+  .dashboard {
+    padding: 0;
   }
 
-  .sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+  .content-grid {
+    gap: 8px;
   }
 }
 </style>
