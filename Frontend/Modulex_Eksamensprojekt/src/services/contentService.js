@@ -127,6 +127,8 @@ export async function updateLibraryContent(contentId, updateData) {
       body: JSON.stringify({
         title: updateData.title,
         description: updateData.description,
+        url: updateData.url,
+        durationOrPages: updateData.durationOrPages,
       }),
     });
 
