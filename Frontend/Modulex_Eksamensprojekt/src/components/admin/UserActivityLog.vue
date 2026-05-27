@@ -33,7 +33,7 @@ function formatTime(timestamp) {
         </span>
 
         <div>
-          <p class="activity-action">{{ entry.text }}</p>
+          <p class="activity-action">{{ entry.title }}</p>
           <p class="activity-meta">{{ formatTime(entry.timestamp) }}</p>
         </div>
       </div>
