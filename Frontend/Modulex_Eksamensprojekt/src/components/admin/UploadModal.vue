@@ -5,6 +5,7 @@ import {
   uploadPdfToLibrary,
   createLibraryContent,
   updateLibraryContent,
+  updateLibraryContentWithFile,
 } from "@/services/contentService";
 
 const props = defineProps({
@@ -98,14 +99,24 @@ async function handleUpload() {
     let uploadedContent;
 
     if (isEditMode.value) {
-      uploadedContent = await updateLibraryContent(props.item.id, {
-        title: form.value.title,
-        description: form.value.description,
-        durationOrPages:
-          form.value.type === "pdf"
-            ? form.value.pages || props.item.durationOrPages
-            : form.value.duration || props.item.durationOrPages,
-      });
+      if (form.value.type === "pdf" && selectedFile.value) {
+        const formData = new FormData();
+        formData.append("pdfFile", selectedFile.value);
+        formData.append("title", form.value.title);
+        formData.append("description", form.value.description);
+        formData.append("durationOrPages", form.value.pages || props.item.durationOrPages || "0");
+        uploadedContent = await updateLibraryContentWithFile(props.item.id, formData);
+      } else {
+        uploadedContent = await updateLibraryContent(props.item.id, {
+          title: form.value.title,
+          description: form.value.description,
+          url: form.value.type === "video" ? form.value.videoUrl : undefined,
+          durationOrPages:
+            form.value.type === "pdf"
+              ? form.value.pages || props.item.durationOrPages
+              : form.value.duration || props.item.durationOrPages,
+        });
+      }
 
       emit("content-added", uploadedContent);
       emit("close");
