@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { getCourseById } from "../../services/courseService.js";
 import { getUserProgress, getUserStats } from "../../services/progressService.js";
 import { getUser } from "../../utils/auth.js";
 
@@ -19,19 +18,12 @@ onMounted(async () => {
       getUserProgress(user.id),
     ]);
 
+    completedModules.value = stats.data?.completedModules ?? 0;
+    totalModules.value = stats.data?.totalModules ?? 0;
     activeCourses.value = stats.data?.activeCourses ?? 0;
 
     const courses = progress.data?.courses ?? [];
-    completedModules.value = courses.reduce(
-      (sum, c) => sum + (c.completedContentIds?.length ?? 0),
-      0,
-    );
     notStarted.value = courses.filter((c) => !c.hasStarted).length;
-    const courseDetails = await Promise.all(courses.map((c) => getCourseById(c.courseId)));
-    totalModules.value = courseDetails.reduce(
-      (sum, c) => sum + (c.contentIds?.length ?? 0),
-      0,
-    );
   } catch (err) {
     console.error("Failed to load stats:", err);
   }

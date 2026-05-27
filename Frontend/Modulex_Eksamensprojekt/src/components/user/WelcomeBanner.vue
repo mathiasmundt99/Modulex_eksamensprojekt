@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { getCourseById } from "../../services/courseService.js";
-import { getUserProgress } from "../../services/progressService.js";
+import { getUserStats } from "../../services/progressService.js";
 import { getUser } from "../../utils/auth.js";
 
 const firstName = ref("");
@@ -14,16 +13,8 @@ onMounted(async () => {
 
     firstName.value = user.firstName;
 
-    const result = await getUserProgress(user.id);
-    const courses = result.data?.courses ?? [];
-
-    const completedModules = courses.reduce(
-      (sum, c) => sum + (c.completedContentIds?.length ?? 0),
-      0,
-    );
-    const courseDetails = await Promise.all(courses.map((c) => getCourseById(c.courseId)));
-    const totalModules = courseDetails.reduce((sum, c) => sum + (c.contentIds?.length ?? 0), 0);
-
+    const result = await getUserStats(user.id);
+    const { completedModules, totalModules } = result.data;
     overallProgress.value =
       totalModules === 0 ? 0 : Math.round((completedModules / totalModules) * 100);
   } catch (err) {
