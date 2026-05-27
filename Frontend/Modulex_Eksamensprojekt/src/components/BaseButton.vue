@@ -1,12 +1,15 @@
 <script setup>
 defineProps({
-  variant: { type: String, default: 'primary' },
-  block:   { type: Boolean, default: false },
+  variant:  { type: String,  default: 'primary' },
+  block:    { type: Boolean, default: false },
+  disabled: { type: Boolean, default: false },
 })
 </script>
 
 <template>
-  <button :class="['btn', `btn--${variant}`, { 'btn--block': block }]">
+  <button
+    :class="['btn', `btn--${variant}`, { 'btn--block': block, 'btn--disabled': disabled }]"
+    :disabled="disabled">
     <slot />
   </button>
 </template>

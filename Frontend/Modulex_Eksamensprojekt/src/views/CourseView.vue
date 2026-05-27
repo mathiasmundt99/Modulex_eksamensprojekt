@@ -10,10 +10,11 @@ import BaseButton from "../components/BaseButton.vue";
 import { getCourseById } from "../services/courseService.js";
 import { getLibraryContentById } from "../services/contentService.js";
 import { getUserCourseProgress, updateProgress } from "../services/progressService.js";
-import { getUser } from "../utils/auth.js";
+import { useCurrentUser, clearCurrentUser } from "../composables/useCurrentUser.js";
 
 const router = useRouter();
 const route = useRoute();
+const { user } = useCurrentUser();
 
 const sidebarOpen = ref(true);
 const currentItemIndex = ref(0);
@@ -21,8 +22,6 @@ const courseTitle = ref("");
 const courseDescription = ref("");
 const contentItems = ref([]);
 const loading = ref(true);
-
-const user = getUser();
 
 function toEmbedUrl(url) {
   if (!url) return "";
@@ -43,7 +42,7 @@ onMounted(async () => {
 
     const [courseRes, progressRes] = await Promise.all([
       getCourseById(courseId),
-      user ? getUserCourseProgress(user.id, courseId) : Promise.resolve(null),
+      user.value ? getUserCourseProgress(user.value.id, courseId) : Promise.resolve(null),
     ]);
 
     courseTitle.value = courseRes.title;
@@ -91,9 +90,9 @@ async function handleMarkComplete() {
   const item = contentItems.value[currentItemIndex.value];
   if (item.completed) return;
   item.completed = true;
-  if (user) {
+  if (user.value) {
     try {
-      await updateProgress(user.id, route.params.courseId, item.id, true);
+      await updateProgress(user.value.id, route.params.courseId, item.id, true);
     } catch (err) {
       console.error("Failed to save progress:", err);
     }
@@ -109,7 +108,7 @@ function handleSelectModule(index) {
 }
 
 function handleLogout() {
-  localStorage.removeItem("user");
+  clearCurrentUser();
   router.push("/login");
 }
 </script>

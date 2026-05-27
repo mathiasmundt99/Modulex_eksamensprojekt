@@ -53,7 +53,7 @@ export async function updateProgress(userId, courseId, contentId, completed) {
     method: "PUT",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ courseId, moduleId: contentId, completed }),
+    body: JSON.stringify({ courseId, contentId, completed }),
   });
   if (!response.ok) throw new Error("Failed to update progress");
   return await response.json();

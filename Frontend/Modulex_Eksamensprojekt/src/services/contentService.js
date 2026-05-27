@@ -100,6 +100,17 @@ export async function getLibraryContentById(contentId) {
   }
 }
 
+// opdater specifikt læringsmateriale med ny fil (multipart)
+export async function updateLibraryContentWithFile(contentId, formData) {
+  const response = await fetch(`${BASE_URL}/library/${contentId}`, {
+    method: "PATCH",
+    credentials: "include",
+    body: formData,
+  });
+  if (!response.ok) throw new Error("Failed to update content with file");
+  return await response.json();
+}
+
 // opdater specifikt læringsmateriale
 export async function updateLibraryContent(contentId, updateData) {
   try {
@@ -116,6 +127,8 @@ export async function updateLibraryContent(contentId, updateData) {
       body: JSON.stringify({
         title: updateData.title,
         description: updateData.description,
+        url: updateData.url,
+        durationOrPages: updateData.durationOrPages,
       }),
     });
 

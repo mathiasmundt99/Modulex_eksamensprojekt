@@ -4,6 +4,7 @@ import BaseButton from "../BaseButton.vue";
 import ForgotPasswordModal from "./ForgotPasswordModal.vue";
 import { ref } from "vue";
 import { loginUser } from "../../services/authService";
+import { refreshCurrentUser } from "../../composables/useCurrentUser.js";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -32,6 +33,8 @@ const handleLogin = async () => {
       email: email.value,
       password: password.value,
     });
+
+    await refreshCurrentUser();
 
     // Redirect baseret på rolle fra login response
     const redirectPath =
