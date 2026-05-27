@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { getRecentActivity } from "@/services/adminService";
+import { getRecentActivity, getUserById } from "@/services/adminService";
 
 const activities = ref([]);
 const loading = ref(false);
@@ -11,7 +11,25 @@ onMounted(async () => {
 
   try {
     const res = await getRecentActivity(10);
-    activities.value = res.data;
+    const fetchedActivities = res.data;
+
+    const activitiesWithUserNames = await Promise.all(
+      fetchedActivities.map(async (activity) => {
+        try {
+          const userRes = await getUserById(activity.userId);
+          const user = userRes.data?.data || userRes.data || userRes;
+          const userName =
+            user && (user.firstName || user.lastName)
+              ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
+              : "Unknown User";
+          return { ...activity, userName };
+        } catch (userError) {
+          console.error(`Error fetching user ${activity.userId}:`, userError);
+          return { ...activity, userName: "Unknown User" };
+        }
+      }),
+    );
+    activities.value = activitiesWithUserNames;
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -60,7 +78,8 @@ function iconFor(title) {
           {{ iconFor(activity.title) }}
         </span>
         <div class="activity-item__text">
-          <p class="activity-item__title">{{ activity.title }}</p>
+          <p class="activity-item__title">{{ activity.userName }}</p>
+          <p>{{ activity.title }}</p>
           <p class="activity-item__time">{{ timeAgo(activity.timestamp) }}</p>
         </div>
       </div>
@@ -114,5 +133,9 @@ function iconFor(title) {
   font-size: 12px;
   color: var(--color-text);
   margin-top: 2px;
+}
+
+.activity-item__title {
+  font-weight: bold;
 }
 </style>

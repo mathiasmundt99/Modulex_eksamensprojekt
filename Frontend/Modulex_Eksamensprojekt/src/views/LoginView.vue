@@ -1,6 +1,6 @@
 <script setup>
-import AuthLeftColumn from '../components/auth/AuthLeftColumn.vue'
-import LoginCard from '../components/auth/LoginCard.vue'
+import AuthLeftColumn from "../components/auth/AuthLeftColumn.vue";
+import LoginCard from "../components/auth/LoginCard.vue";
 </script>
 
 <template>
@@ -41,27 +41,30 @@ import LoginCard from '../components/auth/LoginCard.vue'
 
 <style scoped>
 .wrapper {
-  min-height: 100vh;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
+  height: 100vh;
 }
 
 .right-col {
-  position: relative;
-  background: #fafafa;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .logo {
+  height: 50px;
+  top: 16px;
+  right: 16px;
   position: absolute;
-  top: 36px;
-  right: 34px;
-  height: 42px;
 }
 
-.logo img { height: 100%; }
+.logo img {
+  height: 100%;
+}
 
 .access-box {
   background: rgba(255, 255, 255, 0.18);
@@ -84,12 +87,15 @@ import LoginCard from '../components/auth/LoginCard.vue'
   color: white;
 }
 
-.access-item:last-child { margin-bottom: 0; }
+.access-item:last-child {
+  margin-bottom: 0;
+}
 
 @media (max-width: 900px) {
-  .wrapper { grid-template-columns: 1fr; }
+  .wrapper {
+    grid-template-columns: 1fr;
+  }
   .right-col {
-    min-height: 100vh;
     padding: 120px 20px 40px;
   }
 }
