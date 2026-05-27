@@ -20,6 +20,8 @@ const confirmPassword = ref("");
 const router = useRouter();
 const loading = ref(false);
 const error = ref("");
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
 
 const handleSignup = async () => {
   error.value = "";
@@ -27,16 +29,34 @@ const handleSignup = async () => {
 
   try {
     // Validation
-    if (!firstName.value || !lastName.value || !email.value) {
-      throw new Error("Venligst udfyld alle påkrævede felter");
+    if (
+      !firstName.value ||
+      !lastName.value ||
+      !email.value ||
+      !phone.value ||
+      !companyName.value ||
+      !cvr.value ||
+      !companyAddress.value ||
+      !country.value ||
+      !password.value ||
+      !confirmPassword.value
+    ) {
+      throw new Error("Please fill in all required fields");
     }
 
     if (password.value !== confirmPassword.value) {
-      throw new Error("Adgangskoderne matcher ikke");
+      throw new Error("Passwords do not match");
     }
 
-    if (password.value.length < 8) {
-      throw new Error("Adgangskoden skal være mindst 8 tegn");
+    if (password.value.length < 15) {
+      throw new Error("Password must be at least 15 characters");
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+    if (!passwordRegex.test(password.value)) {
+      throw new Error(
+        "Password must contain both lowercase/uppercase letters and numbers",
+      );
     }
 
     const result = await registerUser({
@@ -54,7 +74,7 @@ const handleSignup = async () => {
 
     router.push("/login");
   } catch (err) {
-    error.value = err.message || "Der skete en fejl under registrering";
+    error.value = err.message || "An error occurred during registration";
   } finally {
     loading.value = false;
   }
@@ -77,14 +97,11 @@ const handleSignup = async () => {
       <SignupSection title="Personal Information">
         <label>
           First Name *
-          <FormInputBox v-model="firstName" icon="person" placeholder="Karin" />
+          <FormInputBox v-model="firstName" icon="person" placeholder="John" />
         </label>
         <label>
           Last Name *
-          <FormInputBox
-            v-model="lastName"
-            icon="person"
-            placeholder="Andersen" />
+          <FormInputBox v-model="lastName" icon="person" placeholder="Doe" />
         </label>
       </SignupSection>
 
@@ -114,7 +131,7 @@ const handleSignup = async () => {
           <FormInputBox
             v-model="companyName"
             icon="apartment"
-            placeholder="Firma ApS" />
+            placeholder="Company Ltd" />
         </label>
         <label>
           CVR *
@@ -125,7 +142,7 @@ const handleSignup = async () => {
           <FormInputBox
             v-model="companyAddress"
             icon="location_on"
-            placeholder="Eksempelgade 1" />
+            placeholder="123 Example St" />
         </label>
         <label>
           Country *
@@ -142,18 +159,20 @@ const handleSignup = async () => {
           <FormInputBox
             v-model="password"
             icon="lock"
-            type="password"
-            placeholder="Min. 8 characters"
-            suffix-icon="visibility_off" />
+            :type="showPassword ? 'text' : 'password'"
+            placeholder="Min. 15 characters (A-z, 0-9)"
+            :suffix-icon="showPassword ? 'visibility' : 'visibility_off'"
+            @click-suffix="showPassword = !showPassword" />
         </label>
         <label>
           Confirm Password *
           <FormInputBox
             v-model="confirmPassword"
             icon="lock"
-            type="password"
-            placeholder="Min. 8 characters"
-            suffix-icon="visibility_off" />
+            :type="showConfirmPassword ? 'text' : 'password'"
+            placeholder="Min. 15 characters (A-z, 0-9)"
+            :suffix-icon="showConfirmPassword ? 'visibility' : 'visibility_off'"
+            @click-suffix="showConfirmPassword = !showConfirmPassword" />
         </label>
       </SignupSection>
 
@@ -177,6 +196,14 @@ const handleSignup = async () => {
   background: #fafafa;
   padding: 56px 20px 80px;
   color: var(--color-text);
+}
+
+/* Ensure the eye icon is interactive and shows a pointer cursor */
+:deep(.material-symbols-rounded) {
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  transition: opacity 0.2s;
 }
 
 .logo {

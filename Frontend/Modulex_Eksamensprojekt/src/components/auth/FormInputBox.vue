@@ -1,24 +1,31 @@
 <script setup>
 defineProps({
-  icon:        { type: String, required: true },
-  type:        { type: String, default: 'text' },
-  placeholder: { type: String, default: '' },
-  modelValue:  { type: String, default: '' },
-  suffixIcon:  { type: String, default: null },
-})
+  icon: { type: String, required: true },
+  type: { type: String, default: "text" },
+  placeholder: { type: String, default: "" },
+  modelValue: { type: String, default: "" },
+  suffixIcon: { type: String, default: null },
+});
 
-defineEmits(['update:modelValue'])
+defineEmits(["update:modelValue", "click-suffix"]);
 </script>
 
 <template>
   <div class="input-box">
     <span class="material-symbols-rounded">{{ icon }}</span>
+
     <input
       :type="type"
       :placeholder="placeholder"
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)" />
-    <span v-if="suffixIcon" class="material-symbols-rounded">{{ suffixIcon }}</span>
+
+    <span
+      v-if="suffixIcon"
+      class="material-symbols-rounded suffix-icon"
+      @click="$emit('click-suffix')">
+      {{ suffixIcon }}
+    </span>
   </div>
 </template>
 

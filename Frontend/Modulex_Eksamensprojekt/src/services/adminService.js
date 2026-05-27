@@ -134,10 +134,10 @@ export async function createUser(userData) {
     if (!response.ok) {
       if (response.status === 400) {
         throw new Error(
-          data?.message || "Validerings-fejl eller email allerede i brug",
+          data?.message || "Validation error or email already in use",
         );
       }
-      throw new Error(data?.message || "Server-fejl");
+      throw new Error(data?.message || "Server error");
     }
 
     return data;
@@ -211,11 +211,9 @@ export async function getAllProgress(courseId = null, limit = 50, skip = 0) {
 
     if (!response.ok) {
       if (response.status === 500) {
-        throw new Error(
-          data?.message || "Server-fejl ved hentning af al progress",
-        );
+        throw new Error(data?.message || "Server error fetching all progress");
       }
-      throw new Error(data?.message || "Fejl ved hentning af al progress");
+      throw new Error(data?.message || "Error fetching all progress");
     }
 
     return data;
@@ -275,15 +273,15 @@ export async function getUserProgressDetails(userId) {
     if (!response.ok) {
       if (response.status === 404) {
         throw new Error(
-          data?.error || data?.message || "Bruger progress ikke fundet",
+          data?.error || data?.message || "User progress not found",
         );
       }
 
       if (response.status === 400) {
-        throw new Error(data?.message || "Validerings-fejl");
+        throw new Error(data?.message || "Validation error");
       }
 
-      throw new Error(data?.message || "Server-fejl");
+      throw new Error(data?.message || "Server error");
     }
 
     return data;
@@ -312,10 +310,10 @@ export async function getUserCourses(userId) {
       }
 
       if (response.status === 400) {
-        throw new Error(data?.message || "Validerings-fejl");
+        throw new Error(data?.message || "Validation error");
       }
 
-      throw new Error(data?.message || "Server-fejl");
+      throw new Error(data?.message || "Server error");
     }
 
     return data;
@@ -340,14 +338,14 @@ export async function getUserActivity(userId) {
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error(data?.message || "Aktivitetslog ikke fundet");
+        throw new Error(data?.message || "Activity log not found");
       }
 
       if (response.status === 400) {
-        throw new Error(data?.message || "Validerings-fejl");
+        throw new Error(data?.message || "Validation error");
       }
 
-      throw new Error(data?.message || "Server-fejl");
+      throw new Error(data?.message || "Server error");
     }
 
     return data;
@@ -374,9 +372,9 @@ export async function getCourseStats(courseId) {
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error(data?.error || data?.message || "Kursus ikke fundet");
+        throw new Error(data?.error || data?.message || "Course not found");
       }
-      throw new Error(data?.message || "Server-fejl");
+      throw new Error(data?.message || "Server error");
     }
 
     return data;
