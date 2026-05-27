@@ -98,25 +98,14 @@ async function handleUpload() {
     let uploadedContent;
 
     if (isEditMode.value) {
-      // Har admin valgt en ny PDF-fil, uploader vi den i stedet for at patche metadata
-      if (form.value.type === "pdf" && selectedFile.value) {
-        const formData = new FormData();
-        formData.append("pdfFile", selectedFile.value);
-        formData.append("title", form.value.title);
-        formData.append("description", form.value.description);
-        formData.append("type", "pdf");
-        formData.append("durationOrPages", form.value.pages || "0");
-        uploadedContent = await uploadPdfToLibrary(formData);
-      } else {
-        uploadedContent = await updateLibraryContent(props.item.id, {
-          title: form.value.title,
-          description: form.value.description,
-          durationOrPages:
-            form.value.type === "pdf"
-              ? form.value.pages || props.item.durationOrPages
-              : form.value.duration || props.item.durationOrPages,
-        });
-      }
+      uploadedContent = await updateLibraryContent(props.item.id, {
+        title: form.value.title,
+        description: form.value.description,
+        durationOrPages:
+          form.value.type === "pdf"
+            ? form.value.pages || props.item.durationOrPages
+            : form.value.duration || props.item.durationOrPages,
+      });
 
       emit("content-added", uploadedContent);
       emit("close");
