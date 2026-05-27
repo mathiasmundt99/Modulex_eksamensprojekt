@@ -1,24 +1,72 @@
 <script setup>
-import BaseButton from '../BaseButton.vue'
+import { ref, onMounted } from "vue";
+import { getUsersAttention, getUserById } from "../../services/adminService";
+import BaseButton from "../BaseButton.vue";
 
-const users = [
-  { id: 1, name: 'John Doe',    company: 'Acme Signs Ltd.', progress: 45 },
-  { id: 3, name: 'Mike Johnson', company: 'Visual Sign Co.', progress: 20 }
-]
+const users = ref([]);
+const loading = ref(false);
+const error = ref(null);
+
+onMounted(async () => {
+  loading.value = true;
+  try {
+    const response = await getUsersAttention(5, 0);
+    const attentionData = response.data || [];
+
+    users.value = await Promise.all(
+      attentionData.map(async (item) => {
+        try {
+          const userResponse = await getUserById(item.userId);
+          const userData =
+            userResponse.data?.data || userResponse.data || userResponse;
+
+          return {
+            ...item,
+            userName: userData.firstName
+              ? `${userData.firstName} ${userData.lastName}`
+              : "Ukendt Bruger",
+          };
+        } catch (e) {
+          return { ...item, userName: "Ukendt Bruger" };
+        }
+      }),
+    );
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
 
 <template>
   <div class="card">
     <h3 class="card__title">Users Needing Attention</h3>
-    <div class="user-list">
-      <div v-for="user in users" :key="user.id" class="user-item">
+
+    <div v-if="loading" class="status-msg">Henter data...</div>
+    <div v-else-if="error" class="status-msg error">{{ error }}</div>
+    <div v-else-if="users.length === 0" class="status-msg">
+      Ingen brugere kræver opmærksomhed lige nu.
+    </div>
+
+    <div v-else class="user-list">
+      <div
+        v-for="item in users"
+        :key="item.userId + item.courseId"
+        class="user-item">
         <div class="user-item__info">
-          <p class="user-item__name">{{ user.name }}</p>
-          <p class="user-item__company">{{ user.company }}</p>
+          <p class="user-item__name">
+            {{ item.userName }}
+          </p>
+          <p class="user-item__company">{{ item.courseName }}</p>
           <div class="progress-bar">
-            <div class="progress-bar__fill" :style="{ width: user.progress + '%' }"></div>
+            <div
+              class="progress-bar__fill"
+              :style="{ width: item.completionPercentage + '%' }"></div>
           </div>
-          <p class="progress-label">{{ user.progress }}% complete</p>
+          <p class="progress-label">
+            {{ item.completionPercentage }}% completed
+          </p>
         </div>
         <BaseButton variant="muted">Send Reminder</BaseButton>
       </div>
@@ -38,6 +86,17 @@ const users = [
   font-size: 20px;
   color: var(--color-text);
   margin-bottom: 16px;
+}
+
+.status-msg {
+  font-size: 14px;
+  color: var(--color-text);
+  opacity: 0.6;
+  padding: 10px 0;
+}
+
+.error {
+  color: var(--color-primary);
 }
 
 .user-list {
@@ -92,5 +151,4 @@ const users = [
   font-size: 12px;
   color: var(--color-text);
 }
-
 </style>

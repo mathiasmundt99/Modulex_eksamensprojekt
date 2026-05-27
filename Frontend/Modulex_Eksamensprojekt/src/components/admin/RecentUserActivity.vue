@@ -11,7 +11,7 @@ onMounted(async () => {
 
   try {
     const res = await getRecentActivity(10);
-    activities.value = res.data; // 👈 backend array
+    activities.value = res.data;
   } catch (err) {
     error.value = err.message;
   } finally {
@@ -19,24 +19,33 @@ onMounted(async () => {
   }
 });
 
-function formatTime(timestamp) {
-  if (!timestamp) return "";
+function timeAgo(timestamp) {
+  const diff = Date.now() - new Date(timestamp).getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (minutes < 60) return `${minutes} min ago`;
+  if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  return `${days} day${days > 1 ? "s" : ""} ago`;
+}
 
-  const date = new Date(timestamp);
-  return date.toLocaleString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+function iconFor(title) {
+  if (title.startsWith("Completed")) return "sports_score";
+  return "start";
 }
 </script>
 
 <template>
   <div class="card">
-    <h3 class="card__title">Recent User Activity</h3>
+    <h3 class="card__title">Recent Activity</h3>
 
-    <div v-if="activities.length" class="activity-list">
+    <div v-if="loading" class="empty-state">Loading...</div>
+
+    <div v-else-if="activities.length === 0" class="empty-state">
+      No activity yet.
+    </div>
+
+    <div v-else class="activity-list">
       <div
         v-for="activity in activities"
         :key="activity.id"
@@ -44,30 +53,18 @@ function formatTime(timestamp) {
         <span
           class="material-symbols-rounded"
           :class="
-            activity.status === 'completed' ? 'icon--primary' : 'icon--accent'
+            activity.title.startsWith('Completed')
+              ? 'icon--primary'
+              : 'icon--accent'
           ">
-          {{
-            activity.status === "completed"
-              ? "sports_score"
-              : activity.status === "registered"
-                ? "person"
-                : "start"
-          }}
+          {{ iconFor(activity.title) }}
         </span>
-
-        <div>
-          <p class="activity-item__text">
-            {{ activity.text }}
-          </p>
-
-          <p class="activity-item__time">
-            {{ formatTime(activity.timestamp) }}
-          </p>
+        <div class="activity-item__text">
+          <p class="activity-item__title">{{ activity.title }}</p>
+          <p class="activity-item__time">{{ timeAgo(activity.timestamp) }}</p>
         </div>
       </div>
     </div>
-
-    <div v-else class="empty">No recent activity</div>
   </div>
 </template>
 

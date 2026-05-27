@@ -12,8 +12,9 @@ import {
   updateUser,
   deleteUser,
   getUserCourses,
+  getUserProgressDetails,
+  getUserActivity,
 } from "../services/adminService";
-import { getUserActivity } from "../services/adminService";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -27,15 +28,43 @@ onMounted(async () => {
   loading.value = true;
 
   try {
-    const [userResponse, activityResponse, coursesResponse] = await Promise.all(
-      [
-        getUserById(route.params.id),
-        getUserActivity(route.params.id),
-        getUserCourses(route.params.id),
-      ],
-    );
+    const userId = route.params.id;
+    const [userResponse, activityResponse, coursesResponse, progressResponse] =
+      await Promise.all([
+        getUserById(userId),
+        getUserActivity(userId).catch(() => ({ data: [] })),
+        getUserCourses(userId).catch(() => ({ data: [] })),
+        getUserProgressDetails(userId).catch(() => ({
+          data: { courses: [], enrolledDate: null },
+        })),
+      ]);
 
-    user.value = userResponse.data?.data || userResponse.data;
+    const baseUser = userResponse.data?.data || userResponse.data;
+    const progressInfo = progressResponse.data?.data || progressResponse.data;
+
+    const courses = progressInfo?.courses || [];
+    const avgProgress =
+      courses.length > 0
+        ? Math.round(
+            courses.reduce((sum, c) => sum + (c.completionPercentage || 0), 0) /
+              courses.length,
+          )
+        : 0;
+
+    const latestActivity = courses.reduce((latest, c) => {
+      if (!c.lastAccessed) return latest;
+      return !latest || new Date(c.lastAccessed) > new Date(latest)
+        ? c.lastAccessed
+        : latest;
+    }, null);
+
+    user.value = {
+      ...baseUser,
+      enrolledDate:
+        progressInfo?.enrolledDate || baseUser?.enrolledDate || "N/A",
+      progress: avgProgress,
+      lastActive: latestActivity || "—",
+    };
 
     activityLog.value =
       activityResponse.data?.data || activityResponse.data || [];
