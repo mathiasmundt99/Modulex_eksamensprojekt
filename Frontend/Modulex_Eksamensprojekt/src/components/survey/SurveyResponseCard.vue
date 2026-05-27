@@ -1,6 +1,5 @@
 <script setup>
 import SurveyField from './SurveyField.vue'
-import TagList from './TagList.vue'
 
 defineProps({
     responses: Object
@@ -9,25 +8,31 @@ defineProps({
 
 <template>
     <div class="survey-box">
+
         <div class="survey-header">
             <h2>Survey Responses</h2>
-            <span class="submitted">Submitted: {{ responses.submitted }}</span>
+
+            <span v-if="responses.submitted" class="submitted">
+                Submitted: {{ responses.submitted }}
+            </span>
         </div>
+
         <div class="survey-fields">
+
             <SurveyField label="Business Type" :value="responses.businessType" />
+
             <SurveyField label="Company Size" :value="responses.companySize" />
+
+            <SurveyField label="Lead Source" :value="responses.leadSource" />
+
+            <SurveyField label="Primary Market" :value="responses.primaryMarket" />
+
             <SurveyField label="Experience Level" :value="responses.experienceLevel" />
-            <SurveyField label="Primary Markets">
-                <TagList :items="responses.primaryMarkets" variant="blue" />
-            </SurveyField>
-            <SurveyField label="Product Interest">
-                <TagList :items="responses.productInterest" variant="orange" />
-            </SurveyField>
-            <SurveyField label="Main Challenges">
-                <TagList :items="responses.challenges" />
-            </SurveyField>
-            <SurveyField label="Setup Timeline" :value="responses.timeline" />
+
+            <SurveyField label="Main Challenge" :value="responses.challenge" />
+
         </div>
+
     </div>
 </template>
 
@@ -38,7 +43,6 @@ defineProps({
     border-radius: 14px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
     padding: 28px 24px 20px 24px;
-    max-width: none;
     width: 100%;
 }
 

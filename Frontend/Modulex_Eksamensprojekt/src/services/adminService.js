@@ -90,6 +90,37 @@ export async function deleteUser(userId) {
 }
 
 // tilmeld en bruger til et onboadring kursus via id
+export async function enrollUserInCourse(
+  userId,
+  courseId
+) {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/users/${userId}/enroll/${courseId}`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(
+        data?.message ||
+        "Failed to enroll user in course"
+      );
+    }
+
+    return data;
+  } catch (error) {
+    console.error(
+      "Error enrolling user in course:",
+      error
+    );
+    throw error;
+  }
+}
 
 // hent alle brugere
 export async function getAllUsers(search = "", limit = 50) {
@@ -319,6 +350,43 @@ export async function getUserCourses(userId) {
     return data;
   } catch (error) {
     console.error("Error fetching user courses:", error);
+    throw error;
+  }
+}
+
+// Hent brugerens kurser
+export async function getUserProgressCourses(
+  userId
+) {
+  try {
+
+    const response = await fetch(
+      `${API_URL}/progress/${userId}/courses`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
+
+    const data =
+      await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data?.message ||
+        "Failed to fetch user progress courses"
+      );
+    }
+
+    return data;
+
+  } catch (error) {
+
+    console.error(
+      "Error fetching user progress courses:",
+      error
+    );
+
     throw error;
   }
 }
