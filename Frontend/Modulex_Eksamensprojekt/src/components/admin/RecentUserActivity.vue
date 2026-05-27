@@ -29,7 +29,9 @@ onMounted(async () => {
         }
       }),
     );
-    activities.value = activitiesWithUserNames;
+    activities.value = activitiesWithUserNames.sort(
+      (a, b) => new Date(b.timestamp) - new Date(a.timestamp),
+    );
   } catch (err) {
     error.value = err.message;
   } finally {
