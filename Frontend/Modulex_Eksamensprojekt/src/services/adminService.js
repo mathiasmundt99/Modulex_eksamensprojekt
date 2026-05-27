@@ -1,30 +1,5 @@
-const BASE_URL = "http://localhost:3000/api/admin";
-
-// hent alle brugere
-export async function getAllUsers(search = "", limit = 50) {
-  try {
-    const params = new URLSearchParams();
-    if (search) params.append("search", search);
-    params.append("limit", limit);
-
-    const response = await fetch(`${BASE_URL}/users?${params}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch users");
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    throw error;
-  }
-}
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const BASE_URL = `${API_URL}/admin`;
 
 // hent specifik bruger
 export async function getUserById(userId) {
@@ -78,6 +53,100 @@ export async function updateUser(userId, userData) {
   }
 }
 
+// slet bruger permanent
+export async function deleteUser(userId) {
+  try {
+    const response = await fetch(`${BASE_URL}/users/${userId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("User not found");
+      }
+
+      if (response.status === 400) {
+        throw new Error("Validation error");
+      }
+
+      throw new Error("Failed to delete user");
+    }
+
+    const contentType = response.headers.get("content-type");
+
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    throw error;
+  }
+}
+
+// tilmeld en bruger til et onboadring kursus via id
+
+// hent alle brugere
+export async function getAllUsers(search = "", limit = 50) {
+  try {
+    const params = new URLSearchParams();
+    if (search) params.append("search", search);
+    params.append("limit", limit);
+
+    const response = await fetch(`${BASE_URL}/users?${params}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch users");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  }
+}
+
+// opret ny bruger
+export async function createUser(userData) {
+  try {
+    const response = await fetch(`${BASE_URL}/users`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(userData),
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      if (response.status === 400) {
+        throw new Error(
+          data?.message || "Validerings-fejl eller email allerede i brug",
+        );
+      }
+      throw new Error(data?.message || "Server-fejl");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error creating user:", error);
+    throw error;
+  }
+}
+
 // hent dashboard statistik
 export async function getDashboardStatistics() {
   try {
@@ -122,10 +191,15 @@ export async function getRecentActivity(limit = 10) {
   }
 }
 
-// hent specifik brugers aktivitetslog
-export async function getUserActivity(userId) {
+// hent al progress
+export async function getAllProgress(courseId = null, limit = 50, skip = 0) {
   try {
-    const response = await fetch(`${BASE_URL}/users/${userId}/activity`, {
+    const params = new URLSearchParams();
+    if (courseId) params.append("courseId", courseId);
+    params.append("limit", limit);
+    params.append("skip", skip);
+
+    const response = await fetch(`${BASE_URL}/progress?${params.toString()}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -133,57 +207,20 @@ export async function getUserActivity(userId) {
       credentials: "include",
     });
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error("User activity not found");
-      }
-
-      if (response.status === 400) {
-        throw new Error("Validation error");
-      }
-
-      throw new Error("Failed to fetch user activity");
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching user activity:", error);
-    throw error;
-  }
-}
-
-// slet bruger permanent
-export async function deleteUser(userId) {
-  try {
-    const response = await fetch(`${BASE_URL}/users/${userId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
+    const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error("User not found");
+      if (response.status === 500) {
+        throw new Error(
+          data?.message || "Server-fejl ved hentning af al progress",
+        );
       }
-
-      if (response.status === 400) {
-        throw new Error("Validation error");
-      }
-
-      throw new Error("Failed to delete user");
+      throw new Error(data?.message || "Fejl ved hentning af al progress");
     }
 
-    const contentType = response.headers.get("content-type");
-
-    if (contentType && contentType.includes("application/json")) {
-      return await response.json();
-    }
-
-    return { success: true };
+    return data;
   } catch (error) {
-    console.error("Error deleting user:", error);
+    console.error("Error fetching all progress:", error);
     throw error;
   }
 }
@@ -222,6 +259,40 @@ export async function getUsersAttention(type = "low-progress", limit = 50) {
   }
 }
 
+// hent brugers progress detaljer
+export async function getUserProgressDetails(userId) {
+  try {
+    const response = await fetch(`${BASE_URL}/users/${userId}/progress`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error(
+          data?.error || data?.message || "Bruger progress ikke fundet",
+        );
+      }
+
+      if (response.status === 400) {
+        throw new Error(data?.message || "Validerings-fejl");
+      }
+
+      throw new Error(data?.message || "Server-fejl");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching user progress details:", error);
+    throw error;
+  }
+}
+
 // hent brugers tilmeldte kurser med progress
 export async function getUserCourses(userId) {
   try {
@@ -241,15 +312,76 @@ export async function getUserCourses(userId) {
       }
 
       if (response.status === 400) {
-        throw new Error(data?.message || "Validation error");
+        throw new Error(data?.message || "Validerings-fejl");
       }
 
-      throw new Error("Failed to fetch user courses");
+      throw new Error(data?.message || "Server-fejl");
     }
 
     return data;
   } catch (error) {
     console.error("Error fetching user courses:", error);
+    throw error;
+  }
+}
+
+// hent specifik brugers aktivitetslog
+export async function getUserActivity(userId) {
+  try {
+    const response = await fetch(`${BASE_URL}/users/${userId}/activity`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error(data?.message || "Aktivitetslog ikke fundet");
+      }
+
+      if (response.status === 400) {
+        throw new Error(data?.message || "Validerings-fejl");
+      }
+
+      throw new Error(data?.message || "Server-fejl");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching user activity:", error);
+    throw error;
+  }
+}
+
+/**
+ * Henter statistik for et specifikt kursus (Admin view).
+ */
+export async function getCourseStats(courseId) {
+  try {
+    const response = await fetch(`${BASE_URL}/courses/${courseId}/stats`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error(data?.error || data?.message || "Kursus ikke fundet");
+      }
+      throw new Error(data?.message || "Server-fejl");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching course stats:", error);
     throw error;
   }
 }
