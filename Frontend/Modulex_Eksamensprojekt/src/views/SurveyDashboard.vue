@@ -1,8 +1,8 @@
 <script setup>
 import SurveyResponsesCard from '../components/survey/SurveyResponseCard.vue'
 import AssignCoursesDropdown from '../components/survey/AssignCoursesDropdown.vue'
-import UserNavbar from '../components/UserNavbar.vue'
-import UserSidebar from '../components/UserSidebar.vue'
+import UserNavbar from '../components/user/UserNavbar.vue'
+import UserSidebar from '../components/user/UserSidebar.vue'
 import { ref } from 'vue'
 
 const sidebarOpen = ref(false)
