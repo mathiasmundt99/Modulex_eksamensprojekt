@@ -96,6 +96,10 @@ const emit = defineEmits(["edit", "delete"]);
   opacity: 0.7;
   margin-bottom: 12px;
   line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .content-card__tags {

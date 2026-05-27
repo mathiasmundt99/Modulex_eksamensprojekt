@@ -5,6 +5,7 @@ import {
   uploadPdfToLibrary,
   createLibraryContent,
   updateLibraryContent,
+  updateLibraryContentWithFile,
 } from "@/services/contentService";
 
 const props = defineProps({
@@ -62,8 +63,8 @@ watch(
       if (!item) return;
       const iso = item.contentDetails?.duration;
       if (iso) form.value.duration = parseIsoDuration(iso);
-      if (!form.value.title) form.value.title = item.snippet?.title ?? "";
-      if (!form.value.description) form.value.description = item.snippet?.description ?? "";
+      form.value.title = item.snippet?.title ?? form.value.title;
+      form.value.description = item.snippet?.description ?? form.value.description;
     } catch {
       // ignorer fejl — brugeren kan udfylde manuelt
     } finally {
@@ -98,11 +99,24 @@ async function handleUpload() {
     let uploadedContent;
 
     if (isEditMode.value) {
-      uploadedContent = await updateLibraryContent(props.item.id, {
-        title: form.value.title,
-        description: form.value.description,
-        durationOrPages: form.value.pages || props.item.durationOrPages,
-      });
+      if (form.value.type === "pdf" && selectedFile.value) {
+        const formData = new FormData();
+        formData.append("pdfFile", selectedFile.value);
+        formData.append("title", form.value.title);
+        formData.append("description", form.value.description);
+        formData.append("durationOrPages", form.value.pages || props.item.durationOrPages || "0");
+        uploadedContent = await updateLibraryContentWithFile(props.item.id, formData);
+      } else {
+        uploadedContent = await updateLibraryContent(props.item.id, {
+          title: form.value.title,
+          description: form.value.description,
+          url: form.value.type === "video" ? form.value.videoUrl : undefined,
+          durationOrPages:
+            form.value.type === "pdf"
+              ? form.value.pages || props.item.durationOrPages
+              : form.value.duration || props.item.durationOrPages,
+        });
+      }
 
       emit("content-added", uploadedContent);
       emit("close");
@@ -191,7 +205,7 @@ async function handleUpload() {
         </div>
 
         <div class="form-group">
-          <div v-if="hasExistingFile" class="existing-file">
+          <div v-if="hasExistingFile && form.type === 'pdf'" class="existing-file">
             <span class="material-symbols-rounded existing-file__icon">
               {{ form.type === "video" ? "play_circle" : "picture_as_pdf" }}
             </span>
@@ -205,7 +219,7 @@ async function handleUpload() {
             </BaseButton>
           </div>
           <div
-            v-if="!isEditMode && form.type === 'pdf'"
+            v-if="!hasExistingFile && form.type === 'pdf'"
             :class="['dropzone', { 'dropzone--active': isDragging }]"
             @click="$refs.fileInput.click()"
             @dragover.prevent="isDragging = true"

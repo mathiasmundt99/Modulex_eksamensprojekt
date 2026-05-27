@@ -1,41 +1,30 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { getCourseById } from "../../services/courseService.js";
+import { ref, watch } from "vue";
 import { getUserProgress, getUserStats } from "../../services/progressService.js";
-import { getUser } from "../../utils/auth.js";
+import { useCurrentUser } from "../../composables/useCurrentUser.js";
 
+const { user } = useCurrentUser();
 const completedModules = ref(0);
 const totalModules = ref(0);
 const activeCourses = ref(0);
 const notStarted = ref(0);
 
-onMounted(async () => {
+watch(user, async (u) => {
+  if (!u) return;
   try {
-    const user = getUser();
-    if (!user) return;
-
     const [stats, progress] = await Promise.all([
-      getUserStats(user.id),
-      getUserProgress(user.id),
+      getUserStats(u.id),
+      getUserProgress(u.id),
     ]);
-
+    completedModules.value = stats.data?.completedModules ?? 0;
+    totalModules.value = stats.data?.totalModules ?? 0;
     activeCourses.value = stats.data?.activeCourses ?? 0;
-
     const courses = progress.data?.courses ?? [];
-    completedModules.value = courses.reduce(
-      (sum, c) => sum + (c.completedContentIds?.length ?? 0),
-      0,
-    );
     notStarted.value = courses.filter((c) => !c.hasStarted).length;
-    const courseDetails = await Promise.all(courses.map((c) => getCourseById(c.courseId)));
-    totalModules.value = courseDetails.reduce(
-      (sum, c) => sum + (c.contentIds?.length ?? 0),
-      0,
-    );
   } catch (err) {
     console.error("Failed to load stats:", err);
   }
-});
+}, { immediate: true });
 </script>
 
 <template>

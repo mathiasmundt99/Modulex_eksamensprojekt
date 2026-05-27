@@ -1,6 +1,6 @@
 <script setup>
-import { getUser } from "../utils/auth.js";
-const user = getUser();
+import { useCurrentUser } from "../composables/useCurrentUser.js";
+const { user } = useCurrentUser();
 </script>
 
 <template>

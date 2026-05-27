@@ -1,27 +1,26 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import BaseButton from "../BaseButton.vue";
 import { getUserCourses } from "../../services/progressService.js";
-import { getUser } from "../../utils/auth.js";
+import { useCurrentUser } from "../../composables/useCurrentUser.js";
 
+const { user } = useCurrentUser();
 const router = useRouter();
 const courses = ref([]);
 const loading = ref(true);
 
-onMounted(async () => {
+watch(user, async (u) => {
+  if (!u) return;
   try {
-    const user = getUser();
-    if (!user) return;
-
-    const result = await getUserCourses(user.id);
+    const result = await getUserCourses(u.id);
     courses.value = result.data.filter((c) => c.status === "in_progress" && c.hasStarted);
   } catch (err) {
     console.error("Failed to load continue learning:", err);
   } finally {
     loading.value = false;
   }
-});
+}, { immediate: true });
 </script>
 
 <template>
