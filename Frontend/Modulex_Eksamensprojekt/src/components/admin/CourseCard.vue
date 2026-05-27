@@ -35,7 +35,6 @@ const router = useRouter();
         <BaseButton variant="muted" @click="router.push('/admin/courses/' + course.id)">
           Edit Course
         </BaseButton>
-        <BaseButton variant="ghost">View Analytics</BaseButton>
       </div>
     </div>
   </div>
