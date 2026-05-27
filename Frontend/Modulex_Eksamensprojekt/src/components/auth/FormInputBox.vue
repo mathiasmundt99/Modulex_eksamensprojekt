@@ -1,5 +1,7 @@
 <script setup>
-defineProps({
+import { ref, computed } from "vue";
+
+const props = defineProps({
   icon:        { type: String, required: true },
   type:        { type: String, default: 'text' },
   placeholder: { type: String, default: '' },
@@ -8,17 +10,33 @@ defineProps({
 })
 
 defineEmits(['update:modelValue'])
+
+const showPassword = ref(false)
+
+const inputType = computed(() => {
+  if (props.type === 'password') return showPassword.value ? 'text' : 'password'
+  return props.type
+})
+
+const visibilityIcon = computed(() =>
+  showPassword.value ? 'visibility' : 'visibility_off'
+)
 </script>
 
 <template>
   <div class="input-box">
     <span class="material-symbols-rounded">{{ icon }}</span>
     <input
-      :type="type"
+      :type="inputType"
       :placeholder="placeholder"
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)" />
-    <span v-if="suffixIcon" class="material-symbols-rounded">{{ suffixIcon }}</span>
+    <span
+      v-if="suffixIcon"
+      class="material-symbols-rounded suffix-icon"
+      @click="showPassword = !showPassword">
+      {{ visibilityIcon }}
+    </span>
   </div>
 </template>
 
@@ -44,5 +62,16 @@ defineEmits(['update:modelValue'])
 
 .input-box input::placeholder {
   color: #aaa;
+}
+
+.suffix-icon {
+  cursor: pointer;
+  user-select: none;
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+.suffix-icon:hover {
+  color: #555;
 }
 </style>
