@@ -1,31 +1,27 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, watch } from "vue";
 import { getUserStats } from "../../services/progressService.js";
-import { getUser } from "../../utils/auth.js";
+import { useCurrentUser } from "../../composables/useCurrentUser.js";
 
-const firstName = ref("");
+const { user } = useCurrentUser();
 const overallProgress = ref(0);
 
-onMounted(async () => {
+watch(user, async (u) => {
+  if (!u) return;
   try {
-    const user = getUser();
-    if (!user) return;
-
-    firstName.value = user.firstName;
-
-    const result = await getUserStats(user.id);
+    const result = await getUserStats(u.id);
     const { completedModules, totalModules } = result.data;
     overallProgress.value =
       totalModules === 0 ? 0 : Math.round((completedModules / totalModules) * 100);
   } catch (err) {
     console.error("Failed to load welcome banner data:", err);
   }
-});
+}, { immediate: true });
 </script>
 
 <template>
   <div class="welcome-banner">
-    <h2 class="welcome-banner__title">Welcome back, {{ firstName }}!</h2>
+    <h2 class="welcome-banner__title">Welcome back, {{ user?.firstName }}!</h2>
     <p class="welcome-banner__subtitle">Continue your learning journey</p>
     <div class="welcome-banner__progress">
       <div class="progress-header">

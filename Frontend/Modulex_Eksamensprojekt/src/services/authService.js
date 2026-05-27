@@ -1,5 +1,15 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
+// Hent den loggede brugers profil
+export async function getMe() {
+  const response = await fetch(`${API_URL}/users/me`, {
+    credentials: "include",
+  });
+  if (!response.ok) throw new Error("Not authenticated");
+  const data = await response.json();
+  return data.data;
+}
+
 // Opret bruger
 export async function registerUser(userData) {
   try {
@@ -56,12 +66,6 @@ export async function loginUser(credentials) {
     }
 
     const data = await response.json();
-
-    // Gem bruger data (token er automatisk i HttpOnly cookie)
-    if (data.user) {
-      localStorage.setItem("user", JSON.stringify(data.user));
-    }
-
     return data;
   } catch (error) {
     console.error("Login error:", error);

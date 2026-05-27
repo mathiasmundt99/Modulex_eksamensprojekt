@@ -1,17 +1,9 @@
 <script setup>
 import BaseButton from '../components/BaseButton.vue'
 import BreadCrumb from '../components/BreadCrumb.vue'
+import { useCurrentUser } from '../composables/useCurrentUser.js'
 
-const user = {
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'john@acmesigns.com',
-  phone: '+45 12 34 56 78',
-  company: 'Acme Signs Ltd.',
-  cvr: '12345678',
-  address: 'Vestergade 12, 7190 Billund',
-  country: 'Denmark'
-}
+const { user } = useCurrentUser()
 </script>
 
 <template>
@@ -32,14 +24,14 @@ const user = {
             <label class="field__label">First Name</label>
             <div class="field__value">
               <span class="material-symbols-rounded">person</span>
-              {{ user.firstName }}
+              {{ user?.firstName }}
             </div>
           </div>
           <div class="field">
             <label class="field__label">Last Name</label>
             <div class="field__value">
               <span class="material-symbols-rounded">person</span>
-              {{ user.lastName }}
+              {{ user?.lastName }}
             </div>
           </div>
         </div>
@@ -55,7 +47,7 @@ const user = {
             <label class="field__label">Email</label>
             <div class="field__value field__value--muted">
               <span class="material-symbols-rounded">email</span>
-              {{ user.email }}
+              {{ user?.email }}
             </div>
             <p class="field__hint">This is the email from your invitation</p>
           </div>
@@ -63,7 +55,7 @@ const user = {
             <label class="field__label">Phone Number</label>
             <div class="field__value">
               <span class="material-symbols-rounded">phone</span>
-              {{ user.phone }}
+              {{ user?.phoneNumber }}
             </div>
           </div>
         </div>

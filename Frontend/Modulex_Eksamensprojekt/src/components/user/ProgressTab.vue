@@ -1,27 +1,26 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, watch } from "vue";
 import BreadCrumb from "../BreadCrumb.vue";
 import HelpBanner from "../HelpBanner.vue";
 import OverallProgress from "./OverallProgress.vue";
 import OnboardingChecklist from "./OnboardingChecklist.vue";
 import { getOnboardingProgress } from "../../services/progressService.js";
-import { getUser } from "../../utils/auth.js";
+import { useCurrentUser } from "../../composables/useCurrentUser.js";
 
+const { user } = useCurrentUser();
 const overallProgress = ref(0);
 const checklistItems = ref([]);
 
-onMounted(async () => {
+watch(user, async (u) => {
+  if (!u) return;
   try {
-    const user = getUser();
-    if (!user) return;
-
-    const result = await getOnboardingProgress(user.id);
+    const result = await getOnboardingProgress(u.id);
     overallProgress.value = result.data?.overallCompletion ?? 0;
     checklistItems.value = result.data?.checklistItems ?? [];
   } catch (err) {
     console.error("Failed to load progress:", err);
   }
-});
+}, { immediate: true });
 </script>
 
 <template>

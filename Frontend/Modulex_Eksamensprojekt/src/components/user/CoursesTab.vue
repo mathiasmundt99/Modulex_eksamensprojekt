@@ -1,21 +1,20 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, watch } from "vue";
 import BreadCrumb from "../BreadCrumb.vue";
 import HelpBanner from "../HelpBanner.vue";
 import UserCourseCard from "./UserCourseCard.vue";
 import { getUserCourses } from "../../services/progressService.js";
 import { getCourseById } from "../../services/courseService.js";
-import { getUser } from "../../utils/auth.js";
+import { useCurrentUser } from "../../composables/useCurrentUser.js";
 
+const { user } = useCurrentUser();
 const courses = ref([]);
 const loading = ref(true);
 
-onMounted(async () => {
+watch(user, async (u) => {
+  if (!u) return;
   try {
-    const user = getUser();
-    if (!user) return;
-
-    const result = await getUserCourses(user.id);
+    const result = await getUserCourses(u.id);
     const progressList = result.data;
 
     const enriched = await Promise.all(
@@ -39,7 +38,7 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
-});
+}, { immediate: true });
 </script>
 
 <template>

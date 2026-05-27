@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, watch } from "vue";
 import { getUserActivity } from "../../services/progressService.js";
-import { getUser } from "../../utils/auth.js";
+import { useCurrentUser } from "../../composables/useCurrentUser.js";
 
+const { user } = useCurrentUser();
 const activities = ref([]);
 const loading = ref(true);
 
@@ -21,19 +22,17 @@ function iconFor(title) {
   return "start";
 }
 
-onMounted(async () => {
+watch(user, async (u) => {
+  if (!u) return;
   try {
-    const user = getUser();
-    if (!user) return;
-
-    const result = await getUserActivity(user.id, 5);
+    const result = await getUserActivity(u.id, 5);
     activities.value = result.data ?? [];
   } catch (err) {
     console.error("Failed to load activity:", err);
   } finally {
     loading.value = false;
   }
-});
+}, { immediate: true });
 </script>
 
 <template>
