@@ -1,9 +1,24 @@
 <script setup>
-defineProps({
+const props = defineProps({
   title: { type: String, required: true },
   pages: { type: Number, default: null },
   pdfUrl: { type: String, required: true },
 });
+
+async function downloadPdf() {
+  try {
+    const response = await fetch(props.pdfUrl, { credentials: "include" });
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = props.title + ".pdf";
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("Download failed:", err);
+  }
+}
 </script>
 
 <template>
@@ -12,10 +27,10 @@ defineProps({
     <p class="pdf-viewer__title">{{ title }}</p>
     <p v-if="pages" class="pdf-viewer__meta">{{ pages }} pages</p>
     <div class="pdf-viewer__actions">
-      <a class="download-btn" :href="pdfUrl" download>
+      <button class="download-btn" @click="downloadPdf">
         <span class="material-symbols-rounded">download</span>
         Download PDF
-      </a>
+      </button>
       <a class="view-link" :href="pdfUrl" target="_blank">Or view in browser</a>
     </div>
   </div>
