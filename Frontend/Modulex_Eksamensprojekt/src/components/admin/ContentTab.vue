@@ -52,9 +52,12 @@ onMounted(async () => {
 function handleContentAdded(newContent) {
   if (editingItem.value) {
     const index = content.value.findIndex((i) => i.id === editingItem.value.id);
-    if (index !== -1) content.value.splice(index, 1, newContent);
+    if (index !== -1) {
+      const usedInCourses = content.value[index].usedInCourses;
+      content.value.splice(index, 1, { ...newContent, usedInCourses });
+    }
   } else {
-    content.value.unshift(newContent);
+    content.value.unshift({ ...newContent, usedInCourses: 0 });
   }
   showUploadModal.value = false;
   editingItem.value = null;
