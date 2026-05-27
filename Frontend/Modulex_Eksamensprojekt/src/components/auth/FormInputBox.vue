@@ -2,30 +2,32 @@
 import { ref, computed } from "vue";
 
 const props = defineProps({
-  icon:        { type: String, required: true },
-  type:        { type: String, default: 'text' },
-  placeholder: { type: String, default: '' },
-  modelValue:  { type: String, default: '' },
-  suffixIcon:  { type: String, default: null },
-})
+  icon: { type: String, required: true },
+  type: { type: String, default: "text" },
+  placeholder: { type: String, default: "" },
+  modelValue: { type: String, default: "" },
+  suffixIcon: { type: String, default: null },
+});
 
-defineEmits(['update:modelValue'])
+defineEmits(["update:modelValue", "click-suffix"]);
 
-const showPassword = ref(false)
+const showPassword = ref(false);
 
 const inputType = computed(() => {
-  if (props.type === 'password') return showPassword.value ? 'text' : 'password'
-  return props.type
-})
+  if (props.type === "password")
+    return showPassword.value ? "text" : "password";
+  return props.type;
+});
 
 const visibilityIcon = computed(() =>
-  showPassword.value ? 'visibility' : 'visibility_off'
-)
+  showPassword.value ? "visibility" : "visibility_off",
+);
 </script>
 
 <template>
   <div class="input-box">
     <span class="material-symbols-rounded">{{ icon }}</span>
+
     <input
       :type="inputType"
       :placeholder="placeholder"

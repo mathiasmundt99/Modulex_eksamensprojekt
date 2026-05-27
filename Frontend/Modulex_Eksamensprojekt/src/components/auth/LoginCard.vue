@@ -14,6 +14,7 @@ const remember = ref(false);
 const loading = ref(false);
 const error = ref("");
 const showForgotPasswordModal = ref(false);
+const showPassword = ref(false);
 
 const handleLogin = async () => {
   error.value = "";
@@ -21,7 +22,7 @@ const handleLogin = async () => {
 
   try {
     if (!email.value || !password.value) {
-      throw new Error("Venligst udfyld email og adgangskode");
+      throw new Error("Please fill in all required fields");
     }
 
     // Gem husk mig
@@ -41,7 +42,7 @@ const handleLogin = async () => {
       result.user?.role === "admin" ? "/admin" : "/dashboard";
     router.push(redirectPath);
   } catch (err) {
-    error.value = err.message || "Login mislykkedes";
+    error.value = err.message || "Login failed";
   } finally {
     loading.value = false;
   }
@@ -64,9 +65,10 @@ const handleLogin = async () => {
       <FormInputBox
         v-model="password"
         icon="lock"
-        type="password"
+        :type="showPassword ? 'text' : 'password'"
         placeholder="Enter your password"
-        suffix-icon="visibility_off" />
+        :suffix-icon="showPassword ? 'visibility' : 'visibility_off'"
+        @click-suffix="showPassword = !showPassword" />
 
       <div class="options">
         <label class="remember">
@@ -119,6 +121,14 @@ h2 {
   font-weight: 700;
   margin-bottom: 24px;
   color: var(--color-text);
+}
+
+/* Ensure the eye icon is interactive and shows a pointer cursor */
+:deep(.material-symbols-rounded) {
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  transition: opacity 0.2s;
 }
 
 form {

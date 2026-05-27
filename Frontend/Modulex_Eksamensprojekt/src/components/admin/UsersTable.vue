@@ -77,7 +77,7 @@ const getCompanyCountry = (companyId) => {
           </thead>
           <tbody>
             <tr v-if="filteredUsers.length === 0">
-              <td colspan="5" class="empty-row">Ingen brugere fundet</td>
+              <td colspan="5" class="empty-row">No users found</td>
             </tr>
             <tr v-for="user in filteredUsers" :key="user.id" class="table-row">
               <td>
@@ -94,7 +94,6 @@ const getCompanyCountry = (companyId) => {
               </td>
               <td>
                 <p class="td-main">
-                  <!-- Vi bruger nu virksomhedens land i stedet for brugerens eget land -->
                   {{ getCompanyCountry(user.companyId) }}
                 </p>
               </td>

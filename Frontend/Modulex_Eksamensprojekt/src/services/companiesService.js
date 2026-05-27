@@ -35,17 +35,17 @@ export async function getCompanyById(companyId) {
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error("Virksomhed ikke fundet");
+        throw new Error("Company not found");
       }
       if (response.status === 403) {
         throw new Error(
-          "Adgang nægtet - Du kan ikke tilgå andre virksomheders data",
+          "Access denied - You cannot access other companies' data",
         );
       }
       if (response.status === 401) {
-        throw new Error("Ikke autoriseret");
+        throw new Error("Unauthorized");
       }
-      throw new Error("Kunne ikke hente virksomheden");
+      throw new Error("Could not fetch company");
     }
 
     return await response.json();

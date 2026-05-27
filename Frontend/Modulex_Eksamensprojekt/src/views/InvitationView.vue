@@ -1,6 +1,6 @@
 <script setup>
-import AuthLeftColumn from '../components/auth/AuthLeftColumn.vue'
-import InvitationCard from '../components/auth/InvitationCard.vue'
+import AuthLeftColumn from "../components/auth/AuthLeftColumn.vue";
+import InvitationCard from "../components/auth/InvitationCard.vue";
 </script>
 
 <template>
@@ -57,7 +57,9 @@ import InvitationCard from '../components/auth/InvitationCard.vue'
   position: absolute;
 }
 
-.logo img { height: 100%; }
+.logo img {
+  height: 100%;
+}
 
 .step-list {
   display: flex;
@@ -88,9 +90,10 @@ import InvitationCard from '../components/auth/InvitationCard.vue'
 }
 
 @media (max-width: 900px) {
-  .wrapper { grid-template-columns: 1fr; }
+  .wrapper {
+    grid-template-columns: 1fr;
+  }
   .right-col {
-    min-height: 100vh;
     padding: 120px 20px 40px;
   }
 }
