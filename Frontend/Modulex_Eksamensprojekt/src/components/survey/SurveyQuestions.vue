@@ -10,18 +10,14 @@ defineEmits(['select'])
 </script>
 
 <template>
-    <div class="card">
+    <div v-if="question" class="card">
 
         <h2>
-            {{ question.title }}
+            {{ question.question }}
         </h2>
 
-        <p>
-            {{ question.subtitle }}
-        </p>
-
-        <SurveyOption v-for="option in question.options" :key="option.value" :option="option"
-            :selected="selected === option.value" @click="$emit('select', option.value)" />
+        <SurveyOption v-for="option in question.options" :key="option" :option="option" :selected="selected === option"
+            @select="$emit('select', option)" />
 
     </div>
 </template>
