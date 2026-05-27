@@ -226,12 +226,12 @@ export async function getAllProgress(courseId = null, limit = 50, skip = 0) {
 }
 
 // hent brugere der kræver opmærksomhed (inaktive / low progress)
-export async function getUsersAttention(type = "low-progress", limit = 50) {
+export async function getUsersAttention(limit = 50, skip = 0) {
   try {
     const params = new URLSearchParams();
 
-    if (type) params.append("type", type);
-    if (limit) params.append("limit", limit);
+    params.append("limit", limit);
+    params.append("skip", skip);
 
     const response = await fetch(
       `${BASE_URL}/users/attention?${params.toString()}`,

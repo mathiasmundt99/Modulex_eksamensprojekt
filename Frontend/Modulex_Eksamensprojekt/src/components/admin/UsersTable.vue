@@ -15,20 +15,25 @@ const companies = ref([]);
 const filteredUsers = computed(() => {
   const q = searchQuery.value.toLowerCase();
   if (!q) return props.users;
+
   return props.users.filter((u) => {
     const name = `${u.firstName ?? ""} ${u.lastName ?? ""}`.toLowerCase();
-    const company = (u.companyId ?? "").toLowerCase();
+    const companyName = getCompanyName(u.companyId).toLowerCase();
+    const companyCountry = getCompanyCountry(u.companyId).toLowerCase();
+
     return (
       name.includes(q) ||
       u.email.toLowerCase().includes(q) ||
-      company.includes(q)
+      companyName.includes(q) ||
+      companyCountry.includes(q)
     );
   });
 });
 
 onMounted(async () => {
   try {
-    companies.value = await getCompanies();
+    const response = await getCompanies();
+    companies.value = response.data || response || [];
   } catch (err) {
     console.error("Failed to load companies", err);
   }
@@ -37,6 +42,11 @@ onMounted(async () => {
 const getCompanyName = (companyId) => {
   const company = companies.value.find((c) => c.id === companyId);
   return company?.name ?? "—";
+};
+
+const getCompanyCountry = (companyId) => {
+  const company = companies.value.find((c) => c.id === companyId);
+  return company?.country ?? "—";
 };
 </script>
 
@@ -83,7 +93,10 @@ const getCompanyName = (companyId) => {
                 </p>
               </td>
               <td>
-                <p class="td-main">{{ user.country ?? "—" }}</p>
+                <p class="td-main">
+                  <!-- Vi bruger nu virksomhedens land i stedet for brugerens eget land -->
+                  {{ getCompanyCountry(user.companyId) }}
+                </p>
               </td>
               <td>
                 <span class="badge">{{ user.role ?? "user" }}</span>
