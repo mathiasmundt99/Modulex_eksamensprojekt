@@ -50,7 +50,12 @@ onMounted(async () => {
 });
 
 function handleContentAdded(newContent) {
-  content.value.unshift(newContent); // Tilføj øverst i listen
+  if (editingItem.value) {
+    const index = content.value.findIndex((i) => i.id === editingItem.value.id);
+    if (index !== -1) content.value.splice(index, 1, newContent);
+  } else {
+    content.value.unshift(newContent);
+  }
   showUploadModal.value = false;
   editingItem.value = null;
 }

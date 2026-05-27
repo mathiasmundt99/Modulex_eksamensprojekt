@@ -18,6 +18,7 @@ function timeAgo(timestamp) {
 }
 
 function iconFor(title) {
+  if (title.startsWith("Passed and Certified")) return "editor_choice";
   if (title.startsWith("Completed")) return "sports_score";
   return "start";
 }
