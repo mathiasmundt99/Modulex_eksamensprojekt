@@ -1,5 +1,33 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
+// Opdater den loggede brugers profil
+export async function updateMe(data) {
+  const response = await fetch(`${API_URL}/users/me`, {
+    method: "PUT",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error("Failed to update profile");
+  const result = await response.json();
+  return result.data;
+}
+
+// Skift adgangskode
+export async function changePassword(currentPassword, newPassword, confirmNewPassword) {
+  const response = await fetch(`${API_URL}/users/me/password`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ currentPassword, newPassword, confirmNewPassword }),
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || "Failed to change password");
+  }
+  return await response.json();
+}
+
 // Hent den loggede brugers profil
 export async function getMe() {
   const response = await fetch(`${API_URL}/users/me`, {

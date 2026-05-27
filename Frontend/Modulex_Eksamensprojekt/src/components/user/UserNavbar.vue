@@ -1,5 +1,9 @@
 <script setup>
+import { useCurrentUser } from '../../composables/useCurrentUser.js'
+
 defineEmits(['toggleSidebar', 'logout'])
+
+const { user } = useCurrentUser()
 </script>
 
 <template>
@@ -17,7 +21,7 @@ defineEmits(['toggleSidebar', 'logout'])
       <div class="navbar-right">
         <RouterLink to="/dashboard/profile" class="user-badge">
           <span class="material-symbols-rounded">person</span>
-          <span>John Doe</span>
+          <span>{{ user?.firstName }} {{ user?.lastName }}</span>
         </RouterLink>
         <button class="logout-btn" @click="$emit('logout')">
           <span class="material-symbols-rounded">logout</span>
