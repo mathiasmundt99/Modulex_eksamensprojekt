@@ -63,8 +63,8 @@ watch(
       if (!item) return;
       const iso = item.contentDetails?.duration;
       if (iso) form.value.duration = parseIsoDuration(iso);
-      if (!form.value.title) form.value.title = item.snippet?.title ?? "";
-      if (!form.value.description) form.value.description = item.snippet?.description ?? "";
+      form.value.title = item.snippet?.title ?? form.value.title;
+      form.value.description = item.snippet?.description ?? form.value.description;
     } catch {
       // ignorer fejl — brugeren kan udfylde manuelt
     } finally {
@@ -205,7 +205,7 @@ async function handleUpload() {
         </div>
 
         <div class="form-group">
-          <div v-if="hasExistingFile" class="existing-file">
+          <div v-if="hasExistingFile && form.type === 'pdf'" class="existing-file">
             <span class="material-symbols-rounded existing-file__icon">
               {{ form.type === "video" ? "play_circle" : "picture_as_pdf" }}
             </span>
