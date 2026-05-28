@@ -2,19 +2,23 @@
 import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import BaseButton from "../BaseButton.vue";
+import NoCoursesPending from "./NoCoursesPending.vue";
 import { getUserCourses } from "../../services/progressService.js";
 import { useCurrentUser } from "../../composables/useCurrentUser.js";
 
 const { user } = useCurrentUser();
 const router = useRouter();
-const courses = ref([]);
+const inProgressCourses = ref([]);
+const hasAnyCourses = ref(false);
 const loading = ref(true);
 
 watch(user, async (u) => {
   if (!u) return;
   try {
     const result = await getUserCourses(u.id);
-    courses.value = result.data.filter((c) => c.status === "in_progress" && c.hasStarted);
+    const all = result.data ?? [];
+    hasAnyCourses.value = all.length > 0;
+    inProgressCourses.value = all.filter((c) => c.status === "in_progress" && c.hasStarted);
   } catch (err) {
     console.error("Failed to load continue learning:", err);
   } finally {
@@ -24,19 +28,27 @@ watch(user, async (u) => {
 </script>
 
 <template>
-  <div class="card">
+  <!-- Loading -->
+  <div v-if="loading" class="card">
+    <h3 class="card__title">Continue Learning</h3>
+    <div class="empty-state">Loading...</div>
+  </div>
+
+  <!-- No courses assigned yet -->
+  <NoCoursesPending v-else-if="!hasAnyCourses" />
+
+  <!-- Has courses -->
+  <div v-else class="card">
     <h3 class="card__title">Continue Learning</h3>
 
-    <div v-if="loading" class="empty-state">Loading...</div>
-
-    <div v-else-if="courses.length === 0" class="empty-state">
+    <div v-if="inProgressCourses.length === 0" class="empty-state">
       No courses in progress. Head to
       <a class="empty-link" @click="router.push('/dashboard/courses')">My Courses</a>
       to get started.
     </div>
 
     <div v-else class="course-list">
-      <div v-for="course in courses" :key="course.courseId" class="continue-item">
+      <div v-for="course in inProgressCourses" :key="course.courseId" class="continue-item">
         <div class="continue-item__info">
           <h4 class="continue-item__name">{{ course.courseName }}</h4>
           <p class="continue-item__meta">{{ course.completionPercentage }}% complete</p>
@@ -53,6 +65,7 @@ watch(user, async (u) => {
 </template>
 
 <style scoped>
+/* ── Shared card base ── */
 .card {
   background-color: var(--color-white);
   border: 1px solid var(--color-border);
@@ -66,6 +79,7 @@ watch(user, async (u) => {
   margin-bottom: 16px;
 }
 
+/* ── Empty / in-progress states ── */
 .empty-state {
   font-size: 14px;
   color: var(--color-text);

@@ -3,6 +3,7 @@ import { ref, watch } from "vue";
 import BreadCrumb from "../BreadCrumb.vue";
 import HelpBanner from "../HelpBanner.vue";
 import UserCourseCard from "./UserCourseCard.vue";
+import NoCoursesPending from "./NoCoursesPending.vue";
 import { getUserCourses } from "../../services/progressService.js";
 import { getCourseById } from "../../services/courseService.js";
 import { useCurrentUser } from "../../composables/useCurrentUser.js";
@@ -47,9 +48,7 @@ watch(user, async (u) => {
     <h2 class="page-title">My Courses</h2>
 
     <div v-if="loading" class="state-message">Loading courses...</div>
-    <div v-else-if="courses.length === 0" class="state-message">
-      You have no courses assigned yet.
-    </div>
+    <NoCoursesPending v-else-if="courses.length === 0" />
     <template v-else>
       <UserCourseCard v-for="course in courses" :key="course.id" :course="course" />
     </template>
