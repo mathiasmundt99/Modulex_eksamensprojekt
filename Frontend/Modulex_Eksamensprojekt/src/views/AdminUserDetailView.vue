@@ -238,43 +238,28 @@ function removeCourse(id) {
 
 async function assignCourse(course) {
   try {
+    await enrollUserInCourse(user.value.id, course.id);
 
-    await enrollUserInCourse(
-      user.value.id,
-      course.id
-    )
+    const [progressCoursesResponse, onboardingResponse] = await Promise.all([
+      getUserProgressCourses(user.value.id),
+      getOnboardingProgress(user.value.id).catch(() => ({ data: { overallCompletion: 0 } })),
+    ]);
 
-    const progressCoursesResponse =
-      await getUserProgressCourses(
-        user.value.id
-      )
-
-    enrolledCourses.value = (
-      progressCoursesResponse.data || []
-    ).map((course) => ({
-      id: course.courseId,
-
-      title:
-        course.courseName,
-
-      progress:
-        course.completionPercentage || 0,
-
-      enrolledDate:
-        course.enrolledDate || "N/A",
-
+    enrolledCourses.value = (progressCoursesResponse.data || []).map((c) => ({
+      id: c.courseId,
+      title: c.courseName,
+      progress: c.completionPercentage || 0,
+      enrolledDate: c.enrolledDate || "N/A",
       completedDate: null,
-
       timeSpent: "-",
-    }))
+    }));
 
+    user.value = {
+      ...user.value,
+      progress: onboardingResponse.data?.overallCompletion ?? 0,
+    };
   } catch (error) {
-
-    console.error(
-      'Failed to assign course:',
-      error
-    )
-
+    console.error("Failed to assign course:", error);
   }
 }
 
