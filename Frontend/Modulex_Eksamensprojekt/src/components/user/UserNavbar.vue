@@ -63,10 +63,13 @@ const { user } = useCurrentUser()
   cursor: pointer;
   padding: 4px;
   border-radius: 6px;
-  transition: color 0.15s;
+  transition: background-color 0.15s, color 0.15s;
 }
 
-.menu-btn:hover { color: var(--color-primary); }
+.menu-btn:hover {
+  background-color: var(--color-border);
+  color: var(--color-primary);
+}
 
 @media (max-width: 1023px) {
   .menu-btn { display: flex; }
@@ -97,19 +100,18 @@ const { user } = useCurrentUser()
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: var(--color-bg);
+  background-color: var(--color-primary);
   padding: 8px 16px;
   border-radius: 8px;
   font-size: 14px;
-  color: var(--color-text);
+  color: var(--color-white);
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color 0.15s;
 }
 
 .user-badge:hover {
-  background-color: var(--color-border);
-  color: var(--color-primary);
+  background-color: var(--color-primary-hover);
 }
 
 @media (max-width: 767px) {
@@ -125,10 +127,13 @@ const { user } = useCurrentUser()
   color: var(--color-text);
   border-radius: 8px;
   cursor: pointer;
-  transition: color 0.15s;
+  transition: background-color 0.15s, color 0.15s;
 }
 
-.logout-btn:hover { color: var(--color-primary); }
+.logout-btn:hover {
+  background-color: var(--color-border);
+  color: var(--color-primary);
+}
 
 @media (max-width: 767px) {
   .logout-btn span { display: none; }
