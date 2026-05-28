@@ -1,295 +1,184 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+
 import BreadCrumb from "../components/BreadCrumb.vue";
 import UserProfileCard from "../components/admin/UserProfileCard.vue";
 import UserStatsCard from "../components/admin/UserStatsCard.vue";
 import UserActionsCard from "../components/admin/UserActionsCard.vue";
 import UserEnrolledCourses from "../components/admin/UserEnrolledCourses.vue";
 import UserActivityLog from "../components/admin/UserActivityLog.vue";
-import { getAllCourses } from '../services/courseService'
+import SurveyResponsesCard from "../components/survey/SurveyResponseCard.vue";
+
+import { getAllCourses } from "../services/courseService";
+
 import {
   getUserById,
   updateUser,
   deleteUser,
-  getUserCourses,
   getUserProgressDetails,
   getUserProgressCourses,
   getUserActivity,
-  enrollUserInCourse
+  enrollUserInCourse,
 } from "../services/adminService";
-import { useRouter } from "vue-router";
-import { getUserSurveyAnswers } from '../services/surveyService'
-import SurveyResponsesCard
-  from '../components/survey/SurveyResponseCard.vue'
+
+import { getUserSurveyAnswers } from "../services/surveyService";
 
 const router = useRouter();
 const route = useRoute();
+
 const user = ref(null);
 const loading = ref(false);
 const error = ref(null);
 const isEditing = ref(false);
-const responses = ref({
-  businessType: '',
-  companySize: '',
-  leadSource: '',
-  primaryMarket: '',
-  experienceLevel: '',
-  challenge: '',
-  submitted: ''
-})
-
-
-onMounted(async () => {
-  loading.value = true;
-
-  try {
-    const userId = route.params.id;
-
-    const [
-      userResponse,
-      activityResponse,
-      progressCoursesResponse,
-      progressResponse,
-    ] = await Promise.all([
-      getUserById(userId),
-      getUserActivity(userId).catch(() => ({ data: [] })),
-      getUserProgressCourses(userId).catch(() => ({
-        data: [],
-      })),
-      getUserProgressDetails(userId).catch(() => ({
-        data: {
-          courses: [],
-          enrolledDate: null,
-        },
-      })),
-    ]);
-
-    console.log(
-      'Progress Courses Response:',
-      progressCoursesResponse
-    )
-
-    const baseUser =
-      userResponse.data?.data ||
-      userResponse.data;
-
-    const progressInfo =
-      progressResponse.data?.data ||
-      progressResponse.data;
-
-    const courses = await getAllCourses()
-    availableCourses.value = courses
-
-    const avgProgress =
-      courses.length > 0
-        ? Math.round(
-          courses.reduce(
-            (sum, c) =>
-              sum +
-              (c.completionPercentage || 0),
-            0
-          ) / courses.length
-        )
-        : 0;
-
-    const latestActivity =
-      courses.reduce((latest, c) => {
-        if (!c.lastAccessed)
-          return latest;
-
-        return !latest ||
-          new Date(c.lastAccessed) >
-          new Date(latest)
-          ? c.lastAccessed
-          : latest;
-      }, null);
-
-    user.value = {
-      ...baseUser,
-
-      enrolledDate:
-        progressInfo?.enrolledDate ||
-        baseUser?.enrolledDate ||
-        "N/A",
-
-      progress: avgProgress,
-
-      lastActive:
-        latestActivity || "—",
-    };
-
-    activityLog.value =
-      activityResponse.data?.data ||
-      activityResponse.data ||
-      [];
-
-    enrolledCourses.value = (
-      progressCoursesResponse.data || []
-    ).map((course) => ({
-      id: course.courseId,
-
-      title:
-        course.courseName,
-
-      progress:
-        course.completionPercentage || 0,
-
-      enrolledDate:
-        course.enrolledDate || "N/A",
-
-      completedDate: null,
-
-      timeSpent: "-",
-    }));
-
-    enrolledCourses.value = (
-      progressCoursesResponse.data || []
-    ).map((course) => ({
-      id: course.courseId,
-      title: course.courseName,
-      progress:
-        course.completionPercentage || 0,
-
-      enrolledDate:
-        course.enrolledDate || "N/A",
-
-      completedDate: null,
-
-      timeSpent: "-",
-    }));
-
-    const surveyData =
-      await getUserSurveyAnswers(
-        userId
-      );
-
-    console.log(
-      "Survey Data:",
-      surveyData
-    );
-
-    if (
-      surveyData &&
-      surveyData.length > 0
-    ) {
-      const latestSurvey =
-        surveyData[
-        surveyData.length - 1
-        ];
-
-      console.log(
-        "Latest Survey:",
-        latestSurvey
-      );
-
-      const answers =
-        latestSurvey.answers || [];
-
-      responses.value = {
-        businessType:
-          answers.find(
-            (a) => a.step === 1
-          )?.selected_option || "",
-
-        companySize:
-          answers.find(
-            (a) => a.step === 2
-          )?.selected_option || "",
-
-        leadSource:
-          answers.find(
-            (a) => a.step === 3
-          )?.selected_option || "",
-
-        primaryMarket:
-          answers.find(
-            (a) => a.step === 4
-          )?.selected_option || "",
-
-        experienceLevel:
-          answers.find(
-            (a) => a.step === 5
-          )?.selected_option || "",
-
-        challenge:
-          answers.find(
-            (a) => a.step === 6
-          )?.selected_option || "",
-
-        submitted:
-          latestSurvey.createdAt
-            ? new Date(
-              latestSurvey.createdAt
-            ).toLocaleDateString()
-            : "",
-      };
-
-      console.log(
-        "Mapped Responses:",
-        responses.value
-      );
-    }
-  } catch (err) {
-    console.error(err);
-
-    error.value =
-      err.message;
-  } finally {
-    loading.value = false;
-  }
-});
 
 const enrolledCourses = ref([]);
-
 const availableCourses = ref([]);
-
 const activityLog = ref([]);
+
+const responses = ref({
+  businessType: "",
+  companySize: "",
+  leadSource: "",
+  primaryMarket: "",
+  experienceLevel: "",
+  challenge: "",
+  submitted: "",
+});
+
+function mapCourses(courses) {
+  return courses.map((course) => ({
+    id: course.courseId,
+    title: course.courseName,
+    progress: course.completionPercentage || 0,
+    enrolledDate: course.enrolledDate || "N/A",
+    completedDate: null,
+    timeSpent: "-",
+  }));
+}
+
+function setUserData(baseUser, progressInfo, courses) {
+  const avgProgress =
+    courses.length > 0
+      ? Math.round(
+          courses.reduce((sum, c) => sum + (c.completionPercentage || 0), 0) /
+            courses.length,
+        )
+      : 0;
+
+  const latestActivity = courses.reduce((latest, c) => {
+    if (!c.lastAccessed) return latest;
+
+    return !latest || new Date(c.lastAccessed) > new Date(latest)
+      ? c.lastAccessed
+      : latest;
+  }, null);
+
+  user.value = {
+    ...baseUser,
+
+    enrolledDate: progressInfo?.enrolledDate || baseUser?.enrolledDate || "N/A",
+
+    progress: avgProgress,
+
+    lastActive: latestActivity || "—",
+  };
+}
+
+async function loadUserData(userId) {
+  const [
+    userResponse,
+    activityResponse,
+    progressCoursesResponse,
+    progressResponse,
+  ] = await Promise.all([
+    getUserById(userId),
+
+    getUserActivity(userId).catch(() => ({
+      data: [],
+    })),
+
+    getUserProgressCourses(userId).catch(() => ({
+      data: [],
+    })),
+
+    getUserProgressDetails(userId).catch(() => ({
+      data: {
+        courses: [],
+        enrolledDate: null,
+      },
+    })),
+  ]);
+
+  const baseUser = userResponse.data?.data || userResponse.data;
+
+  const progressInfo = progressResponse.data?.data || progressResponse.data;
+
+  const courses = await getAllCourses();
+
+  availableCourses.value = courses;
+
+  setUserData(baseUser, progressInfo, courses);
+
+  activityLog.value =
+    activityResponse.data?.data || activityResponse.data || [];
+
+  enrolledCourses.value = mapCourses(progressCoursesResponse.data || []);
+}
+
+async function loadSurveyData(userId) {
+  const surveyData = await getUserSurveyAnswers(userId);
+
+  if (!surveyData || surveyData.length === 0) {
+    return;
+  }
+
+  const latestSurvey = surveyData[surveyData.length - 1];
+
+  const answers = latestSurvey.answers || [];
+
+  const mappedAnswers = {};
+
+  answers.forEach((answer) => {
+    mappedAnswers[answer.step] = answer.selected_option;
+  });
+
+  responses.value = {
+    businessType: mappedAnswers[1] || "",
+
+    companySize: mappedAnswers[2] || "",
+
+    leadSource: mappedAnswers[3] || "",
+
+    primaryMarket: mappedAnswers[4] || "",
+
+    experienceLevel: mappedAnswers[5] || "",
+
+    challenge: mappedAnswers[6] || "",
+
+    submitted: latestSurvey.createdAt
+      ? new Date(latestSurvey.createdAt).toLocaleDateString()
+      : "",
+  };
+}
 
 function removeCourse(id) {
   const idx = enrolledCourses.value.findIndex((c) => c.id === id);
-  if (idx !== -1) enrolledCourses.value.splice(idx, 1);
+
+  if (idx !== -1) {
+    enrolledCourses.value.splice(idx, 1);
+  }
 }
 
 async function assignCourse(course) {
   try {
+    await enrollUserInCourse(user.value.id, course.id);
 
-    await enrollUserInCourse(
-      user.value.id,
-      course.id
-    )
+    const progressCoursesResponse = await getUserProgressCourses(user.value.id);
 
-    const progressCoursesResponse =
-      await getUserProgressCourses(
-        user.value.id
-      )
-
-    enrolledCourses.value = (
-      progressCoursesResponse.data || []
-    ).map((course) => ({
-      id: course.courseId,
-
-      title:
-        course.courseName,
-
-      progress:
-        course.completionPercentage || 0,
-
-      enrolledDate:
-        course.enrolledDate || "N/A",
-
-      completedDate: null,
-
-      timeSpent: "-",
-    }))
-
+    enrolledCourses.value = mapCourses(progressCoursesResponse.data || []);
   } catch (error) {
-
-    console.error(
-      'Failed to assign course:',
-      error
-    )
-
+    console.error("Failed to assign course:", error);
   }
 }
 
@@ -301,6 +190,7 @@ async function saveUser(updatedUser) {
 
     user.value = {
       ...(response.data?.data || response.data),
+
       id: response.data?.data?.userId || response.data?.userId,
     };
 
@@ -331,35 +221,62 @@ async function handleDeleteUser() {
     router.push("/admin/users");
   } catch (err) {
     console.error(err);
+
     alert("Failed to delete user");
   } finally {
     loading.value = false;
   }
 }
+
+onMounted(async () => {
+  loading.value = true;
+
+  try {
+    const userId = route.params.id;
+
+    await loadUserData(userId);
+
+    await loadSurveyData(userId);
+  } catch (err) {
+    console.error(err);
+
+    error.value = err.message;
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
 
 <template>
   <div>
     <div v-if="user" class="detail-root">
-      <BreadCrumb :items="[
-        { label: 'Admin', to: '/admin' },
-        { label: 'Users', to: '/admin/users' },
-        {
-          label: `${user.firstName} ${user.lastName}`,
-        },
-      ]" />
+      <BreadCrumb
+        :items="[
+          { label: 'Admin', to: '/admin' },
+          { label: 'Users', to: '/admin/users' },
+          {
+            label: `${user.firstName} ${user.lastName}`,
+          },
+        ]" />
 
       <div class="detail-grid">
         <div class="col">
-          <UserProfileCard :user="user" :is-editing="isEditing" @start-edit="isEditing = true" @save-user="saveUser"
+          <UserProfileCard
+            :user="user"
+            :is-editing="isEditing"
+            @start-edit="isEditing = true"
+            @save-user="saveUser"
             @cancel-edit="isEditing = false" />
           <UserStatsCard :user="user" />
           <UserActionsCard @delete-user="handleDeleteUser" />
         </div>
 
         <div class="col">
-          <UserEnrolledCourses :courses="enrolledCourses" :availableCourses="availableCourses"
-            :userName="`${user.firstName} ${user.lastName}`" @remove-course="removeCourse"
+          <UserEnrolledCourses
+            :courses="enrolledCourses"
+            :availableCourses="availableCourses"
+            :userName="`${user.firstName} ${user.lastName}`"
+            @remove-course="removeCourse"
             @assign-course="assignCourse" />
           <UserActivityLog :log="activityLog" />
           <SurveyResponsesCard :responses="responses" />
