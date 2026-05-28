@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:3000/api/surveys";
+const BASE_URL = `${import.meta.env.VITE_API_URL}/surveys`;
 
 // hent alle spørgsmål
 export async function getSurveyQuestions() {
