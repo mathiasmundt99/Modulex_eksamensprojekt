@@ -20,7 +20,7 @@ defineEmits(['back', 'next'])
                 class="primary"
                 :disabled="!canGoNext"
                 @click="$emit('next')">
-                {{ isLast ? 'Indsend svar' : 'Next' }}
+                {{ isLast ? 'Submit Survey' : 'Next' }}
             </button>
         </div>
     </div>
