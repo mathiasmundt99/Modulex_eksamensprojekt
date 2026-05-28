@@ -12,7 +12,6 @@ import {
   getUserById,
   updateUser,
   deleteUser,
-  getUserCourses,
   getUserProgressDetails,
   getUserProgressCourses,
   getUserActivity,
@@ -62,11 +61,6 @@ onMounted(async () => {
       })),
       getOnboardingProgress(userId).catch(() => ({ data: { overallCompletion: 0 } })),
     ]);
-
-    console.log(
-      'Progress Courses Response:',
-      progressCoursesResponse
-    )
 
     const baseUser =
       userResponse.data?.data ||
@@ -149,11 +143,6 @@ onMounted(async () => {
         userId
       );
 
-    console.log(
-      "Survey Data:",
-      surveyData
-    );
-
     if (
       surveyData &&
       surveyData.length > 0
@@ -162,11 +151,6 @@ onMounted(async () => {
         surveyData[
         surveyData.length - 1
         ];
-
-      console.log(
-        "Latest Survey:",
-        latestSurvey
-      );
 
       const answers =
         latestSurvey.answers || [];
@@ -210,10 +194,6 @@ onMounted(async () => {
             : "",
       };
 
-      console.log(
-        "Mapped Responses:",
-        responses.value
-      );
     }
   } catch (err) {
     console.error(err);

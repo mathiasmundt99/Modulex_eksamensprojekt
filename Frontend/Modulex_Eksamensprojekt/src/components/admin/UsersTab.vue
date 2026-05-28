@@ -17,7 +17,6 @@ onMounted(async () => {
   try {
     const response = await getAllUsers();
     users.value = response.data || [];
-    console.log(response);
   } catch (err) {
     error.value = err.message;
   } finally {
