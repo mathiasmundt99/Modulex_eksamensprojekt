@@ -1,18 +1,21 @@
 <script setup>
 import { ref, watch } from "vue";
-import { getUserStats } from "../../services/progressService.js";
+import { getOnboardingProgress, getUserCourses } from "../../services/progressService.js";
 import { useCurrentUser } from "../../composables/useCurrentUser.js";
 
 const { user } = useCurrentUser();
 const overallProgress = ref(0);
+const hasCourses = ref(false);
 
 watch(user, async (u) => {
   if (!u) return;
   try {
-    const result = await getUserStats(u.id);
-    const { completedModules, totalModules } = result.data;
-    overallProgress.value =
-      totalModules === 0 ? 0 : Math.round((completedModules / totalModules) * 100);
+    const [onboarding, courses] = await Promise.all([
+      getOnboardingProgress(u.id),
+      getUserCourses(u.id),
+    ]);
+    overallProgress.value = onboarding.data?.overallCompletion ?? 0;
+    hasCourses.value = (courses.data ?? []).length > 0;
   } catch (err) {
     console.error("Failed to load welcome banner data:", err);
   }
@@ -23,7 +26,7 @@ watch(user, async (u) => {
   <div class="welcome-banner">
     <h2 class="welcome-banner__title">Welcome back, {{ user?.firstName }}!</h2>
     <p class="welcome-banner__subtitle">Continue your learning journey</p>
-    <div class="welcome-banner__progress">
+    <div v-if="hasCourses" class="welcome-banner__progress">
       <div class="progress-header">
         <span>Overall Progress</span>
         <span>{{ overallProgress }}%</span>

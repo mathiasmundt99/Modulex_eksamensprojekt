@@ -78,7 +78,7 @@ import InvitationCard from "../components/auth/InvitationCard.vue";
 }
 
 .list-num {
-  background-color: #d9d9d92a;
+  background-color: var(--color-bg);
   text-align: center;
   width: 36px;
   height: 36px;

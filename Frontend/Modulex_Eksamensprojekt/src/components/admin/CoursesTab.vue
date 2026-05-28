@@ -1,17 +1,11 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
 import BaseButton from "../BaseButton.vue";
 import BreadCrumb from "../BreadCrumb.vue";
-import {
-  getAllCourses,
-  deleteCourse,
-  updateCourse,
-} from "@/services/courseService";
+import { getAllCourses } from "@/services/courseService";
 import CreateCourseModal from "./CreateCourseModal.vue";
 import CourseCard from "./CourseCard.vue";
 
-const router = useRouter();
 const courses = ref([]);
 const isLoading = ref(false);
 const error = ref(null);
@@ -31,22 +25,6 @@ async function loadCourses() {
   } finally {
     isLoading.value = false;
   }
-}
-
-async function handleDeleteCourse(courseId) {
-  if (!confirm("Are you sure you want to delete this course?")) return;
-
-  try {
-    await deleteCourse(courseId);
-    courses.value = courses.value.filter((c) => c.id !== courseId);
-  } catch (err) {
-    console.error("Failed to delete course:", err);
-    error.value = "Failed to delete course";
-  }
-}
-
-function handleEditCourse(courseId) {
-  router.push("/admin/courses/" + courseId);
 }
 
 const showCreateModal = ref(false);
@@ -93,16 +71,16 @@ async function handleCourseCreated(newCourse) {
 <style scoped>
 .error-message {
   padding: 12px 16px;
-  background-color: #fee;
-  color: #c33;
+  background-color: var(--color-error-bg);
+  color: var(--color-error);
   border-radius: 8px;
   margin-bottom: 16px;
 }
 
 .loading-message {
   padding: 12px 16px;
-  background-color: #eef;
-  color: #33c;
+  background-color: var(--color-bg);
+  color: var(--color-accent);
   border-radius: 8px;
   margin-bottom: 16px;
 }

@@ -28,7 +28,7 @@ defineEmits(['close', 'add'])
               <div>
                 <p class="content-item__title">{{ item.title }}</p>
                 <p class="content-item__meta">
-                  {{ item.type === 'video' ? item.duration : item.pages + ' pages' }}
+                  {{ item.type === 'video' ? item.durationOrPages : item.durationOrPages + ' pages' }}
                 </p>
               </div>
             </div>

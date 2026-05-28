@@ -60,7 +60,7 @@ defineProps({
 }
 
 .submitted {
-    color: #888;
+    color: var(--color-text-muted);
     font-size: 0.95rem;
 }
 

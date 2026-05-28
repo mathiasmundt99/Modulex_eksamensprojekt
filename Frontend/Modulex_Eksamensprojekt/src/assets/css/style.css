@@ -2,12 +2,19 @@
     --site-width: 1500px;
     --color-primary: #ef6023;
     --color-primary-hover: #d95520;
+    --color-primary-bg: #fff8f4;
     --color-text: #54585a;
+    --color-text-muted: #888888;
     --color-border: #ccd0d2;
     --color-accent: #96b2d0;
     --color-accent-hover: #7a9ab8;
     --color-bg: rgba(204, 208, 210, 0.1);
     --color-white: #ffffff;
+    --color-input-bg: #f6f6f6;
+    --color-error: #c33333;
+    --color-error-bg: #fef2f2;
+    --color-success: #16a34a;
+    --color-success-bg: #d4edda;
 }
 
 *,

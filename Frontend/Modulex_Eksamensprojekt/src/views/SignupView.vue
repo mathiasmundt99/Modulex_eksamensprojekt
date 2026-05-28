@@ -59,7 +59,7 @@ const handleSignup = async () => {
       );
     }
 
-    const result = await registerUser({
+    await registerUser({
       firstName: firstName.value,
       lastName: lastName.value,
       email: email.value,
@@ -193,7 +193,7 @@ const handleSignup = async () => {
 .signup-page {
   min-height: 100vh;
   position: relative;
-  background: #fafafa;
+  background: var(--color-bg);
   padding: 56px 20px 80px;
   color: var(--color-text);
 }

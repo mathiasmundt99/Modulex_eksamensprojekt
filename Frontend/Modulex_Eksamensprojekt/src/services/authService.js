@@ -175,9 +175,6 @@ export async function logoutUser() {
       );
     }
 
-    // Slet bruger data fra localStorage
-    localStorage.removeItem("user");
-
     return await response.json();
   } catch (error) {
     console.error("Logout error:", error);

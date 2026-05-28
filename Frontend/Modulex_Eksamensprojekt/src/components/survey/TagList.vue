@@ -30,16 +30,16 @@ defineProps({
 }
 
 .blue {
-    background: #9bb5d6;
-    color: white;
+    background: var(--color-accent);
+    color: var(--color-white);
 }
 
 .orange {
-    background: #f36f21;
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-white);
 }
 
 .default {
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border);
 }
 </style>

@@ -160,13 +160,13 @@ const emit = defineEmits([
 .available-course__meta {
   margin-top: 6px;
   font-size: 13px;
-  color: #666;
+  color: var(--color-text-muted);
 }
 
 .course-description {
   margin-top: 10px;
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-muted);
   line-height: 1.5;
 }
 

@@ -21,17 +21,21 @@ defineProps({
 
 <style scoped>
 .field {
-    padding: 20px 0;
-    border-bottom: 1px solid #e5e5e5;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .label {
-    font-size: 14px;
-    color: #666;
+    font-size: 10px;
+    color: var(--color-white);
+    background-color: var(--color-accent);
+    width: fit-content;
+    padding: 5px 10px;
+    border-radius: 9999px;
 }
 
 .value {
     margin-top: 8px;
-    font-size: 24px;
+    font-size: 16px;
 }
 </style>

@@ -14,6 +14,18 @@ function formatTime(timestamp) {
     minute: "2-digit",
   });
 }
+
+function iconFor(title) {
+  if (title.startsWith("Passed and Certified")) return "editor_choice";
+  if (title.startsWith("Completed: Welcome Survey")) return "editor_choice";
+  if (title.startsWith("Completed")) return "sports_score";
+  return "start";
+}
+
+function iconClass(title) {
+  if (title.startsWith("Completed") || title.startsWith("Passed and Certified")) return "activity-icon--primary";
+  return "activity-icon--accent";
+}
 </script>
 
 <template>
@@ -24,12 +36,8 @@ function formatTime(timestamp) {
       <div v-for="entry in log" :key="entry.id" class="activity-row">
         <span
           class="material-symbols-rounded activity-icon"
-          :class="
-            entry.status === 'completed'
-              ? 'activity-icon--primary'
-              : 'activity-icon--accent'
-          ">
-          {{ entry.status === "completed" ? "sports_score" : "start" }}
+          :class="iconClass(entry.title)">
+          {{ iconFor(entry.title) }}
         </span>
 
         <div>

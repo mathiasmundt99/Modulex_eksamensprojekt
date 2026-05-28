@@ -385,10 +385,10 @@ async function submitPasswordChange() {
 }
 
 .feedback--success {
-  color: #16a34a;
+  color: var(--color-success);
 }
 
 .feedback--error {
-  color: #dc2626;
+  color: var(--color-error);
 }
 </style>
