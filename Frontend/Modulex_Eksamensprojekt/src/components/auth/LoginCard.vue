@@ -5,6 +5,7 @@ import ForgotPasswordModal from "./ForgotPasswordModal.vue";
 import { ref } from "vue";
 import { loginUser } from "../../services/authService";
 import { refreshCurrentUser } from "../../composables/useCurrentUser.js";
+import { getOnboardingProgress } from "../../services/progressService.js";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -35,12 +36,22 @@ const handleLogin = async () => {
       password: password.value,
     });
 
-    await refreshCurrentUser();
+    const user = await refreshCurrentUser();
 
-    // Redirect baseret på rolle fra login response
-    const redirectPath =
-      result.user?.role === "admin" ? "/admin" : "/dashboard";
-    router.push(redirectPath);
+    if (result.user?.role === "admin") {
+      router.push("/admin");
+    } else {
+      // Tjek om survey er udfyldt via onboarding progress
+      try {
+        const onboarding = await getOnboardingProgress(user.id);
+        const surveyDone = onboarding?.data?.checklistItems?.find(
+          (i) => i.id === "survey-welcome"
+        )?.completed;
+        router.push(surveyDone ? "/dashboard" : "/survey");
+      } catch {
+        router.push("/survey");
+      }
+    }
   } catch (err) {
     error.value = err.message || "Login failed";
   } finally {
