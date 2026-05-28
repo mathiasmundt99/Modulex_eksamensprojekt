@@ -50,8 +50,16 @@ function timeAgo(timestamp) {
 }
 
 function iconFor(title) {
+  if (title.startsWith("Passed and Certified")) return "editor_choice";
+  if (title.startsWith("Completed: Welcome Survey")) return "editor_choice";
   if (title.startsWith("Completed")) return "sports_score";
   return "start";
+}
+
+function iconClass(title) {
+  if (title.startsWith("Passed and Certified")) return "icon--primary";
+  if (title.startsWith("Completed")) return "icon--primary";
+  return "icon--accent";
 }
 </script>
 
@@ -72,11 +80,7 @@ function iconFor(title) {
         class="activity-item">
         <span
           class="material-symbols-rounded"
-          :class="
-            activity.title.startsWith('Completed')
-              ? 'icon--primary'
-              : 'icon--accent'
-          ">
+          :class="iconClass(activity.title)">
           {{ iconFor(activity.title) }}
         </span>
         <div class="activity-item__text">
@@ -127,7 +131,6 @@ function iconFor(title) {
 
 .activity-item__text {
   font-size: 14px;
-  font-weight: 500;
   color: var(--color-text);
 }
 
