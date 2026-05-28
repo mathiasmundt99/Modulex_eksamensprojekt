@@ -1,13 +1,14 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 
 import SurveyResponsesCard from '../components/survey/SurveyResponseCard.vue'
 import AssignCoursesDropdown from '../components/survey/AssignCoursesDropdown.vue'
 import UserNavbar from '../components/user/UserNavbar.vue'
-import UserSidebar from '../components/user/UserSidebar.vue'
-import AssignCourseModal from '@/components/admin/AssignCourseModal.vue'
 
 import { getUserSurveyAnswers } from '../services/surveyService'
+import { useCurrentUser } from '../composables/useCurrentUser.js'
+
+const { user } = useCurrentUser()
 
 const sidebarOpen = ref(false)
 
@@ -25,14 +26,11 @@ const responses = ref({
   submitted: ''
 })
 
-onMounted(async () => {
+watch(user, async (u) => {
+  if (!u) return
   try {
-    const user = JSON.parse(
-      localStorage.getItem('user')
-    )
-
     const surveyData =
-      await getUserSurveyAnswers(user.id)
+      await getUserSurveyAnswers(u.id)
 
     console.log(
       'Survey answers:',

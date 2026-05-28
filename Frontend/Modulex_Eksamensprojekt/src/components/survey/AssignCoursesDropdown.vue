@@ -1,15 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { getAllCourses } from '../../services/courseService'
+import { useCurrentUser } from '../../composables/useCurrentUser.js'
 
+const { user } = useCurrentUser()
 const courses = ref([])
 
-const user = JSON.parse(
-    localStorage.getItem('user')
-)
-
-const userName =
-    user?.firstName || 'User'
+const userName = computed(() => user.value?.firstName || 'User')
 
 onMounted(async () => {
     try {
