@@ -13,12 +13,14 @@ export function useCurrentUser() {
   return { user };
 }
 
-// Kaldes efter login — henter ny bruger med den nye cookie
+// Kaldes efter login — henter ny bruger med den nye cookie og returnerer den
 export async function refreshCurrentUser() {
   try {
     user.value = await getMe();
+    return user.value;
   } catch {
     user.value = null;
+    return null;
   }
 }
 
