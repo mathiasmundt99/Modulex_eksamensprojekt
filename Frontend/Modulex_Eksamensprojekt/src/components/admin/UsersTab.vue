@@ -80,6 +80,6 @@ onMounted(async () => {
 .error-state {
   text-align: center;
   padding: 40px 20px;
-  color: #c33;
+  color: var(--color-error);
 }
 </style>

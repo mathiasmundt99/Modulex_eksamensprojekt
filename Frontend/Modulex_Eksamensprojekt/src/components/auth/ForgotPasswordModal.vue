@@ -146,12 +146,11 @@ form > label {
   display: flex;
   align-items: center;
   gap: 12px;
-  background-color: #d4edda;
-  border: 1px solid #c3e6cb;
+  background-color: var(--color-success-bg);
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 16px;
-  color: #155724;
+  color: var(--color-success);
 }
 
 .success-message .material-symbols-rounded {
@@ -165,12 +164,11 @@ form > label {
 }
 
 .error-message {
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
+  background-color: var(--color-error-bg);
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 16px;
-  color: #721c24;
+  color: var(--color-error);
   font-size: 0.9rem;
 }
 

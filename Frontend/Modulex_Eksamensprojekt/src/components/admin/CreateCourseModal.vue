@@ -213,8 +213,8 @@ async function handleCreateCourse() {
 
 .error-message {
   padding: 10px 16px;
-  background-color: #fee;
-  color: #c33;
+  background-color: var(--color-error-bg);
+  color: var(--color-error);
   border-radius: 8px;
   font-size: 14px;
 }

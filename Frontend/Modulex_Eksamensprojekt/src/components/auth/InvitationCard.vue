@@ -52,7 +52,7 @@ defineProps({
   height: 60px;
   margin: 0 auto 28px;
   border-radius: 50%;
-  background: #a9bfdc;
+  background: var(--color-accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -91,7 +91,7 @@ h2 {
 }
 
 .invite-box p {
-  color: #bbb;
+  color: var(--color-text-muted);
 }
 
 .footer-text {

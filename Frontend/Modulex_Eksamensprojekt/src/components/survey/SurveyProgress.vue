@@ -34,13 +34,13 @@ defineProps({
 
 .bar {
     height: 8px;
-    background: #ddd;
+    background: var(--color-border);
     border-radius: 999px;
 }
 
 .fill {
     height: 100%;
-    background: #f36f21;
+    background: var(--color-primary);
     border-radius: 999px;
 }
 </style>

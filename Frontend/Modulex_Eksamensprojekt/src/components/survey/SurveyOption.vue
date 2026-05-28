@@ -20,13 +20,13 @@ const emit = defineEmits(['select'])
     padding: 20px;
     margin-top: 12px;
     border-radius: 10px;
-    border: 1px solid #d9d9d9;
-    background: white;
+    border: 1px solid var(--color-border);
+    background: var(--color-white);
     cursor: pointer;
 }
 
 .option.selected {
-    border-color: #f36f21;
-    background: #fff8f4;
+    border-color: var(--color-primary);
+    background: var(--color-primary-bg);
 }
 </style>

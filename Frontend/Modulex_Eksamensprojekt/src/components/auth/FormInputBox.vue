@@ -45,7 +45,7 @@ const visibilityIcon = computed(() =>
 <style scoped>
 .input-box {
   height: 46px;
-  background: #f6f6f6;
+  background: var(--color-input-bg);
   border-radius: 5px;
   display: flex;
   align-items: center;
@@ -63,17 +63,17 @@ const visibilityIcon = computed(() =>
 }
 
 .input-box input::placeholder {
-  color: #aaa;
+  color: var(--color-text-muted);
 }
 
 .suffix-icon {
   cursor: pointer;
   user-select: none;
-  color: #aaa;
+  color: var(--color-text-muted);
   flex-shrink: 0;
 }
 
 .suffix-icon:hover {
-  color: #555;
+  color: var(--color-text);
 }
 </style>
