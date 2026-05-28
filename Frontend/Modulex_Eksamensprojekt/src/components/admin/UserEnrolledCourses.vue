@@ -44,7 +44,6 @@ const showModal = ref(false)
               <span v-if="course.completedDate">
                 <span class="meta-label">Completed:</span> {{ course.completedDate }}
               </span>
-              <span><span class="meta-label">Time spent:</span> {{ course.timeSpent }}</span>
             </div>
             <div class="progress-bar">
               <div class="progress-bar__fill" :style="{ width: course.progress + '%' }"></div>
