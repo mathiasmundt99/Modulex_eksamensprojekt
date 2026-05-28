@@ -95,8 +95,8 @@ async function submitPasswordChange() {
       <section class="section">
         <div class="section__head">
           <h2 class="section__title">Personal Information</h2>
-          <BaseButton v-if="!editing" variant="outline" @click="startEdit">
-            <span class="material-symbols-rounded">edit</span>
+          <BaseButton v-if="!editing" @click="startEdit">
+            <span class="material-symbols-rounded">edit_square</span>
             Edit
           </BaseButton>
         </div>
