@@ -9,6 +9,9 @@ import {
     getSurveyQuestions,
     submitSurveyAnswers
 } from '../services/surveyService'
+import { useCurrentUser } from '../composables/useCurrentUser.js'
+
+const { user } = useCurrentUser()
 
 const questions = ref([])
 
@@ -38,12 +41,8 @@ function selectAnswer(value) {
 
 async function submitSurvey() {
     try {
-        const user = JSON.parse(
-            localStorage.getItem('user')
-        )
-
         const payload = {
-            user_id: user.id,
+            user_id: user.value?.id,
             answers: Object.entries(
                 answers.value
             ).map(([step, selectedOption]) => ({
