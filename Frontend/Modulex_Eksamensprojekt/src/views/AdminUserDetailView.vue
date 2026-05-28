@@ -20,6 +20,7 @@ import {
 } from "../services/adminService";
 import { useRouter } from "vue-router";
 import { getUserSurveyAnswers } from '../services/surveyService'
+import { getOnboardingProgress } from '../services/progressService'
 import SurveyResponsesCard
   from '../components/survey/SurveyResponseCard.vue'
 
@@ -51,18 +52,15 @@ onMounted(async () => {
       activityResponse,
       progressCoursesResponse,
       progressResponse,
+      onboardingResponse,
     ] = await Promise.all([
       getUserById(userId),
       getUserActivity(userId).catch(() => ({ data: [] })),
-      getUserProgressCourses(userId).catch(() => ({
-        data: [],
-      })),
+      getUserProgressCourses(userId).catch(() => ({ data: [] })),
       getUserProgressDetails(userId).catch(() => ({
-        data: {
-          courses: [],
-          enrolledDate: null,
-        },
+        data: { courses: [], enrolledDate: null },
       })),
+      getOnboardingProgress(userId).catch(() => ({ data: { overallCompletion: 0 } })),
     ]);
 
     console.log(
@@ -81,26 +79,13 @@ onMounted(async () => {
     const courses = await getAllCourses()
     availableCourses.value = courses
 
-    const avgProgress =
-      courses.length > 0
-        ? Math.round(
-          courses.reduce(
-            (sum, c) =>
-              sum +
-              (c.completionPercentage || 0),
-            0
-          ) / courses.length
-        )
-        : 0;
+    const userCourses = progressCoursesResponse.data || [];
+    const avgProgress = onboardingResponse.data?.overallCompletion ?? 0;
 
     const latestActivity =
-      courses.reduce((latest, c) => {
-        if (!c.lastAccessed)
-          return latest;
-
-        return !latest ||
-          new Date(c.lastAccessed) >
-          new Date(latest)
+      userCourses.reduce((latest, c) => {
+        if (!c.lastAccessed) return latest;
+        return !latest || new Date(c.lastAccessed) > new Date(latest)
           ? c.lastAccessed
           : latest;
       }, null);
