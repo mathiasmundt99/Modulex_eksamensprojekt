@@ -20,15 +20,16 @@ Du kan nu tilgå applikationen i din browser på den adresse, som Vite terminale
 For at teste hele flowet korrekt, skal du følge disse trin:
 
 1.  **Invitation & Oprettelse:** Når du åbner siden, lander du på invitationssiden. Her skal du starte med at **oprette en bruger**.
-2.  **Survey:** Efter oprettelse skal den nye bruger udfylde en **survey**.
-3.  **Admin Login:** For at give den nye bruger adgang til kurser, skal du logge ind som administrator.
+2.  **Login:** Efter oprettelse skal den nye bruger **logge ind** med sin email og adgangskode.
+3.  **Survey:** Efter login bliver brugeren automatisk sendt videre til en **survey**, som skal udfyldes.
+4.  **Admin Login:** For at give den nye bruger adgang til kurser, skal du logge ind som administrator.
     - **Admin Email:** `admintest@test.dk`
     - **Kodeord:** `Test1234`
-4.  **Tildeling af kurser:**
+5.  **Tildeling af kurser:**
     - Gå til **Admin Dashboard**.
     - Find den bruger, du lige har oprettet, under brugeroversigten.
     - Tildel de relevante kurser til brugeren.
-5.  **Bruger Dashboard:** Log ud som admin og ind med den nye bruger for at se de tildelte kurser på brugerens dashboard.
+6.  **Bruger Dashboard:** Log ud som admin og ind med den nye bruger for at se de tildelte kurser på brugerens dashboard.
 
 ---
 
