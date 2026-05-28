@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import BaseButton from '../BaseButton.vue'
 import AssignCourseModal from './AssignCourseModal.vue'
 
@@ -12,6 +12,10 @@ const props = defineProps({
 const emit = defineEmits(['remove-course', 'assign-course'])
 
 const showModal = ref(false)
+
+const unassignedCourses = computed(() =>
+  props.availableCourses.filter(c => !props.courses.some(e => e.id === c.id))
+)
 </script>
 
 <template>
@@ -58,7 +62,7 @@ const showModal = ref(false)
     <AssignCourseModal
       :show="showModal"
       :userName="userName"
-      :availableCourses="availableCourses"
+      :availableCourses="unassignedCourses"
       @close="showModal = false"
       @assign="(course) => { emit('assign-course', course); showModal = false }"
     />
