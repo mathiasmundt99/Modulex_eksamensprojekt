@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { logoutUser } from "../services/authService";
+import { clearCurrentUser } from "../composables/useCurrentUser.js";
 import UserNavbar from "../components/user/UserNavbar.vue";
 import UserSidebar from "../components/user/UserSidebar.vue";
 
@@ -17,9 +18,10 @@ function toggleSidebar() {
 async function handleLogout() {
   try {
     await logoutUser();
-    router.push("/login");
   } catch (error) {
     console.error("Logout error:", error);
+  } finally {
+    clearCurrentUser();
     router.push("/login");
   }
 }

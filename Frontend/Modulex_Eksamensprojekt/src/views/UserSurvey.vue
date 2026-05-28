@@ -1,5 +1,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 import SurveyProgress from '../components/survey/SurveyProgress.vue'
 import SurveyQuestion from '../components/survey/SurveyQuestions.vue'
@@ -58,7 +61,7 @@ async function submitSurvey() {
 
         console.log('Survey submitted:', result)
 
-        // redirect eller success message her
+        router.push('/dashboard')
 
     } catch (error) {
         console.error(error)
