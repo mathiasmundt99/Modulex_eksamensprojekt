@@ -125,9 +125,9 @@ const showModal = ref(false)
   color: var(--color-text); 
 }
 
-.completed-icon { 
-  font-size: 20px; 
-  color: var(--color-accent); 
+.completed-icon {
+  font-size: 20px;
+  color: var(--color-primary);
 }
 
 .course-meta {
